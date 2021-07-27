@@ -4,21 +4,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import technology.rocketjump.civimperium.model.Card;
+import technology.rocketjump.civimperium.model.SourceDataRepo;
 
-import java.util.List;
+import java.util.Collection;
 
 @RestController
 @RequestMapping("/example")
 public class ExampleController {
 
-	@Autowired
-	public ExampleController() {
+	private final SourceDataRepo sourceDataRepo;
 
+	@Autowired
+	public ExampleController(SourceDataRepo sourceDataRepo) {
+		this.sourceDataRepo = sourceDataRepo;
 	}
 
-	@GetMapping("/data")
-	public List<String> getSomeText() {
-		return List.of("A", "B", "C");
+	@GetMapping("/cards")
+	public Collection<Card> getAllCards() {
+		return sourceDataRepo.getAll();
 	}
 
 }
