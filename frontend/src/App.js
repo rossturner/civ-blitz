@@ -27,7 +27,6 @@ function App() {
                 .then(
                     (cards) => {
                         if (!CardStore.initialised) {
-                            console.log('result', cards);
                             CardStore.addCards(cards);
                             let newCollection = CardStore.getInitialCollection();
                             newCollection.sort(cardSort);
@@ -115,11 +114,6 @@ function App() {
         <div>
             <TopLevelMenu/>
 
-            {/*{loading &&*/}
-            {/*<p>Loading</p>*/}
-            {/*}*/}
-
-            {/*{!loading &&*/}
             <React.Fragment>
                 <Container style={{marginTop: '6em'}}>
                     {civItems}
@@ -134,7 +128,6 @@ function App() {
 
                 </Container>
             </React.Fragment>
-            {/*}*/}
 
         </div>
     );
