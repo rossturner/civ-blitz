@@ -1,1 +1,1 @@
-web: java -jar target/civimperium.jar
+web: java -Dserver.port=$PORT -jar target/civimperium.jar
