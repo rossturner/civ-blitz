@@ -1,3 +1,5 @@
+import ImpRandom from "../ImpRandom";
+
 const allCards = [];
 
 export const CATEGORIES = ["CivilizationAbility", "LeaderAbility", "UniqueUnit", "UniqueInfrastructure"];
@@ -8,14 +10,10 @@ CATEGORIES.forEach(cat => {
     byCategory[cat] = [];
 })
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-}
-
 function getUniqueCardsFromCategory(category, numCards) {
     let selected = [];
     while (selected.length < numCards) {
-        const possibleCard = byCategory[category][getRandomInt(byCategory[category].length)];
+        const possibleCard = byCategory[category][ImpRandom.getRandomInt(byCategory[category].length)];
         if (!selected.includes(possibleCard)) {
             selected.push(possibleCard);
         }

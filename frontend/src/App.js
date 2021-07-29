@@ -10,9 +10,6 @@ function App() {
 
     const [civilizations, setCivilizations] = useState([{
         cards: [],
-        editable: false
-    }, {
-        cards: [],
         editable: true
     }]);
     const [collection, setCollection] = useState([]);
@@ -39,11 +36,18 @@ function App() {
         }
     });
 
+    const collectionCardClicked = (card) => {
+
+    };
+    const civCardClicked = (card) => {
+
+    };
+
     const cardItems = collection.map((cardJson, index) => {
-        return (<ImperiumCard key={index} cardJson={cardJson}/>);
+        return (<ImperiumCard key={index} cardJson={cardJson} onClick={() => collectionCardClicked(cardJson)}/>);
     })
     const civItems = civilizations.map((civ, index) => {
-        return (<ConstructedCiv key={index} index={index + 1} cards={civ.cards} editable={civ.editable}/>);
+        return (<ConstructedCiv key={index} index={index + 1} cards={civ.cards} editable={civ.editable} onCardClick={(card) => civCardClicked(card)}  />);
     })
 
     return (

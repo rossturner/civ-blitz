@@ -2,7 +2,7 @@ import {Card, Icon} from "semantic-ui-react";
 import './ImperiumCard.css'
 import CardInfo from "./CardInfo";
 
-const ImperiumCard = ({cardJson}) => {
+const ImperiumCard = ({cardJson, onClick}) => {
 
     const footer = (
         <div>
@@ -13,7 +13,7 @@ const ImperiumCard = ({cardJson}) => {
     return <Card
         className='imperium-card'
         link
-        onClick={() => {console.log('Clicked')}}
+        onClick={onClick}
         color={CardInfo.getCategoryColor(cardJson.cardCategory)}
         header={cardJson.cardName}
         meta={CardInfo.getCategoryName(cardJson.cardCategory)}
