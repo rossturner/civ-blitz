@@ -5,13 +5,13 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
 import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.model.SourceDataRepo;
 
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.Optional;
 
 @Component
@@ -24,8 +24,8 @@ public class LeaderTraitsParser {
 		this.sourceDataRepo = sourceDataRepo;
 	}
 
-	public void parse(String resourceName) throws IOException {
-		try (FileReader input = new FileReader(ResourceUtils.getFile("classpath:"+resourceName))) {
+	public void parse(String resourceContent) throws IOException {
+		try (Reader input = new StringReader(resourceContent)) {
 			CSVParser parsed = CSVFormat.DEFAULT
 					.withFirstRecordAsHeader()
 					.parse(input);
