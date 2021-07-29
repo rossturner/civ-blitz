@@ -1,4 +1,4 @@
-import machineId from 'machine-id';
+import machineId from './lib/machine-id';
 import seedrandom from 'seedrandom';
 
 let myMachineId = machineId();
