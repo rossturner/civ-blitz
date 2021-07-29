@@ -10,11 +10,11 @@ CATEGORIES.forEach(cat => {
     byCategory[cat] = [];
 })
 
-function getUniqueCardsFromCategory(category, numCards) {
+function getUniqueCardsFromCategory(category, numCards, collection = []) {
     let selected = [];
     while (selected.length < numCards) {
         const possibleCard = byCategory[category][ImpRandom.getRandomInt(byCategory[category].length)];
-        if (!selected.includes(possibleCard)) {
+        if (!selected.includes(possibleCard) && !collection.includes(possibleCard)) {
             selected.push(possibleCard);
         }
     }
@@ -43,6 +43,14 @@ const CardStore = {
         let selected = [];
         CATEGORIES.forEach(category => {
             selected = selected.concat(getUniqueCardsFromCategory(category, 4));
+        })
+        return selected;
+    },
+
+    getMoreCardsForCollection: (collection) => {
+        let selected = [];
+        CATEGORIES.forEach(category => {
+            selected = selected.concat(getUniqueCardsFromCategory(category, 2, collection));
         })
         return selected;
     }

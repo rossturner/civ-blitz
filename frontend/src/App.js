@@ -8,12 +8,17 @@ import CardStore from "./cards/CardStore";
 
 function App() {
 
-    const [civilizations, setCivilizations] = useState([{
+    const [storedCivilizations, setStoredCivilizations] = useState([]);
+    const [editingCiv, setEditingCiv] = useState({
         cards: [],
         editable: true
-    }]);
+    });
     const [collection, setCollection] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const cardSort = (a, b) => {
+        return a.cardCategory.localeCompare(b.cardCategory) || a.cardName.localeCompare(b.cardName);
+    }
 
     useEffect(() => {
         if (loading) {
@@ -25,6 +30,7 @@ function App() {
                             console.log('result', cards);
                             CardStore.addCards(cards);
                             let newCollection = CardStore.getInitialCollection();
+                            newCollection.sort(cardSort);
                             setCollection(newCollection);
                             setLoading(false);
                         }
@@ -37,17 +43,72 @@ function App() {
     });
 
     const collectionCardClicked = (card) => {
+        if (!editingCiv) {
+            return;
+        }
+        const toReplaceInCiv = editingCiv.cards.filter(selected => selected.cardCategory === card.cardCategory);
 
+        let editedCards = editingCiv.cards.filter(selected => selected.cardCategory !== card.cardCategory);
+        editedCards.push(card);
+        editedCards.sort(cardSort);
+
+        let updatedCollection = [].concat(collection).filter(c => c !== card);
+        updatedCollection = updatedCollection.concat(toReplaceInCiv);
+        updatedCollection.sort(cardSort);
+
+        setEditingCiv({
+            cards: editedCards,
+            editable: true
+        });
+        setCollection(updatedCollection);
     };
     const civCardClicked = (card) => {
 
+        let editedCards = editingCiv.cards.filter(c => c !== card);
+        editedCards.sort(cardSort);
+
+        let updatedCollection = [].concat(collection);
+        updatedCollection.push(card);
+        updatedCollection.sort(cardSort);
+
+        setEditingCiv({
+            cards: editedCards,
+            editable: true
+        });
+        setCollection(updatedCollection);
+    };
+    const civConfirmed = () => {
+        const updatedCivs = [].concat(storedCivilizations);
+        updatedCivs.push({
+            cards: editingCiv.cards,
+            editiable: false
+        });
+        setStoredCivilizations(updatedCivs);
+
+        let updatedCollection = [].concat(collection).concat(CardStore.getMoreCardsForCollection(collection));
+        updatedCollection.sort(cardSort);
+        setCollection(updatedCollection);
+
+        if (updatedCivs.length < 3) {
+            setEditingCiv({
+                cards: [],
+                editable: true
+            });
+        } else {
+            setEditingCiv(null);
+        }
     };
 
     const cardItems = collection.map((cardJson, index) => {
         return (<ImperiumCard key={index} cardJson={cardJson} onClick={() => collectionCardClicked(cardJson)}/>);
     })
+    let civilizations = [].concat(storedCivilizations);
+    if (editingCiv) {
+        civilizations.push(editingCiv);
+    }
     const civItems = civilizations.map((civ, index) => {
-        return (<ConstructedCiv key={index} index={index + 1} cards={civ.cards} editable={civ.editable} onCardClick={(card) => civCardClicked(card)}  />);
+        return (<ConstructedCiv key={index} index={index + 1} cards={civ.cards} editable={civ.editable}
+                                onCardClick={(card) => civCardClicked(card)} onConfirmClick={() => civConfirmed()}  />);
     })
 
     return (
