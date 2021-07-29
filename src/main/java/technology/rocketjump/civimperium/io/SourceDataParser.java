@@ -16,5 +16,6 @@ public class SourceDataParser {
 		civTraitsParser.parse("csv/CivTraits.csv");
 
 		sourceDataRepo.removeGrantedCards();
+		System.out.println("Cards parsed: " + sourceDataRepo.getAll().size());
 	}
 }

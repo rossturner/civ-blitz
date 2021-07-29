@@ -10,9 +10,9 @@ public enum CardCategory {
 	public static CardCategory parseAcronym(String acronym) {
 		switch (acronym) {
 			case "UI":
-				return UniqueUnit;
-			case "UU":
 				return UniqueInfrastructure;
+			case "UU":
+				return UniqueUnit;
 			case "CA":
 				return CivilizationAbility;
 			default:

@@ -4,14 +4,14 @@ import java.util.Optional;
 
 public class Card {
 
+	private String cardName;
+	private String cardDescription;
+	private String traitType; // Use this as the unique identifier
 	private String civilizationType;
 	private Optional<String> leaderType = Optional.empty();
-	private String traitType;
 	private CardCategory cardCategory;
 
 	private String civilizationFriendlyName;
-	private String cardName;
-	private String cardDescription;
 
 	private Optional<String> grantsTraitType = Optional.empty();
 
