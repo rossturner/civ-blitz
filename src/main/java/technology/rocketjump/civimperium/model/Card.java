@@ -14,6 +14,7 @@ public class Card {
 	private String civilizationFriendlyName;
 
 	private Optional<String> grantsTraitType = Optional.empty();
+	private String subtype;
 
 	public String getCivilizationType() {
 		return civilizationType;
@@ -77,5 +78,13 @@ public class Card {
 
 	public void setGrantsTraitType(Optional<String> grantsTraitType) {
 		this.grantsTraitType = grantsTraitType;
+	}
+
+	public void setSubtype(String subtype) {
+		this.subtype = subtype;
+	}
+
+	public String getSubtype() {
+		return subtype;
 	}
 }

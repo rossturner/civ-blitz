@@ -49,4 +49,8 @@ public class SourceDataRepo {
 	public String getFriendlyCivName(String civilizationType) {
 		return friendlyNameByCivilizationType.get(civilizationType);
 	}
+
+	public Card getByTraitType(String traitType) {
+		return cardsByTraitType.get(traitType);
+	}
 }

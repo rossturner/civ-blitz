@@ -37,4 +37,16 @@ public class ResourceFiles {
 		}
 	}
 
+	@Value("classpath:csv/subtypes.csv")
+	private Resource subtypesFile;
+
+	@Bean(name = "subtypes")
+	public String subtypes() {
+		try (InputStream is = subtypesFile.getInputStream()) {
+			return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 }

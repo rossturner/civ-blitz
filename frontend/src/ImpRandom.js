@@ -5,7 +5,6 @@ if (!clientId) {
     clientId = ''+seedrandom().int32();
     localStorage.setItem('clientId', clientId);
 }
-console.log('clientId', clientId);
 const rnd = seedrandom(clientId);
 
 const ImpRandom = {
