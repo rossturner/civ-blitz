@@ -24,8 +24,11 @@ VALUES
  'LEADER_IMP_JAPABULLARABCREE',
  'LOC_LEADER_IMP_JAPABULLARABCREE',
  (SELECT Players.LeaderIcon FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.LeaderType = 'LEADER_T_ROOSEVELT'),
- (SELECT Players.LeaderAbilityName FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.LeaderType = 'LEADER_T_ROOSEVELT'),
- (SELECT Players.LeaderAbilityDescription FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.LeaderType = 'LEADER_T_ROOSEVELT'),
+ -- TODO pull leader ability name and description from source data
+--  (SELECT Players.LeaderAbilityName FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.LeaderType = 'LEADER_T_ROOSEVELT'),
+ 'LOC_TRAIT_LEADER_ANTIQUES_AND_PARKS_NAME',
+--  (SELECT Players.LeaderAbilityDescription FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.LeaderType = 'LEADER_T_ROOSEVELT'),
+ 'LOC_TRAIT_LEADER_ANTIQUES_AND_PARKS_DESCRIPTION',
  (SELECT Players.LeaderAbilityIcon FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.LeaderType = 'LEADER_T_ROOSEVELT'),
  (SELECT Players.CivilizationName FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.CivilizationType = 'CIVILIZATION_JAPAN' LIMIT 1),
  (SELECT Players.CivilizationIcon FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.CivilizationType = 'CIVILIZATION_JAPAN' LIMIT 1),

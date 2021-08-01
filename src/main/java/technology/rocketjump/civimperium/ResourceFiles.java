@@ -49,4 +49,27 @@ public class ResourceFiles {
 		}
 	}
 
+	@Value("classpath:csv/CivIcons.csv")
+	private Resource civIconsFile;
+
+	@Bean(name = "CivIcons")
+	public String civIcons() {
+		try (InputStream is = civIconsFile.getInputStream()) {
+			return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Value("classpath:csv/LeaderIcons.csv")
+	private Resource leaderIconsFile;
+
+	@Bean(name = "LeaderIcons")
+	public String leaderIcons() {
+		try (InputStream is = leaderIconsFile.getInputStream()) {
+			return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

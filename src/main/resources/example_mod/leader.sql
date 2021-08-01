@@ -20,9 +20,7 @@ WHERE DiplomacyInfo.Type = 'LEADER_T_ROOSEVELT';
 -- LeaderTraits
 --------------------------------------------------------------------------------------------------------------------------
 INSERT INTO LeaderTraits (LeaderType, TraitType)
-SELECT 'LEADER_IMP_JAPABULLARABCREE', TraitType
-FROM LeaderTraits
-WHERE LeaderType = 'LEADER_T_ROOSEVELT';
+VALUES ('LEADER_IMP_JAPABULLARABCREE', 'TRAIT_LEADER_ANTIQUES_AND_PARKS');
 --------------------------------------------------------------------------------------------------------------------------
 -- LeaderQuotes
 --------------------------------------------------------------------------------------------------------------------------

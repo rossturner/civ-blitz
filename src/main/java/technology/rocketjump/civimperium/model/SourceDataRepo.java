@@ -11,7 +11,8 @@ public class SourceDataRepo {
 	private final Map<String, String> friendlyNameByCivilizationType = new TreeMap<>();
 	private final Map<String, Card> cardsByTraitType = new TreeMap<>();
 	private final Map<String, Card> cardsByCardName = new TreeMap<>();
-	private final Set<String> traitsGrantedByOthers = new HashSet<>();
+	private final Map<String, String> subtypesByTraitType = new HashMap<>();
+	private final Map<String, IconAtlasEntry> iconAtlasEntriesByCivOrLeaderType = new HashMap<>();
 
 	@Autowired
 	public SourceDataRepo() {
@@ -53,4 +54,21 @@ public class SourceDataRepo {
 	public Card getByTraitType(String traitType) {
 		return cardsByTraitType.get(traitType);
 	}
+
+	public void addSubtypeByTraitType(String traitType, String subtype) {
+		subtypesByTraitType.put(traitType, subtype);
+	}
+
+	public String getSubtypeByTraitType(String traitType) {
+		return subtypesByTraitType.get(traitType);
+	}
+
+	public void addIconAtlasEntry(String civOrLeaderType, IconAtlasEntry iconAtlasEntry) {
+		iconAtlasEntriesByCivOrLeaderType.put(civOrLeaderType, iconAtlasEntry);
+	}
+
+	public IconAtlasEntry getIconAtlasEntry(String civOrLeaderType) {
+		return iconAtlasEntriesByCivOrLeaderType.get(civOrLeaderType);
+	}
+
 }

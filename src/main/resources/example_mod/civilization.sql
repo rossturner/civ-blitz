@@ -10,13 +10,13 @@ VALUES	('CIVILIZATION_IMP_JAPABULLARABCREE',	'KIND_CIVILIZATION');
 
 INSERT OR REPLACE INTO CivilizationLeaders
 (CivilizationType, LeaderType, CapitalName)
-VALUES
-('CIVILIZATION_IMP_JAPABULLARABCREE', 'LEADER_T_ROOSEVELT', 'LOC_CITY_NAME_WASHINGTON');
--- TODO collate capital names
--- SELECT 'CIVILIZATION_IMP_JAPABULLARABCREE', 'LEADER_T_ROOSEVELT', CivilizationLeaders.CapitalName
--- FROM CivilizationLeaders
--- WHERE CivilizationLeaders.LeaderType = 'LEADER_T_ROOSEVELT'
---   and CivilizationLeaders.CivilizationType = 'CIVILIZATION_AMERICA';
+-- VALUES
+-- ('CIVILIZATION_IMP_JAPABULLARABCREE', 'LEADER_IMP_JAPABULLARABCREE', 'LOC_CITY_NAME_WASHINGTON');
+-- TODO collate capital names, or map from base civ leader
+SELECT 'CIVILIZATION_IMP_JAPABULLARABCREE', 'LEADER_IMP_JAPABULLARABCREE', CivilizationLeaders.CapitalName
+FROM CivilizationLeaders
+WHERE CivilizationLeaders.LeaderType = 'LEADER_T_ROOSEVELT'
+  and CivilizationLeaders.CivilizationType = 'CIVILIZATION_AMERICA';
 
 -- following from vanilla civ selected for names (Civ Ability civ?)
 

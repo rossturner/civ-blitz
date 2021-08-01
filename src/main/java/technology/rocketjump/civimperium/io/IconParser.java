@@ -5,7 +5,7 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import technology.rocketjump.civimperium.model.Card;
+import technology.rocketjump.civimperium.model.IconAtlasEntry;
 import technology.rocketjump.civimperium.model.SourceDataRepo;
 
 import java.io.IOException;
@@ -13,14 +13,13 @@ import java.io.Reader;
 import java.io.StringReader;
 
 @Component
-public class SubtypesParser {
+public class IconParser {
 
 	private final SourceDataRepo sourceDataRepo;
 
 	@Autowired
-	public SubtypesParser(SourceDataRepo sourceDataRepo) {
+	public IconParser(SourceDataRepo sourceDataRepo) {
 		this.sourceDataRepo = sourceDataRepo;
-
 	}
 
 	public void parse(String resourceContent) throws IOException {
@@ -30,17 +29,11 @@ public class SubtypesParser {
 					.parse(input);
 
 			for (CSVRecord record : parsed.getRecords()) {
-				String traitType = record.get("TraitType");
-				String subtype = record.get("Type");
+				String type = record.get("Type");
+				String iconAtlas = record.get("IconAtlas");
+				String index = record.get("Index");
 
-				sourceDataRepo.addSubtypeByTraitType(traitType, subtype);
-
-				Card card = sourceDataRepo.getByTraitType(traitType);
-				if (card == null) {
-					throw new RuntimeException("Could not find card for TraitType " + traitType);
-				} else {
-					card.setSubtype(subtype);
-				}
+				sourceDataRepo.addIconAtlasEntry(type, new IconAtlasEntry(iconAtlas, Integer.parseInt(index)));
 			}
 		}
 	}
