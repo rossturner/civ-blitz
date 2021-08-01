@@ -1,17 +1,23 @@
 package technology.rocketjump.civimperium.modgenerator;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import technology.rocketjump.civimperium.model.Card;
+import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
+import technology.rocketjump.civimperium.modgenerator.sql.ImperiumFileGenerator;
 
 import java.time.Instant;
+import java.util.Map;
 
 @Component
-public class ModInfoGenerator {
+public class ModInfoGenerator implements ImperiumFileGenerator {
 
-	@Autowired
-	public ModInfoGenerator() {
+	private String modName = "UNSET";
 
+	@Override
+	public String getFileContents(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
+		modName = modHeader.modName;
+		return getModInfoContent(modHeader);
 	}
 
 	public String getModInfoContent(ModHeader modHeader) {
@@ -77,4 +83,8 @@ public class ModInfoGenerator {
 		return contentBuilder.toString();
 	}
 
+	@Override
+	public String getFilename() {
+		return "Imperium"+modName+".modinfo";
+	}
 }

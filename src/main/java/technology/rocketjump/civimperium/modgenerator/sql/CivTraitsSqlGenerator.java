@@ -8,9 +8,10 @@ import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
 import java.util.Map;
 
 @Component
-public class CivTraitsSqlGenerator {
+public class CivTraitsSqlGenerator implements ImperiumFileGenerator {
 
-	public String getCivTraits(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
+	@Override
+	public String getFileContents(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
 		String modName = modHeader.modName.toUpperCase();
 		StringBuilder sqlBuilder = new StringBuilder();
 
@@ -32,4 +33,8 @@ public class CivTraitsSqlGenerator {
 				.append(traitType).append("', 'CIVILIZATION_IMP_").append(modName).append("');\n");
 	}
 
+	@Override
+	public String getFilename() {
+		return "CivTraits.sql";
+	}
 }

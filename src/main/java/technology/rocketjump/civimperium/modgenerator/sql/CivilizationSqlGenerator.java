@@ -1,16 +1,21 @@
 package technology.rocketjump.civimperium.modgenerator.sql;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technology.rocketjump.civimperium.model.Card;
+import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
 
+import java.util.Map;
+
 @Component
-public class CivilizationSqlGenerator {
+public class CivilizationSqlGenerator implements ImperiumFileGenerator {
 
-	@Autowired
-	public CivilizationSqlGenerator() {
-
+	@Override
+	public String getFileContents(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
+		return getCivilizationSql(modHeader,
+				selectedCards.get(CardCategory.CivilizationAbility),
+				selectedCards.get(CardCategory.LeaderAbility),
+				selectedCards.get(CardCategory.CivilizationAbility).getCivilizationType());
 	}
 
 	public String getCivilizationSql(ModHeader modHeader, Card civAbilityCard, Card leaderAbilityCard, String startBiasCivType) {
@@ -37,7 +42,7 @@ public class CivilizationSqlGenerator {
 				"FROM CivilizationLeaders\n" +
 				"WHERE CivilizationLeaders.LeaderType = '").append(leaderType).append("'\n" +
 				"  and CivilizationLeaders.CivilizationType = '").append(leaderCivType).append("';\n\n");
-		
+
 		sqlBuilder.append("INSERT OR REPLACE INTO Civilizations\n" +
 				"(CivilizationType, Name, Description, Adjective, StartingCivilizationLevelType, RandomCityNameDepth, Ethnicity)\n" +
 				"SELECT 'CIVILIZATION_IMP_").append(modName).append("', Civilizations.Name, Civilizations.Description, Civilizations.Adjective,\n" +
@@ -89,4 +94,8 @@ public class CivilizationSqlGenerator {
 		return sqlBuilder.toString();
 	}
 
+	@Override
+	public String getFilename() {
+		return "Civilization.sql";
+	}
 }

@@ -8,7 +8,12 @@ import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
 import java.util.Map;
 
 @Component
-public class LeaderTextSqlGenerator {
+public class LeaderTextSqlGenerator implements ImperiumFileGenerator {
+
+	@Override
+	public String getFileContents(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
+		return getLeaderTextSql(modHeader, selectedCards);
+	}
 
 	public String getLeaderTextSql(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
 		StringBuilder sqlBuilder = new StringBuilder();
@@ -26,9 +31,8 @@ public class LeaderTextSqlGenerator {
 		return sqlBuilder.toString();
 	}
 
-	private void addLeaderTrait(StringBuilder sqlBuilder, String traitType, String modName) {
-		sqlBuilder.append("INSERT INTO LeaderTraits (LeaderType, TraitType)\n" +
-				"VALUES ('LEADER_IMP_").append(modName).append("', '").append(traitType).append("');\n");
+	@Override
+	public String getFilename() {
+		return "LeaderText.sql";
 	}
-
 }

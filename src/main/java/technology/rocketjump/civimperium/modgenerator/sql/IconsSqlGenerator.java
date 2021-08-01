@@ -11,13 +11,18 @@ import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
 import java.util.Map;
 
 @Component
-public class IconsSqlGenerator {
+public class IconsSqlGenerator implements ImperiumFileGenerator {
 
 	private final SourceDataRepo sourceDataRepo;
 
 	@Autowired
 	public IconsSqlGenerator(SourceDataRepo sourceDataRepo) {
 		this.sourceDataRepo = sourceDataRepo;
+	}
+
+	@Override
+	public String getFileContents(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
+		return getIconsSql(modHeader, selectedCards);
 	}
 
 	public String getIconsSql(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
@@ -36,4 +41,8 @@ public class IconsSqlGenerator {
 		return sqlBuilder.toString();
 	}
 
+	@Override
+	public String getFilename() {
+		return "Icons.sql";
+	}
 }

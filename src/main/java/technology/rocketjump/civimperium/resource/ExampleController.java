@@ -9,8 +9,10 @@ import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.model.SourceDataRepo;
 import technology.rocketjump.civimperium.modgenerator.CompleteModGenerator;
+import technology.rocketjump.civimperium.modgenerator.ModHeaderGenerator;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -22,11 +24,13 @@ public class ExampleController {
 
 	private final SourceDataRepo sourceDataRepo;
 	private final CompleteModGenerator completeModGenerator;
+	private final ModHeaderGenerator modHeaderGenerator;
 
 	@Autowired
-	public ExampleController(SourceDataRepo sourceDataRepo, CompleteModGenerator completeModGenerator) {
+	public ExampleController(SourceDataRepo sourceDataRepo, CompleteModGenerator completeModGenerator, ModHeaderGenerator modHeaderGenerator) {
 		this.sourceDataRepo = sourceDataRepo;
 		this.completeModGenerator = completeModGenerator;
+		this.modHeaderGenerator = modHeaderGenerator;
 	}
 
 	@GetMapping("/cards")
@@ -36,20 +40,21 @@ public class ExampleController {
 
 	@GetMapping(value = "/mod", produces = "application/zip")
 	@ResponseBody
-	public byte[] getSomething(HttpServletResponse response) {
+	public byte[] getSomething(HttpServletResponse response) throws IOException {
 		response.setContentType("application/zip");
 		response.setStatus(HttpServletResponse.SC_OK);
-		response.addHeader("Content-Disposition", "attachment; filename=\"test.zip\"");
-
 		Map<CardCategory, Card> selectedCards = new HashMap<>();
 		for (Card card : List.of(
-				sourceDataRepo.getByTraitType("TRAIT_CIVILIZATION_ADJACENT_DISTRICTS"),
-				sourceDataRepo.getByTraitType("TRAIT_LEADER_ANTIQUES_AND_PARKS"),
-				sourceDataRepo.getByTraitType("TRAIT_CIVILIZATION_BUILDING_MADRASA"),
-				sourceDataRepo.getByTraitType("TRAIT_CIVILIZATION_UNIT_CREE_OKIHTCITAW")
+				sourceDataRepo.getByTraitType("TRAIT_CIVILIZATION_MAYAB"),
+				sourceDataRepo.getByTraitType("TRAIT_LEADER_KUPES_VOYAGE"),
+				sourceDataRepo.getByTraitType("TRAIT_CIVILIZATION_DISTRICT_SEOWON"),
+				sourceDataRepo.getByTraitType("TRAIT_CIVILIZATION_UNIT_AZTEC_EAGLE_WARRIOR")
 		)) {
 			selectedCards.put(card.getCardCategory(), card);
 		}
+
+		String modName = modHeaderGenerator.createFor(selectedCards).modName;
+		response.addHeader("Content-Disposition", "attachment; filename=\"Imperium_"+modName+".zip\"");
 
 		return completeModGenerator.generateMod(selectedCards);
 	}

@@ -11,11 +11,11 @@ import technology.rocketjump.civimperium.modgenerator.sql.*;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import static technology.rocketjump.civimperium.model.CardCategory.LeaderAbility;
 
 @Component
 public class CompleteModGenerator {
@@ -30,6 +30,8 @@ public class CompleteModGenerator {
 	private final IconsSqlGenerator iconsSqlGenerator;
 	private final LeaderSqlGenerator leaderSqlGenerator;
 	private final LeaderTextSqlGenerator leaderTextSqlGenerator;
+
+	private List<ImperiumFileGenerator> fileGeneratorList = new ArrayList<>();
 
 	@Autowired
 	public CompleteModGenerator(ModHeaderGenerator modHeaderGenerator, ModInfoGenerator modInfoGenerator,
@@ -47,6 +49,16 @@ public class CompleteModGenerator {
 		this.iconsSqlGenerator = iconsSqlGenerator;
 		this.leaderSqlGenerator = leaderSqlGenerator;
 		this.leaderTextSqlGenerator = leaderTextSqlGenerator;
+
+		fileGeneratorList.add(civilizationSqlGenerator);
+		fileGeneratorList.add(civTraitsSqlGenerator);
+		fileGeneratorList.add(colorsSqlGenerator);
+		fileGeneratorList.add(configurationSqlGenerator);
+		fileGeneratorList.add(geographySqlGenerator);
+		fileGeneratorList.add(iconsSqlGenerator);
+		fileGeneratorList.add(modInfoGenerator);
+		fileGeneratorList.add(leaderSqlGenerator);
+		fileGeneratorList.add(leaderTextSqlGenerator);
 	}
 
 	public byte[] generateMod(Map<CardCategory, Card> selectedCards) throws IOException {
@@ -61,29 +73,15 @@ public class CompleteModGenerator {
 
 		ModHeader header = modHeaderGenerator.createFor(selectedCards);
 
-		String modInfoContent = modInfoGenerator.getModInfoContent(header);
-		String civilizationSqlContent = civilizationSqlGenerator.getCivilizationSql(header,
-				selectedCards.get(CardCategory.CivilizationAbility), selectedCards.get(LeaderAbility),
-				selectedCards.get(CardCategory.CivilizationAbility).getCivilizationType());
-		String civTraitsSqlContent = civTraitsSqlGenerator.getCivTraits(header, selectedCards);
-		String colorsSqlContent = colorsSqlGenerator.getColorsSql(header, selectedCards.get(LeaderAbility).getLeaderType().get());
-		String configurationSqlContent = configurationSqlGenerator.getConfigurationSql(header, selectedCards);
-		String geographySqlContent = geographySqlGenerator.getGeographySql(header, selectedCards.get(CardCategory.CivilizationAbility).getCivilizationType());
-		String iconsSqlContent = iconsSqlGenerator.getIconsSql(header, selectedCards);
-		String leaderSqlContent = leaderSqlGenerator.getLeaderSql(header, selectedCards);
-		String leaderTextSqlContent = leaderTextSqlGenerator.getLeaderTextSql(header, selectedCards);
-
-
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
 		ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
-		//simple file list, just for tests
-		zipOutputStream.putNextEntry(new ZipEntry("Civilization.sql"));
-		byte[] civSqlBytes = civilizationSqlContent.getBytes();
-		zipOutputStream.write(civSqlBytes, 0, civSqlBytes.length);
-
-
+		for (ImperiumFileGenerator generator : fileGeneratorList) {
+			byte[] contentBytes = generator.getFileContents(header, selectedCards).getBytes();
+			zipOutputStream.putNextEntry(new ZipEntry(generator.getFilename()));
+			zipOutputStream.write(contentBytes, 0, contentBytes.length);
+		}
 
 		zipOutputStream.finish();
 		zipOutputStream.flush();

@@ -10,7 +10,7 @@ import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
 import java.util.Map;
 
 @Component
-public class ConfigurationSqlGenerator {
+public class ConfigurationSqlGenerator implements ImperiumFileGenerator {
 
 	private final SourceDataRepo sourceDataRepo;
 
@@ -19,16 +19,17 @@ public class ConfigurationSqlGenerator {
 		this.sourceDataRepo = sourceDataRepo;
 	}
 
-	public String getConfigurationSql(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
+	@Override
+	public String getFileContents(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
 		StringBuilder sqlBuilder = new StringBuilder();
 
 		Card civAbilityCard = selectedCards.get(CardCategory.CivilizationAbility);
 		String civType = civAbilityCard.getCivilizationType();
-		
+
 		Card leaderAbilityCard = selectedCards.get(CardCategory.LeaderAbility);
 		String leaderType = leaderAbilityCard.getLeaderType().get();
 		String leaderTrait = leaderAbilityCard.getTraitType();
-		
+
 		String locLeaderTraitName = sourceDataRepo.leaderTraitNameByTraitType.getOrDefault(leaderTrait, "");
 		String locLeaderTraitDesc = sourceDataRepo.leaderTraitDescByTraitType.getOrDefault(leaderTrait, "");
 
@@ -98,4 +99,8 @@ public class ConfigurationSqlGenerator {
 				"WHERE Domain = 'Players:Expansion2_Players' and CivilizationType = '").append(civilizationType).append("' and Type = '").append(subtype).append("';\n\n");
 	}
 
+	@Override
+	public String getFilename() {
+		return "Configuration.sql";
+	}
 }

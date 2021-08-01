@@ -1,10 +1,19 @@
 package technology.rocketjump.civimperium.modgenerator.sql;
 
 import org.springframework.stereotype.Component;
+import technology.rocketjump.civimperium.model.Card;
+import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
 
+import java.util.Map;
+
 @Component
-public class GeographySqlGenerator {
+public class GeographySqlGenerator implements ImperiumFileGenerator {
+
+	@Override
+	public String getFileContents(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
+		return getGeographySql(modHeader, selectedCards.get(CardCategory.CivilizationAbility).getCivilizationType());
+	}
 
 	public String getGeographySql(ModHeader modHeader, String geographyCivType) {
 		StringBuilder sqlBuilder = new StringBuilder();
@@ -42,4 +51,8 @@ public class GeographySqlGenerator {
 		return sqlBuilder.toString();
 	}
 
+	@Override
+	public String getFilename() {
+		return "Geography.sql";
+	}
 }

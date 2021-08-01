@@ -6,9 +6,9 @@ import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
 
 import java.util.Map;
 
-public interface ImperiumSqlGenerator {
+public interface ImperiumFileGenerator {
 
-	String getSql(ModHeader modHeader, Map<CardCategory, Card> selectedCards);
+	String getFileContents(ModHeader modHeader, Map<CardCategory, Card> selectedCards);
 
 	String getFilename();
 
