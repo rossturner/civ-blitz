@@ -17,17 +17,12 @@ INSERT OR REPLACE INTO Players
 VALUES
 ('Players:Expansion2_Players',
  'CIVILIZATION_IMP_JAPABULLARABCREE',
---  (SELECT Players.Portrait FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.LeaderType = 'LEADER_T_ROOSEVELT'),
  'LEADER_T_ROOSEVELT_NEUTRAL',
---  (SELECT Players.PortraitBackground FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.LeaderType = 'LEADER_T_ROOSEVELT'),
  'LEADER_T_ROOSEVELT_BACKGROUND',
  'LEADER_IMP_JAPABULLARABCREE',
  'LOC_LEADER_IMP_JAPABULLARABCREE',
  (SELECT Players.LeaderIcon FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.LeaderType = 'LEADER_T_ROOSEVELT'),
- -- TODO pull leader ability name and description from source data
---  (SELECT Players.LeaderAbilityName FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.LeaderType = 'LEADER_T_ROOSEVELT'),
  'LOC_TRAIT_LEADER_ANTIQUES_AND_PARKS_NAME',
---  (SELECT Players.LeaderAbilityDescription FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.LeaderType = 'LEADER_T_ROOSEVELT'),
  'LOC_TRAIT_LEADER_ANTIQUES_AND_PARKS_DESCRIPTION',
  (SELECT Players.LeaderAbilityIcon FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.LeaderType = 'LEADER_T_ROOSEVELT'),
  (SELECT Players.CivilizationName FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.CivilizationType = 'CIVILIZATION_JAPAN' LIMIT 1),
@@ -50,3 +45,4 @@ INSERT OR REPLACE INTO PlayerItems (Domain, CivilizationType, LeaderType, Type, 
 SELECT 'Players:Expansion2_Players', 'CIVILIZATION_IMP_JAPABULLARABCREE', 'LEADER_IMP_JAPABULLARABCREE', PlayerItems.Type, PlayerItems.Icon, PlayerItems.Name, PlayerItems.Description, 20
 FROM PlayerItems
 WHERE Domain = 'Players:Expansion2_Players' and CivilizationType = 'CIVILIZATION_CREE' and Type = 'UNIT_CREE_OKIHTCITAW';
+

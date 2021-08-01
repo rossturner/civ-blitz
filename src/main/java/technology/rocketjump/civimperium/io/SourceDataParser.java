@@ -16,16 +16,19 @@ public class SourceDataParser {
 	@Autowired
 	public SourceDataParser(LeaderTraitsParser leaderTraitsParser, CivTraitsParser civTraitsParser,
 							SubtypesParser subtypesParser, SourceDataRepo sourceDataRepo, IconParser iconParser,
+							PortraitsParser portraitsParser,
 							@Qualifier("leaderTraits") String leaderTraitsContent,
 							@Qualifier("civTraits") String civTraitsContent,
 							@Qualifier("subtypes") String subtypesContent,
 							@Qualifier("CivIcons") String civIconsContent,
-							@Qualifier("LeaderIcons") String leaderIconsContent) throws IOException {
+							@Qualifier("LeaderIcons") String leaderIconsContent,
+							@Qualifier("Portraits") String portraitsContent) throws IOException {
 		leaderTraitsParser.parse(leaderTraitsContent);
 		civTraitsParser.parse(civTraitsContent);
 		subtypesParser.parse(subtypesContent);
 		iconParser.parse(civIconsContent);
 		iconParser.parse(leaderIconsContent);
+		portraitsParser.parse(portraitsContent);
 
 		sourceDataRepo.removeGrantedCards();
 		System.out.println("Cards parsed: " + sourceDataRepo.getAll().size());

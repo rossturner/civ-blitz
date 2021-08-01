@@ -72,4 +72,16 @@ public class ResourceFiles {
 			throw new RuntimeException(e);
 		}
 	}
+
+	@Value("classpath:csv/Portraits.csv")
+	private Resource portraitsFile;
+
+	@Bean(name = "Portraits")
+	public String portraits() {
+		try (InputStream is = portraitsFile.getInputStream()) {
+			return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

@@ -14,6 +14,11 @@ public class SourceDataRepo {
 	private final Map<String, String> subtypesByTraitType = new HashMap<>();
 	private final Map<String, IconAtlasEntry> iconAtlasEntriesByCivOrLeaderType = new HashMap<>();
 
+	public final Map<String, String> leaderTraitNameByTraitType = new HashMap<>();
+	public final Map<String, String> leaderTraitDescByTraitType = new HashMap<>();
+	public final Map<String, String> portraitsByLeaderType = new HashMap<>();
+	public final Map<String, String> portraitBackgroundsByLeaderType = new HashMap<>();
+
 	@Autowired
 	public SourceDataRepo() {
 

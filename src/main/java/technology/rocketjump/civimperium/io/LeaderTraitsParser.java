@@ -33,13 +33,14 @@ public class LeaderTraitsParser {
 			for (CSVRecord record : parsed.getRecords()) {
 				String civilizationType = record.get("CivilizationType");
 				String civFriendlyName = getCivNameFrom(record.get("Name"));
+				String traitType = record.get("TraitType");
 
 				sourceDataRepo.addCivFriendlyName(civilizationType, civFriendlyName);
 
 				Card card = new Card();
 				card.setCivilizationType(civilizationType);
 				card.setLeaderType(Optional.of(record.get("LeaderType")));
-				card.setTraitType(record.get("TraitType"));
+				card.setTraitType(traitType);
 				card.setCardCategory(CardCategory.LeaderAbility);
 				card.setCivilizationFriendlyName(civFriendlyName);
 				card.setCardName(getLeaderNameFrom(record.get("Name")));
@@ -51,6 +52,14 @@ public class LeaderTraitsParser {
 				}
 
 				sourceDataRepo.add(card);
+
+				String locTraitName = record.get("LocTraitTypeName");
+				String locTraitDesc = record.get("LocTraitTypeDesc");
+				if (locTraitDesc == null || locTraitDesc.isEmpty()) {
+					locTraitDesc = locTraitName.replace("_NAME", "_DESCRIPTION");
+				}
+				sourceDataRepo.leaderTraitNameByTraitType.put(traitType, locTraitName);
+				sourceDataRepo.leaderTraitDescByTraitType.put(traitType, locTraitDesc);
 			}
 		}
 	}
