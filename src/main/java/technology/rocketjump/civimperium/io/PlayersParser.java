@@ -12,12 +12,12 @@ import java.io.Reader;
 import java.io.StringReader;
 
 @Component
-public class PortraitsParser {
+public class PlayersParser {
 
 	private final SourceDataRepo sourceDataRepo;
 
 	@Autowired
-	public PortraitsParser(SourceDataRepo sourceDataRepo) {
+	public PlayersParser(SourceDataRepo sourceDataRepo) {
 		this.sourceDataRepo = sourceDataRepo;
 	}
 
@@ -28,10 +28,19 @@ public class PortraitsParser {
 					.parse(input);
 
 			for (CSVRecord record : parsed.getRecords()) {
+				String civType = record.get("CivilizationType");
 				String leaderType = record.get("LeaderType");
 				String portrait = record.get("Portrait");
 				String portraitBackground = record.get("PortraitBackground");
 
+				sourceDataRepo.leaderNameByLeaderType.put(leaderType, record.get("LeaderName"));
+				sourceDataRepo.leaderIconByLeaderType.put(leaderType, record.get("LeaderIcon"));
+				sourceDataRepo.leaderAbilityIconByLeaderType.put(leaderType, record.get("LeaderAbilityIcon"));
+				sourceDataRepo.civNameByCivType.put(civType, record.get("CivilizationName"));
+				sourceDataRepo.civIconByCivType.put(civType, record.get("CivilizationAbilityIcon"));
+				sourceDataRepo.civAbilityNameByCivType.put(civType, record.get("CivilizationAbilityName"));
+				sourceDataRepo.civAbilityDescByCivType.put(civType, record.get("CivilizationAbilityDescription"));
+				sourceDataRepo.civAbilityIconByCivType.put(civType, record.get("CivilizationAbilityIcon"));
 				sourceDataRepo.portraitsByLeaderType.put(leaderType, portrait);
 				sourceDataRepo.portraitBackgroundsByLeaderType.put(leaderType, portraitBackground);
 			}

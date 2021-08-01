@@ -25,10 +25,18 @@ public class ConfigurationSqlGenerator implements ImperiumFileGenerator {
 
 		Card civAbilityCard = selectedCards.get(CardCategory.CivilizationAbility);
 		String civType = civAbilityCard.getCivilizationType();
+		String civName = sourceDataRepo.civNameByCivType.get(civType);
+		String civIcon = sourceDataRepo.civIconByCivType.get(civType);
+
+		String civAbilityName = sourceDataRepo.civAbilityNameByCivType.get(civType);
+		String civAbilityDesc = sourceDataRepo.civAbilityDescByCivType.get(civType);
+		String civAbilityIcon = sourceDataRepo.civAbilityIconByCivType.get(civType);
 
 		Card leaderAbilityCard = selectedCards.get(CardCategory.LeaderAbility);
 		String leaderType = leaderAbilityCard.getLeaderType().get();
 		String leaderTrait = leaderAbilityCard.getTraitType();
+		String leaderIcon = sourceDataRepo.leaderIconByLeaderType.get(leaderType);
+		String leaderAbilityIcon = sourceDataRepo.leaderAbilityIconByLeaderType.get(leaderType);
 
 		String locLeaderTraitName = sourceDataRepo.leaderTraitNameByTraitType.getOrDefault(leaderTrait, "");
 		String locLeaderTraitDesc = sourceDataRepo.leaderTraitDescByTraitType.getOrDefault(leaderTrait, "");
@@ -59,15 +67,15 @@ public class ConfigurationSqlGenerator implements ImperiumFileGenerator {
 				" '").append(portraitBackground).append("',\n" +
 				" 'LEADER_IMP_").append(modHeader.modName.toUpperCase()).append("',\n" +
 				" 'LOC_LEADER_IMP_").append(modHeader.modName.toUpperCase()).append("',\n" +
-				" (SELECT Players.LeaderIcon FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.LeaderType = '").append(leaderType).append("'),\n" +
+				" '").append(leaderIcon).append("',\n" +
 				" '").append(locLeaderTraitName).append("',\n" +
 				" '").append(locLeaderTraitDesc).append("',\n" +
-				" (SELECT Players.LeaderAbilityIcon FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.LeaderType = '").append(leaderType).append("'),\n" +
-				" (SELECT Players.CivilizationName FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.CivilizationType = '").append(civType).append("' LIMIT 1),\n" +
-				" (SELECT Players.CivilizationIcon FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.CivilizationType = '").append(civType).append("' LIMIT 1),\n" +
-				" (SELECT Players.CivilizationAbilityName FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.CivilizationType = '").append(civType).append("' LIMIT 1),\n" +
-				" (SELECT Players.CivilizationAbilityDescription FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.CivilizationType = '").append(civType).append("' LIMIT 1),\n" +
-				" (SELECT Players.CivilizationAbilityIcon FROM Players WHERE Players.Domain = 'Players:Expansion2_Players' and Players.CivilizationType = '").append(civType).append("' LIMIT 1)\n" +
+				" '").append(leaderAbilityIcon).append("',\n" +
+				" '").append(civName).append("',\n" +
+				" '").append(civIcon).append("',\n" +
+				" '").append(civAbilityName).append("',\n" +
+				" '").append(civAbilityDesc).append("',\n" +
+				" '").append(civAbilityIcon).append("'\n" +
 				");\n\n");
 
 		int sortIndex = 10;

@@ -35,20 +35,22 @@ public class CivilizationSqlGenerator implements ImperiumFileGenerator {
 
 		sqlBuilder.append("INSERT OR REPLACE INTO Types (Type, Kind)\n" +
 				"VALUES\t('CIVILIZATION_IMP_").append(modName).append("',\t'KIND_CIVILIZATION');\n" +
-				"\n" +
-				"INSERT OR REPLACE INTO CivilizationLeaders\n" +
-				"(CivilizationType, LeaderType, CapitalName)\n" +
-				"SELECT 'CIVILIZATION_IMP_").append(modName).append("', 'LEADER_IMP_").append(modName).append("', CivilizationLeaders.CapitalName\n" +
-				"FROM CivilizationLeaders\n" +
-				"WHERE CivilizationLeaders.LeaderType = '").append(leaderType).append("'\n" +
-				"  and CivilizationLeaders.CivilizationType = '").append(leaderCivType).append("';\n\n");
+				"\n");
 
 		sqlBuilder.append("INSERT OR REPLACE INTO Civilizations\n" +
 				"(CivilizationType, Name, Description, Adjective, StartingCivilizationLevelType, RandomCityNameDepth, Ethnicity)\n" +
 				"SELECT 'CIVILIZATION_IMP_").append(modName).append("', Civilizations.Name, Civilizations.Description, Civilizations.Adjective,\n" +
 				"       Civilizations.StartingCivilizationLevelType,  Civilizations.RandomCityNameDepth, Civilizations.Ethnicity\n" +
 				"FROM Civilizations\n" +
-				"WHERE Civilizations.CivilizationType = '").append(namesCivType).append("';\n" +
+				"WHERE Civilizations.CivilizationType = '").append(namesCivType).append("';\n");
+
+		sqlBuilder.append("\n" +
+				"INSERT OR REPLACE INTO CivilizationLeaders\n" +
+				"(CivilizationType, LeaderType, CapitalName)\n" +
+				"SELECT 'CIVILIZATION_IMP_").append(modName).append("', 'LEADER_IMP_").append(modName).append("', CivilizationLeaders.CapitalName\n" +
+				"FROM CivilizationLeaders\n" +
+				"WHERE CivilizationLeaders.LeaderType = '").append(leaderType).append("'\n" +
+				"  and CivilizationLeaders.CivilizationType = '").append(leaderCivType).append("';\n\n" +
 				"\n" +
 				"INSERT OR REPLACE INTO CityNames (CivilizationType, CityName)\n" +
 				"SELECT 'CIVILIZATION_IMP_").append(modName).append("', CityNames.CityName\n" +
