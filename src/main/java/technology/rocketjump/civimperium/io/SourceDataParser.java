@@ -1,5 +1,6 @@
 package technology.rocketjump.civimperium.io;
 
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -16,24 +17,30 @@ public class SourceDataParser {
 	@Autowired
 	public SourceDataParser(LeaderTraitsParser leaderTraitsParser, CivTraitsParser civTraitsParser,
 							SubtypesParser subtypesParser, SourceDataRepo sourceDataRepo, IconParser iconParser,
-							PlayersParser playersParser,
+							PlayersParser playersParser, CivilizationsCsvParser civilizationsCsvParser,
+							CivilizationLeadersCsvParser civilizationLeadersCsvParser,
 							@Qualifier("leaderTraits") String leaderTraitsContent,
 							@Qualifier("civTraits") String civTraitsContent,
 							@Qualifier("subtypes") String subtypesContent,
 							@Qualifier("CivIcons") String civIconsContent,
 							@Qualifier("LeaderIcons") String leaderIconsContent,
-							@Qualifier("Players") String playersContent) throws IOException {
+							@Qualifier("Players") String playersContent,
+							@Qualifier("Civilizations") String civCsvContent,
+							@Qualifier("CivilizationLeaders") String civLeadersCsvContent) throws IOException {
 		leaderTraitsParser.parse(leaderTraitsContent);
 		civTraitsParser.parse(civTraitsContent);
 		subtypesParser.parse(subtypesContent);
 		iconParser.parse(civIconsContent);
 		iconParser.parse(leaderIconsContent);
 		playersParser.parse(playersContent);
+		civilizationsCsvParser.parse(civCsvContent);
+		civilizationLeadersCsvParser.parse(civLeadersCsvContent);
 
 		sourceDataRepo.removeGrantedCards();
 		System.out.println("Cards parsed: " + sourceDataRepo.getAll().size());
 
 		verifyIconAtlasEntries(sourceDataRepo);
+		verifyAllCivRecordEntries(sourceDataRepo);
 	}
 
 	private void verifyIconAtlasEntries(SourceDataRepo sourceDataRepo) {
@@ -47,6 +54,24 @@ public class SourceDataParser {
 				IconAtlasEntry iconAtlasEntry = sourceDataRepo.getIconAtlasEntry(card.getCivilizationType());
 				if (iconAtlasEntry == null) {
 					throw new RuntimeException("Could not find icon atlas entry for " + card.getCivilizationType());
+				}
+			}
+		}
+	}
+
+	private void verifyAllCivRecordEntries(SourceDataRepo sourceDataRepo) {
+		for (Card card : sourceDataRepo.getAll()) {
+			if (card.getCardCategory().equals(CardCategory.CivilizationAbility)) {
+				String civType = card.getCivilizationType();
+
+				CSVRecord record = sourceDataRepo.civilizationCsvRecordsByCivType.get(civType);
+				if (record == null) {
+					throw new RuntimeException("No Civ csv record for " + civType);
+				}
+
+				String capitalName = sourceDataRepo.capitalNamesByCivType.get(civType);
+				if (capitalName == null) {
+					throw new RuntimeException("No capital name for " + civType);
 				}
 			}
 		}

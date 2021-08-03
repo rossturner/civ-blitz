@@ -84,4 +84,28 @@ public class ResourceFiles {
 			throw new RuntimeException(e);
 		}
 	}
+
+	@Value("classpath:csv/Civilizations.csv")
+	private Resource civilizationsFile;
+
+	@Bean(name = "Civilizations")
+	public String civilizations() {
+		try (InputStream is = civilizationsFile.getInputStream()) {
+			return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Value("classpath:csv/CivilizationLeaders.csv")
+	private Resource civilizationLeadersFile;
+
+	@Bean(name = "CivilizationLeaders")
+	public String civilizationLeaders() {
+		try (InputStream is = civilizationLeadersFile.getInputStream()) {
+			return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

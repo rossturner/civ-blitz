@@ -37,6 +37,15 @@ public class ModInfoGenerator implements ImperiumFileGenerator {
 				"  <Dependencies>\n" +
 				"    <Mod id=\"4873eb62-8ccc-4574-b784-dda455e74e68\" title=\"Expansion: Gathering Storm\" />\n" +
 				"  </Dependencies>\n" +
+				"  <References>\n" +
+				"    <Mod id=\"E3F53C61-371C-440B-96CE-077D318B36C0\" title=\"DLC: Australia Civilization Pack\" />\n" +
+				"    <Mod id=\"02A8BDDE-67EA-4D38-9540-26E685E3156E\" title=\"DLC: Aztec Civilization Pack\" />\n" +
+				"    <Mod id=\"1F367231-A040-4793-BDBB-088816853683\" title=\"DLC: Khmer and Indonesia Civilization Pack\" />\n" +
+				"    <Mod id=\"643EA320-8E1A-4CF1-A01C-00D88DDD131A\" title=\"DLC: Nubia Civilization Pack\" />\n" +
+				"    <Mod id=\"E2749E9A-8056-45CD-901B-C368C8E83DEB\" title=\"DLC: Persia and Macedon Civilization Pack\" />\n" +
+				"    <Mod id=\"3809975F-263F-40A2-A747-8BFB171D821A\" title=\"DLC: Poland Civilization Pack\" />\n" +
+				"    <Mod id=\"2F6E858A-28EF-46B3-BEAC-B985E52E9BC1\" title=\"DLC: Vikings Content\" />\n" +
+				"  </References>\n" +
 				"  <FrontEndActions>\n" +
 				"    <UpdateDatabase id=\"Update_DB_Frontend\">\n" +
 				"      <File>Configuration.sql</File>\n" +

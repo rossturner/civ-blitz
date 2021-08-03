@@ -1,14 +1,24 @@
 package technology.rocketjump.civimperium.modgenerator.sql;
 
+import org.apache.commons.csv.CSVRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
+import technology.rocketjump.civimperium.model.SourceDataRepo;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
 
 import java.util.Map;
 
 @Component
 public class CivilizationSqlGenerator implements ImperiumFileGenerator {
+
+	private final SourceDataRepo sourceDataRepo;
+
+	@Autowired
+	public CivilizationSqlGenerator(SourceDataRepo sourceDataRepo) {
+		this.sourceDataRepo = sourceDataRepo;
+	}
 
 	@Override
 	public String getFileContents(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
@@ -37,21 +47,31 @@ public class CivilizationSqlGenerator implements ImperiumFileGenerator {
 				"VALUES\t('CIVILIZATION_IMP_").append(modName).append("',\t'KIND_CIVILIZATION');\n" +
 				"\n");
 
+		CSVRecord civRecord = sourceDataRepo.civilizationCsvRecordsByCivType.get(namesCivType);
+		String ethnicity = civRecord.get("Ethnicity");
+		if (ethnicity == null) {
+			ethnicity = "";
+		}
+
 		sqlBuilder.append("INSERT OR REPLACE INTO Civilizations\n" +
 				"(CivilizationType, Name, Description, Adjective, StartingCivilizationLevelType, RandomCityNameDepth, Ethnicity)\n" +
-				"SELECT 'CIVILIZATION_IMP_").append(modName).append("', Civilizations.Name, Civilizations.Description, Civilizations.Adjective,\n" +
-				"       Civilizations.StartingCivilizationLevelType,  Civilizations.RandomCityNameDepth, Civilizations.Ethnicity\n" +
-				"FROM Civilizations\n" +
-				"WHERE Civilizations.CivilizationType = '").append(namesCivType).append("';\n");
+				"VALUES\n" +
+				"('CIVILIZATION_IMP_").append(modName).append("', " +
+				"'").append(civRecord.get("Name")).append("', '").append(civRecord.get("Description")).append("', '").append(civRecord.get("Adjective")).append("', " +
+				"'CIVILIZATION_LEVEL_FULL_CIV', 10, '").append(ethnicity).append("');\n\n");
+
+		// TODO replace CivLeaders insert with a VALUES statement
+
+		String capitalName = sourceDataRepo.capitalNamesByCivType.get(namesCivType);
 
 		sqlBuilder.append("\n" +
 				"INSERT OR REPLACE INTO CivilizationLeaders\n" +
 				"(CivilizationType, LeaderType, CapitalName)\n" +
-				"SELECT 'CIVILIZATION_IMP_").append(modName).append("', 'LEADER_IMP_").append(modName).append("', CivilizationLeaders.CapitalName\n" +
-				"FROM CivilizationLeaders\n" +
-				"WHERE CivilizationLeaders.LeaderType = '").append(leaderType).append("'\n" +
-				"  and CivilizationLeaders.CivilizationType = '").append(leaderCivType).append("';\n\n" +
-				"\n" +
+				"VALUES ('CIVILIZATION_IMP_").append(modName).append("', 'LEADER_IMP_").append(modName).append("', '").append(capitalName).append("');\n\n");
+
+		// Names aren't as important, see how fallback works
+
+		sqlBuilder.append("\n" +
 				"INSERT OR REPLACE INTO CityNames (CivilizationType, CityName)\n" +
 				"SELECT 'CIVILIZATION_IMP_").append(modName).append("', CityNames.CityName\n" +
 				"from CityNames\n" +
@@ -68,6 +88,8 @@ public class CivilizationSqlGenerator implements ImperiumFileGenerator {
 				"SELECT 'CIVILIZATION_IMP_").append(modName).append("', CivilizationInfo.Header, CivilizationInfo.Caption, CivilizationInfo.SortIndex\n" +
 				"FROM CivilizationInfo\n" +
 				"WHERE CivilizationInfo.CivilizationType = '").append(namesCivType).append("';\n\n");
+
+		// TODO collate start biases and replace with VALUES insert
 
 		sqlBuilder.append("INSERT OR REPLACE INTO StartBiasFeatures\n" +
 				"(CivilizationType, FeatureType, Tier)\n" +

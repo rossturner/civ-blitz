@@ -1,5 +1,6 @@
 package technology.rocketjump.civimperium.model;
 
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +27,9 @@ public class SourceDataRepo {
 	public final Map<String, String> leaderTraitDescByTraitType = new HashMap<>();
 	public final Map<String, String> portraitsByLeaderType = new HashMap<>();
 	public final Map<String, String> portraitBackgroundsByLeaderType = new HashMap<>();
+	public final Map<String, String> capitalNamesByCivType = new HashMap<>();
+
+	public final Map<String, CSVRecord> civilizationCsvRecordsByCivType = new HashMap<>();
 
 	@Autowired
 	public SourceDataRepo() {

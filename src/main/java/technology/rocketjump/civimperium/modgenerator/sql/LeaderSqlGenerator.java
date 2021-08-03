@@ -23,6 +23,8 @@ public class LeaderSqlGenerator implements ImperiumFileGenerator {
 		Card leaderCard = selectedCards.get(CardCategory.LeaderAbility);
 		String leaderType = leaderCard.getLeaderType().get();
 
+		// TODO replace leaders insert with VALUES statement
+
 		sqlBuilder.append("\n" +
 				"INSERT INTO Types\n" +
 				"(Type, Kind)\n" +
