@@ -11,6 +11,10 @@ const ImpRandom = {
 
     getRandomInt: (exclusiveLimit) => {
         return Math.floor(rnd() * (exclusiveLimit ));
+    },
+
+    cardSort: (a, b) => {
+        return a.cardCategory.localeCompare(b.cardCategory) || a.cardName.localeCompare(b.cardName);
     }
 
 };

@@ -2,16 +2,21 @@ import {Container, Menu} from "semantic-ui-react";
 import React from "react";
 
 
-const TopLevelMenu = () => {
+const TopLevelMenu = ({onItemClick}) => {
 
     return (
         <Menu fixed='top' inverted>
             <Container>
-                <Menu.Item as='a' header>
+                <Menu.Item as='a'>
                     {/*<Image size='mini' src='/logo.png' style={{ marginRight: '1.5em' }} />*/}
                     Civ Imperium
                 </Menu.Item>
-                <Menu.Item as='a'>Civ Builder Proof of Concept</Menu.Item>
+                <Menu.Item as='a' header onClick={() => onItemClick('civbuilder')}>
+                    Civ Builder Proof of Concept
+                </Menu.Item>
+                <Menu.Item as='a' header onClick={() => onItemClick('modtester')}>
+                    Mod Tester
+                </Menu.Item>
 
                 {/*<Dropdown item simple text='Dropdown'>*/}
                 {/*    <Dropdown.Menu>*/}

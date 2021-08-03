@@ -1,6 +1,6 @@
 import ImpRandom from "../ImpRandom";
 
-const allCards = [];
+let allCards = [];
 
 export const CATEGORIES = ["CivilizationAbility", "LeaderAbility", "UniqueUnit", "UniqueInfrastructure"];
 
@@ -27,7 +27,7 @@ const CardStore = {
 
     addCards: (cards) => {
         if (!CardStore.initialised) {
-            allCards.concat(cards);
+            allCards = allCards.concat(cards);
             cards.forEach(card => {
                 byCategory[card.cardCategory].push(card);
             });
