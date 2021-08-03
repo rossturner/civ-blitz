@@ -45,6 +45,15 @@ public class ModInfoGenerator implements ImperiumFileGenerator {
 				"    <Mod id=\"E2749E9A-8056-45CD-901B-C368C8E83DEB\" title=\"DLC: Persia and Macedon Civilization Pack\" />\n" +
 				"    <Mod id=\"3809975F-263F-40A2-A747-8BFB171D821A\" title=\"DLC: Poland Civilization Pack\" />\n" +
 				"    <Mod id=\"2F6E858A-28EF-46B3-BEAC-B985E52E9BC1\" title=\"DLC: Vikings Content\" />\n" +
+				"    <Mod id=\"8424840C-92EF-4426-A9B4-B4E0CB818049\" title=\"LOC_BABYLON_MOD_TITLE\" />\n" +
+				"    <Mod id=\"A1100FC4-70F2-4129-AC27-2A65A685ED08\" title=\"LOC_BYZANTIUM_GAUL_MOD_TITLE\" />\n" +
+				"    <Mod id=\"CE5876CD-6900-46D1-9C9C-8DBA1F28872E\" title=\"LOC_CATHERINE_DE_MEDICI_MOD_TITLE\" />\n" +
+				"    <Mod id=\"1B394FE9-23DC-4868-8F0A-5220CB8FB427\" title=\"LOC_ETHIOPIA_MOD_TITLE\" />\n" +
+				"    <Mod id=\"1B28771A-C749-434B-9053-D1380C553DE9\" title=\"LOC_EXPANSION1_MOD_TITLE\" />\n" +
+				"    <Mod id=\"9DE86512-DE1A-400D-8C0A-AB46EBBF76B9\" title=\"LOC_GRANCOLOMBIA_MAYA_MOD_TITLE\" />\n" +
+				"    <Mod id=\"A3F42CD4-6C3E-4F5A-BC81-BE29E0C0B87C\" title=\"LOC_KUBLAIKHAN_VIETNAM_MOD_TITLE\" />\n" +
+				"    <Mod id=\"FFDF4E79-DEE2-47BB-919B-F5739106627A\" title=\"LOC_PORTUGAL_MOD_TITLE\" />\n" +
+				"    <Mod id=\"113D9459-0A3B-4FCB-A49C-483F40303575\" title=\"LOC_TEDDY_ROOSEVELT_MOD_TITLE\" />\n" +
 				"  </References>\n" +
 				"  <FrontEndActions>\n" +
 				"    <UpdateDatabase id=\"Update_DB_Frontend\">\n" +
