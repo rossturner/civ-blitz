@@ -3,6 +3,8 @@ package technology.rocketjump.civimperium.modgenerator;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import technology.rocketjump.civimperium.infrastructurefix.InfrastructureFixFileProvider;
+import technology.rocketjump.civimperium.infrastructurefix.StaticModFile;
 import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
@@ -30,6 +32,7 @@ public class CompleteModGenerator {
 	private final IconsSqlGenerator iconsSqlGenerator;
 	private final LeaderSqlGenerator leaderSqlGenerator;
 	private final LeaderTextSqlGenerator leaderTextSqlGenerator;
+	private final InfrastructureFixFileProvider infrastructureFixFileProvider;
 
 	private List<ImperiumFileGenerator> fileGeneratorList = new ArrayList<>();
 
@@ -38,7 +41,7 @@ public class CompleteModGenerator {
 								CivilizationSqlGenerator civilizationSqlGenerator, CivTraitsSqlGenerator civTraitsSqlGenerator,
 								ColorsSqlGenerator colorsSqlGenerator, ConfigurationSqlGenerator configurationSqlGenerator,
 								GeographySqlGenerator geographySqlGenerator, IconsSqlGenerator iconsSqlGenerator,
-								LeaderSqlGenerator leaderSqlGenerator, LeaderTextSqlGenerator leaderTextSqlGenerator) {
+								LeaderSqlGenerator leaderSqlGenerator, LeaderTextSqlGenerator leaderTextSqlGenerator, InfrastructureFixFileProvider infrastructureFixFileProvider) {
 		this.modHeaderGenerator = modHeaderGenerator;
 		this.modInfoGenerator = modInfoGenerator;
 		this.civilizationSqlGenerator = civilizationSqlGenerator;
@@ -49,6 +52,7 @@ public class CompleteModGenerator {
 		this.iconsSqlGenerator = iconsSqlGenerator;
 		this.leaderSqlGenerator = leaderSqlGenerator;
 		this.leaderTextSqlGenerator = leaderTextSqlGenerator;
+		this.infrastructureFixFileProvider = infrastructureFixFileProvider;
 
 		fileGeneratorList.add(civilizationSqlGenerator);
 		fileGeneratorList.add(civTraitsSqlGenerator);
@@ -80,6 +84,11 @@ public class CompleteModGenerator {
 		for (ImperiumFileGenerator generator : fileGeneratorList) {
 			byte[] contentBytes = generator.getFileContents(header, selectedCards).getBytes();
 			zipOutputStream.putNextEntry(new ZipEntry(generator.getFilename()));
+			zipOutputStream.write(contentBytes, 0, contentBytes.length);
+		}
+		for (StaticModFile fixFile : infrastructureFixFileProvider.getAll()) {
+			byte[] contentBytes = fixFile.getFileContent().getBytes();
+			zipOutputStream.putNextEntry(new ZipEntry(fixFile.getFilename()));
 			zipOutputStream.write(contentBytes, 0, contentBytes.length);
 		}
 

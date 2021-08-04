@@ -85,6 +85,15 @@ public class ModInfoGenerator implements ImperiumFileGenerator {
 				"    <UpdateIcons id=\"Icons\">\n" +
 				"      <File>Icons.sql</File>\n" +
 				"    </UpdateIcons>\n" +
+				"    <UpdateArt id=\"ArtUpdate\">\n" +
+				"      <Properties>\n" +
+				"        <LoadOrder>9000</LoadOrder>\n" +
+				"      </Properties>\n" +
+				"      <File>DLC_Indones_Khmer.dep</File>\n" +
+				"      <File>DLC_Maced_Pers.dep</File>\n" +
+				"      <File>DLC_Nubia_Amanit.dep</File>\n" +
+				"      <File>Exp1.dep</File>\n" +
+				"    </UpdateArt>\n" +
 				"  </InGameActions>\n" +
 				"  <Files>\n" +
 				"    <File>Civilization.sql</File>\n" +
@@ -95,6 +104,14 @@ public class ModInfoGenerator implements ImperiumFileGenerator {
 				"    <File>Icons.sql</File>\n" +
 				"    <File>Leader.sql</File>\n" +
 				"    <File>LeaderText.sql</File>\n" +
+				"    <File>ArtDefs/Landmarks_DLC_Indones_Khmer.artdef</File>\n" +
+				"    <File>ArtDefs/Landmarks_DLC_Maced_Pers.artdef</File>\n" +
+				"    <File>ArtDefs/Landmarks_DLC_Nubia_Amanit.artdef</File>\n" +
+				"    <File>ArtDefs/Landmarks_Exp1.artdef</File>\n" +
+				"    <File>DLC_Indones_Khmer.dep</File>\n" +
+				"    <File>DLC_Maced_Pers.dep</File>\n" +
+				"    <File>DLC_Nubia_Amanit.dep</File>\n" +
+				"    <File>Exp1.dep</File>\n" +
 				"  </Files>\n" +
 				"</Mod>");
 
