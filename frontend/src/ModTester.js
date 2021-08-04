@@ -19,7 +19,7 @@ const ModTester = ({}) => {
         let cardsClone = [].concat(allCards);
         cardsClone.sort(ImpRandom.cardSort);
         setCollection(cardsClone);
-    })
+    }, []);
 
     const collectionCardClicked = (card) => {
         if (!editingCiv) {

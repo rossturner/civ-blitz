@@ -6,47 +6,45 @@ import CivBuilder from "./CivBuilder";
 import ImpRandom from "./ImpRandom";
 import ModTester from "./ModTester";
 
+const axios = require('axios');
+
 function App() {
 
     const [currentPage, setCurrentPage] = useState('modtester');
     const [collection, setCollection] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (loading) {
-            fetch("/api/cards")
-                .then(res => res.json())
-                .then(
-                    (cards) => {
-                        if (!CardStore.initialised) {
-                            CardStore.addCards(cards);
-                            let newCollection = CardStore.getInitialCollection();
-                            newCollection.sort(ImpRandom.cardSort);
-                            setCollection(newCollection);
-                            setLoading(false);
-                        }
-                    },
-                    (error) => {
-                        console.error('Error loading cards', error);
-                    }
-                );
-        }
-    });
+        setLoading(true);
+        axios.get("/api/cards")
+            .then((response) => {
+                if (!CardStore.initialised) {
+                    CardStore.addCards(response.data);
+                    let newCollection = CardStore.getInitialCollection();
+                    newCollection.sort(ImpRandom.cardSort);
+                    setLoading(false);
+                    setCollection(newCollection);
+                }
+            })
+            .catch((error) => {
+                console.error('Error loading cards', error);
+            });
+    }, []);
 
     if (loading) {
         return <div>Loading...</div>
     }
     return (
         <div>
-            <TopLevelMenu onItemClick={(name) => setCurrentPage(name)}  />
+            <TopLevelMenu onItemClick={(name) => setCurrentPage(name)}/>
 
 
             {currentPage === 'civbuilder' &&
-            <CivBuilder collection={collection} setCollection={setCollection} />
+            <CivBuilder collection={collection} setCollection={setCollection}/>
             }
 
             {currentPage === 'modtester' &&
-            <ModTester />
+            <ModTester/>
             }
 
         </div>

@@ -53,10 +53,10 @@ public class ExampleController {
 			selectedCards.put(card.getCardCategory(), card);
 		}
 
-		String modName = modHeaderGenerator.createFor(selectedCards).modName;
+		String modName = modHeaderGenerator.createFor(selectedCards, null).modName;
 		response.addHeader("Content-Disposition", "attachment; filename=\"Imperium_"+modName+".zip\"");
 
-		return completeModGenerator.generateMod(selectedCards);
+		return completeModGenerator.generateMod(selectedCards, null);
 	}
 
 }

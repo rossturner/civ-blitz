@@ -13,7 +13,7 @@ import static technology.rocketjump.civimperium.model.CardCategory.*;
 @Component
 public class ModHeaderGenerator {
 
-	public ModHeader createFor(Map<CardCategory, Card> selectedCards) {
+	public ModHeader createFor(Map<CardCategory, Card> selectedCards, String startBiasCivType) {
 		StringBuilder nameBuilder = new StringBuilder();
 
 		nameBuilder.append(getShortName(selectedCards.get(CivilizationAbility).getCivilizationFriendlyName()));
@@ -32,7 +32,12 @@ public class ModHeaderGenerator {
 				.append(selectedCards.get(UniqueUnit).getCivilizationFriendlyName()).append(").");
 
 
-		return new ModHeader(name, descriptionBuilder.toString(), UUID.nameUUIDFromBytes(name.getBytes()));
+		ModHeader modHeader = new ModHeader(name, descriptionBuilder.toString(), UUID.nameUUIDFromBytes(name.getBytes()));
+		modHeader.setStartBiasCivType(selectedCards.get(CivilizationAbility).getCivilizationType());
+		if (startBiasCivType != null) {
+			modHeader.setStartBiasCivType(startBiasCivType);
+		}
+		return modHeader;
 	}
 
 	private String getShortName(String name) {

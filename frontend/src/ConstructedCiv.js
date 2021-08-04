@@ -1,5 +1,5 @@
-import {Button, Card, Container, Header, Segment} from "semantic-ui-react";
-import React from "react";
+import {Button, Card, Container, Header, Segment, Select} from "semantic-ui-react";
+import React, {useState} from "react";
 import ImperiumCard from "./cards/ImperiumCard";
 
 const ConstructedCiv = ({index, cards, editable, onCardClick, onConfirmClick, alwaysEditing}) => {
@@ -10,11 +10,29 @@ const ConstructedCiv = ({index, cards, editable, onCardClick, onConfirmClick, al
 
     let downloadLink = "/api/mods?";
 
+    const [selectedBias, setSelectedBias] = useState();
+
     const searchParams = new URLSearchParams();
+    const startBiases = {};
     if (cards) {
-        cards.forEach(card => searchParams.append('traitType', card.traitType));
+        cards.forEach(card => {
+            searchParams.append('traitType', card.traitType);
+            startBiases[card.civilizationType] = card.civilizationFriendlyName;
+        });
+    }
+    if (setSelectedBias) {
+        searchParams.append('startBias', selectedBias);
     }
     downloadLink += searchParams.toString();
+
+    const options = [];
+    for (const [civType, friendlyName] of Object.entries(startBiases)) {
+        options.push({
+            key: civType,
+            value: civType,
+            text: friendlyName
+        });
+    }
 
     return (
         <Segment>
@@ -29,7 +47,13 @@ const ConstructedCiv = ({index, cards, editable, onCardClick, onConfirmClick, al
             </Card.Group>
 
 
-            <Container style={{'padding-top': '2em'}}>
+            <Container style={{'paddingTop': '2em'}}>
+                {cards.length > 0 &&
+                <div style={{'paddingBottom': '1em'}}>
+                    <Select placeholder='Select start bias...' options={options} onChange={(event, {value}) => setSelectedBias(value)}/>
+                </div>
+                }
+
                 {editable && !alwaysEditing &&
                 <Button primary disabled={cards.length < 4} onClick={() => onConfirmClick()}>
                     Confirm
@@ -37,7 +61,7 @@ const ConstructedCiv = ({index, cards, editable, onCardClick, onConfirmClick, al
                 }
 
                 {(!editable || (alwaysEditing && cards.length === 4)) &&
-                <Button as='a' href={downloadLink}>
+                <Button as='a' href={downloadLink} disabled={!selectedBias}>
                     Download mod
                 </Button>
                 }

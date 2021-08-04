@@ -65,7 +65,7 @@ public class CompleteModGenerator {
 		fileGeneratorList.add(leaderTextSqlGenerator);
 	}
 
-	public byte[] generateMod(Map<CardCategory, Card> selectedCards) throws IOException {
+	public byte[] generateMod(Map<CardCategory, Card> selectedCards, String startBiasCivType) throws IOException {
 		if (selectedCards.size() != 4) {
 			throw new IllegalArgumentException(getClass().getSimpleName() + " must be passed a map of 4 cards");
 		}
@@ -75,7 +75,7 @@ public class CompleteModGenerator {
 			}
 		}
 
-		ModHeader header = modHeaderGenerator.createFor(selectedCards);
+		ModHeader header = modHeaderGenerator.createFor(selectedCards, startBiasCivType);
 
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);

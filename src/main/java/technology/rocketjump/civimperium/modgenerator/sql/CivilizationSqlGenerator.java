@@ -25,7 +25,7 @@ public class CivilizationSqlGenerator implements ImperiumFileGenerator {
 		return getCivilizationSql(modHeader,
 				selectedCards.get(CardCategory.CivilizationAbility),
 				selectedCards.get(CardCategory.LeaderAbility),
-				selectedCards.get(CardCategory.CivilizationAbility).getCivilizationType());
+				modHeader.getStartBiasCivType());
 	}
 
 	public String getCivilizationSql(ModHeader modHeader, Card civAbilityCard, Card leaderAbilityCard, String startBiasCivType) {

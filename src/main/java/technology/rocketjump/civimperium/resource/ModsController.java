@@ -31,7 +31,9 @@ public class ModsController {
 
 	@GetMapping(produces = "application/zip")
 	@ResponseBody
-	public byte[] getMod(@RequestParam(name="traitType") List<String> traitTypes, HttpServletResponse response) throws IOException {
+	public byte[] getMod(@RequestParam(name="traitType") List<String> traitTypes,
+						 @RequestParam(name="startBias") String startBiasCivType,
+						 HttpServletResponse response) throws IOException {
 		response.setContentType("application/zip");
 		response.setStatus(HttpServletResponse.SC_OK);
 		Map<CardCategory, Card> selectedCards = new HashMap<>();
@@ -39,10 +41,10 @@ public class ModsController {
 			selectedCards.put(card.getCardCategory(), card);
 		});
 
-		String modName = modHeaderGenerator.createFor(selectedCards).modName;
+		String modName = modHeaderGenerator.createFor(selectedCards, startBiasCivType).modName;
 		response.addHeader("Content-Disposition", "attachment; filename=\"Imperium_"+modName+".zip\"");
 
-		return completeModGenerator.generateMod(selectedCards);
+		return completeModGenerator.generateMod(selectedCards, startBiasCivType);
 	}
 
 }
