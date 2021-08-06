@@ -18,12 +18,27 @@
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
         <node.version>v14.17.3</node.version>
         <yarn.version>v1.12.1</yarn.version>
+
+        <db.schema>imperium</db.schema>
+        <h2.db.url>jdbc:h2:${project.build.directory}/compile_db;DATABASE_TO_UPPER=false;INIT=CREATE SCHEMA IF NOT
+            EXISTS "imperium"
+        </h2.db.url>
+        <h2.db.username>sa</h2.db.username>
+
+        <db.name>imperium</db.name>
+        <db.host>localhost</db.host>
+        <db.port>5432</db.port>
+        <db.username>postgres</db.username>
+        <db.password>Ok03TkcHjY96</db.password>
+        <db.url>jdbc:postgresql://${db.host}:${db.port}:${db.name}</db.url>
+        <jooq.generated.source.directory>${project.build.directory}/generated-sources/jooq
+        </jooq.generated.source.directory>
     </properties>
     <dependencies>
-        <!--		<dependency>-->
-        <!--			<groupId>org.springframework.boot</groupId>-->
-        <!--			<artifactId>spring-boot-starter-data-jpa</artifactId>-->
-        <!--		</dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
         <!--		<dependency>-->
         <!--			<groupId>org.springframework.boot</groupId>-->
         <!--			<artifactId>spring-boot-starter-data-rest</artifactId>-->
@@ -53,6 +68,42 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.12.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jooq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-meta</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq-codegen</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <!-- Switch back from Spring Boot 2.x standard HikariCP to Tomcat JDBC,
+            configured later in Heroku (see https://stackoverflow.com/a/49970142/4964553) -->
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.23</version>
         </dependency>
 
 
@@ -124,19 +175,6 @@
                         <phase>generate-resources</phase>
                     </execution>
                     <execution>
-                        <id>yarn test</id>
-                        <goals>
-                            <goal>yarn</goal>
-                        </goals>
-                        <phase>test</phase>
-                        <configuration>
-                            <arguments>test</arguments>
-                            <environmentVariables>
-                                <CI>true</CI>
-                            </environmentVariables>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>yarn build</id>
                         <goals>
                             <goal>yarn</goal>
@@ -144,6 +182,109 @@
                         <phase>compile</phase>
                         <configuration>
                             <arguments>build</arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <configuration>
+                    <url>${h2.db.url}</url>
+                    <user>${h2.db.username}</user>
+                    <password/>
+                    <locations>
+                        <location>filesystem:src/main/resources/db/migration</location>
+                    </locations>
+                    <schemas>
+                        <schema>${db.schema}</schema>
+                    </schemas>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>run-flyway</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>migrate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.h2database</groupId>
+                        <artifactId>h2</artifactId>
+                        <version>${h2.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <jdbc>
+                                <url>${h2.db.url}</url>
+                                <user>${h2.db.username}</user>
+                            </jdbc>
+                            <generator>
+                                <database>
+                                    <includes>.*</includes>
+                                    <excludes>QRTZ_.*</excludes>
+                                    <inputSchema>${db.schema}</inputSchema>
+
+                                    <!--                                    <forcedTypes>-->
+                                    <!--                                        <forcedType>-->
+                                    <!--                                            <userType>technology.rocketjump.civimperium.contracts.Exchange</userType>-->
+                                    <!--                                            <expressions>exchange</expressions>-->
+                                    <!--                                            <enumConverter>true</enumConverter>-->
+                                    <!--                                        </forcedType>-->
+                                    <!--                                    </forcedTypes>-->
+                                </database>
+                                <generate>
+                                    <deprecated>false</deprecated>
+                                    <instanceFields>true</instanceFields>
+                                    <pojos>true</pojos>
+                                    <pojosEqualsAndHashCode>true</pojosEqualsAndHashCode>
+                                    <daos>true</daos>
+                                </generate>
+                                <target>
+                                    <packageName>technology.rocketjump.civimperium.codegen</packageName>
+                                    <directory>${jooq.generated.source.directory}</directory>
+                                </target>
+                            </generator>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.h2database</groupId>
+                        <artifactId>h2</artifactId>
+                        <version>${h2.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>add-generated-jooq-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${jooq.generated.source.directory}</source>
+                            </sources>
                         </configuration>
                     </execution>
                 </executions>
