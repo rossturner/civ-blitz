@@ -1,5 +1,5 @@
 create table contract (
-    contract_id         integer     not null auto_increment,
+    contract_id         SERIAL PRIMARY KEY,
     symbol              varchar(10),
     long_name           varchar(2000),
     exchange            varchar(10),
@@ -11,9 +11,8 @@ create table contract (
     low_52_week         decimal,
     high_52_week        decimal,
 
-    last_updated        timestamp,
+    last_updated        timestamp
 
-    primary key (contract_id)
 );
 
 CREATE INDEX idx_contract_symbol on contract (symbol);
