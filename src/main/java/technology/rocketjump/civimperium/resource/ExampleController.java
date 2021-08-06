@@ -16,6 +16,7 @@ import technology.rocketjump.civimperium.modgenerator.ModHeaderGenerator;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +56,12 @@ public class ExampleController {
 		contractRecord.store();
 
 		return create.selectFrom(CONTRACT).fetchInto(Contract.class);
+	}
+
+	@GetMapping("/user")
+	public Principal getUser(Principal principal) {
+		// Go to http://localhost:8080/oauth2/authorization/discord to login, redirected to redirect URI
+		return principal;
 	}
 
 	@GetMapping(value = "/mod", produces = "application/zip")

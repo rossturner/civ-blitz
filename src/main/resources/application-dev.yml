@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/imperium
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: Ok03TkcHjY96
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  flyway:
+    schemas: imperium
+    default-schema: imperium
+

@@ -1,0 +1,35 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:./persistent_db/imperium_db;DATABASE_TO_UPPER=false
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  flyway:
+    schemas: imperium
+    default-schema: imperium
+  h2:
+    console:
+      enabled: true # Console available at http://localhost:8080/h2-console
+
+  security:
+    oauth2:
+      client:
+        registration:
+          discord:
+            client-id: 873320729351958539
+            client-secret: -fuHRpI8YFB1fGNOHqzB_Vbs7TQAXtAB
+            clientAuthenticationMethod: post
+            authorizationGrantType: authorization_code
+            scope:
+              - identify
+            redirectUri: "{baseUrl}/login/oauth2/code/discord"
+            clientName: FourScouts client
+        provider:
+          discord:
+            authorizationUri: https://discordapp.com/api/oauth2/authorize
+            tokenUri: https://discordapp.com/api/oauth2/token
+            userInfoUri: https://discordapp.com/api/users/@me
+            usernameAttribute: username
+
