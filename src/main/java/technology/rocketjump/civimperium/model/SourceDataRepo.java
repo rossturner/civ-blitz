@@ -12,6 +12,7 @@ public class SourceDataRepo {
 	private final Map<String, String> friendlyNameByCivilizationType = new TreeMap<>();
 	private final Map<String, Card> cardsByTraitType = new TreeMap<>();
 	private final Map<String, Card> cardsByCardName = new TreeMap<>();
+	private final Map<CardCategory, List<Card>> cardsByCategory = new EnumMap<>(CardCategory.class);
 	private final Map<String, String> subtypesByTraitType = new HashMap<>();
 	private final Map<String, IconAtlasEntry> iconAtlasEntriesByCivOrLeaderType = new HashMap<>();
 
@@ -47,6 +48,7 @@ public class SourceDataRepo {
 
 		cardsByTraitType.put(card.getTraitType(), card);
 		cardsByCardName.put(card.getCardName(), card);
+		cardsByCategory.computeIfAbsent(card.getCardCategory(), a -> new ArrayList<>()).add(card);
 	}
 
 	public void removeGrantedCards() {
@@ -70,6 +72,10 @@ public class SourceDataRepo {
 
 	public Card getByTraitType(String traitType) {
 		return cardsByTraitType.get(traitType);
+	}
+
+	public List<Card> getByCategory(CardCategory cardCategory) {
+		return cardsByCategory.get(cardCategory);
 	}
 
 	public void addSubtypeByTraitType(String traitType, String subtype) {

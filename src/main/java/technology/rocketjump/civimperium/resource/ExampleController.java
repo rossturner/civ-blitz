@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import technology.rocketjump.civimperium.codegen.tables.pojos.Contract;
-import technology.rocketjump.civimperium.codegen.tables.records.ContractRecord;
 import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.model.SourceDataRepo;
@@ -21,8 +19,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static technology.rocketjump.civimperium.codegen.tables.Contract.CONTRACT;
 
 @RestController
 @RequestMapping("/example")
@@ -48,14 +44,15 @@ public class ExampleController {
 	}
 
 	@GetMapping("/sql")
-	public List<Contract> getSqlExecution() {
-		List<Contract> contracts = create.selectFrom(CONTRACT).fetchInto(Contract.class);
-
-		ContractRecord contractRecord = create.newRecord(CONTRACT);
-		contractRecord.setContractId(contracts.size() + 1);
-		contractRecord.store();
-
-		return create.selectFrom(CONTRACT).fetchInto(Contract.class);
+	public List<String> getSqlExecution() {
+//		List<Contract> contracts = create.selectFrom(CONTRACT).fetchInto(Contract.class);
+//
+//		ContractRecord contractRecord = create.newRecord(CONTRACT);
+//		contractRecord.setContractId(contracts.size() + 1);
+//		contractRecord.store();
+//
+//		return create.selectFrom(CONTRACT).fetchInto(Contract.class);
+		return List.of();
 	}
 
 	@GetMapping("/user")

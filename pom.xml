@@ -243,13 +243,13 @@
                                     <excludes>QRTZ_.*</excludes>
                                     <inputSchema>${db.schema}</inputSchema>
 
-                                    <!--                                    <forcedTypes>-->
-                                    <!--                                        <forcedType>-->
-                                    <!--                                            <userType>technology.rocketjump.civimperium.contracts.Exchange</userType>-->
-                                    <!--                                            <expressions>exchange</expressions>-->
-                                    <!--                                            <enumConverter>true</enumConverter>-->
-                                    <!--                                        </forcedType>-->
-                                    <!--                                    </forcedTypes>-->
+                                    <forcedTypes>
+                                        <forcedType>
+                                            <userType>technology.rocketjump.civimperium.matches.MatchState</userType>
+                                            <expressions>match_state</expressions>
+                                            <enumConverter>true</enumConverter>
+                                        </forcedType>
+                                    </forcedTypes>
                                 </database>
                                 <generate>
                                     <deprecated>false</deprecated>

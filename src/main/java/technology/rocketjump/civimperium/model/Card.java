@@ -1,20 +1,55 @@
 package technology.rocketjump.civimperium.model;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public class Card {
 
-	private String cardName;
-	private String cardDescription;
-	private String traitType; // Use this as the unique identifier
-	private String civilizationType;
-	private Optional<String> leaderType = Optional.empty();
-	private CardCategory cardCategory;
+	protected String cardName;
+	protected String cardDescription;
+	protected String traitType; // Use this as the unique identifier
+	protected String civilizationType;
+	protected Optional<String> leaderType = Optional.empty();
+	protected CardCategory cardCategory;
 
-	private String civilizationFriendlyName;
+	protected String civilizationFriendlyName;
 
-	private Optional<String> grantsTraitType = Optional.empty();
-	private String subtype;
+	protected Optional<String> grantsTraitType = Optional.empty();
+	protected String subtype;
+
+	public Card() {
+
+	}
+
+	public Card(Card original) {
+		this.cardName = original.cardName;
+		this.cardDescription = original.cardDescription;
+		this.traitType = original.traitType;
+		this.civilizationType = original.civilizationType;
+		this.leaderType = original.leaderType;
+		this.cardCategory = original.cardCategory;
+		this.civilizationFriendlyName = original.civilizationFriendlyName;
+		this.grantsTraitType = original.grantsTraitType;
+		this.subtype = original.subtype;
+	}
+
+	@Override
+	public String toString() {
+		return cardName + " " + traitType;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Card card = (Card) o;
+		return traitType.equals(card.traitType);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(traitType);
+	}
 
 	public String getCivilizationType() {
 		return civilizationType;

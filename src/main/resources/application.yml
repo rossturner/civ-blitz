@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:file:./persistent_db/imperium_db;DATABASE_TO_UPPER=false
+    url: jdbc:h2:file:./persistent_db/imperium_db;DATABASE_TO_UPPER=false;AUTO_SERVER=TRUE
     driver-class-name: org.h2.Driver
     username: sa
     password:
