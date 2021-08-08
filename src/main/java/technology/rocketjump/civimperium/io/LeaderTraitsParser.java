@@ -14,6 +14,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.Optional;
 
+import static technology.rocketjump.civimperium.io.MediaNameUtil.simplify;
+
 @Component
 public class LeaderTraitsParser {
 
@@ -41,7 +43,7 @@ public class LeaderTraitsParser {
 				card.setCivilizationType(civilizationType);
 				card.setLeaderType(Optional.of(record.get("LeaderType")));
 				card.setTraitType(traitType);
-				card.setMediaName(record.get("MediaName"));
+				card.setMediaName(simplify(record.get("MediaName")));
 				card.setCardCategory(CardCategory.LeaderAbility);
 				card.setCivilizationFriendlyName(civFriendlyName);
 				card.setCardName(getLeaderNameFrom(record.get("Name")));

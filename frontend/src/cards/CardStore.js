@@ -5,6 +5,8 @@ let allCards = [];
 export const CATEGORIES = ["CivilizationAbility", "LeaderAbility", "UniqueUnit", "UniqueInfrastructure"];
 
 const byCategory = {};
+const byTraitType = {};
+const mediaByCivType = {};
 
 CATEGORIES.forEach(cat => {
     byCategory[cat] = [];
@@ -30,6 +32,10 @@ const CardStore = {
             allCards = allCards.concat(cards);
             cards.forEach(card => {
                 byCategory[card.cardCategory].push(card);
+                byTraitType[card.traitType] = card;
+                if (card.cardCategory === 'CivilizationAbility') {
+                    mediaByCivType[card.civilizationType] = card.mediaName;
+                }
             });
             CardStore.initialised = true;
         }
@@ -53,6 +59,10 @@ const CardStore = {
             selected = selected.concat(getUniqueCardsFromCategory(category, 2, collection));
         })
         return selected;
+    },
+
+    getMediaNameForCivType: (civType) => {
+        return mediaByCivType[civType];
     }
 
 };

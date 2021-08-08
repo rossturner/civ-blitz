@@ -15,6 +15,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.Optional;
 
+import static technology.rocketjump.civimperium.io.MediaNameUtil.simplify;
+
 @Component
 public class CivTraitsParser {
 
@@ -38,7 +40,7 @@ public class CivTraitsParser {
 				Card card = new Card();
 				card.setCivilizationType(civilizationType);
 				card.setTraitType(record.get("TraitType"));
-				card.setMediaName(record.get("MediaName"));
+				card.setMediaName(simplify(record.get("MediaName")));
 				card.setCardCategory(CardCategory.parseAcronym(record.get("CardType")));
 				card.setCivilizationFriendlyName(friendlyCivName);
 

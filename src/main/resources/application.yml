@@ -19,7 +19,7 @@ spring:
         registration:
           discord:
             client-id: 873320729351958539
-            client-secret: -fuHRpI8YFB1fGNOHqzB_Vbs7TQAXtAB
+            client-secret: SET_BY_ENV_VARIABLE
             clientAuthenticationMethod: post
             authorizationGrantType: authorization_code
             scope:
