@@ -1,9 +1,9 @@
-import {Card, Container, Header} from "semantic-ui-react";
+import {Container, Header} from "semantic-ui-react";
 import React, {useState} from "react";
 import CardStore from "./cards/CardStore";
-import ImperiumCard from "./cards/ImperiumCard";
 import ConstructedCiv from "./ConstructedCiv";
 import ImpRandom from "./ImpRandom";
+import ImperiumCardGroup from "./cards/ImperiumCardGroup";
 
 
 const CivBuilder = ({collection, setCollection}) => {
@@ -71,9 +71,6 @@ const CivBuilder = ({collection, setCollection}) => {
         }
     };
 
-    const cardItems = collection.map((cardJson, index) => {
-        return (<ImperiumCard key={index} cardJson={cardJson} onClick={() => collectionCardClicked(cardJson)}/>);
-    })
     let civilizations = [].concat(storedCivilizations);
     if (editingCiv) {
         civilizations.push(editingCiv);
@@ -91,11 +88,7 @@ const CivBuilder = ({collection, setCollection}) => {
 
             <Container style={{marginTop: '2em'}}>
                 <Header as='h2'>Available collection</Header>
-
-                <Card.Group>
-                    {cardItems}
-                </Card.Group>
-
+                <ImperiumCardGroup cards={collection} cardClicked={collectionCardClicked} />
             </Container>
         </React.Fragment>
     );

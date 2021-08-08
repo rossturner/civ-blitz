@@ -1,12 +1,11 @@
 import React, {useEffect, useState} from "react";
 import ImpRandom from "./ImpRandom";
 import CardStore from "./cards/CardStore";
-import ImperiumCard from "./cards/ImperiumCard";
 import ConstructedCiv from "./ConstructedCiv";
-import {Card, Container, Header} from "semantic-ui-react";
+import {Container, Header} from "semantic-ui-react";
+import ImperiumCardGroup from "./cards/ImperiumCardGroup";
 
-
-const ModTester = ({}) => {
+const ModTester = () => {
     const [editingCiv, setEditingCiv] = useState({
         cards: [],
         editable: true
@@ -57,10 +56,6 @@ const ModTester = ({}) => {
         setCollection(updatedCollection);
     };
 
-    const cardItems = collection.map((cardJson, index) => {
-        return (<ImperiumCard key={index} cardJson={cardJson} onClick={() => collectionCardClicked(cardJson)}/>);
-    })
-
     return (
         <React.Fragment>
             <Container style={{marginTop: '6em'}}>
@@ -70,11 +65,7 @@ const ModTester = ({}) => {
 
             <Container style={{marginTop: '2em'}}>
                 <Header as='h2'>All cards</Header>
-
-                <Card.Group>
-                    {cardItems}
-                </Card.Group>
-
+                <ImperiumCardGroup cards={collection} cardClicked={collectionCardClicked} />
             </Container>
         </React.Fragment>
     );
