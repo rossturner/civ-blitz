@@ -11,8 +11,8 @@ const ImperiumCardGroup = ({cards, cardClicked}) => {
         'All': '',
         'Civilization Ability': 'CivilizationAbility',
         'Leader Ability': 'LeaderAbility',
-        'UniqueInfrastructure': 'UniqueInfrastructure',
-        'UniqueUnit': 'UniqueUnit'
+        'Unique Infrastructure': 'UniqueInfrastructure',
+        'Unique Unit': 'UniqueUnit'
     };
     const checkboxes = [];
     for (const [displayText, value] of Object.entries(filters)) {
