@@ -16,6 +16,7 @@ import java.util.*;
 public class CollectionService {
 
 	private static final Integer NUM_INITIAL_CARDS_PER_CATEGORY = 4;
+	public static final int MAX_MULLIGANS_ALLOWED = 4;
 	private final SourceDataRepo sourceDataRepo;
 	private final CollectionRepo collectionRepo;
 	private final MatchRepo matchRepo;
@@ -29,7 +30,7 @@ public class CollectionService {
 	}
 
 	public List<Collection> initialiseCollection(Player player, int timesMulliganed) {
-		if (timesMulliganed > 4) {
+		if (timesMulliganed > MAX_MULLIGANS_ALLOWED) {
 			throw new IllegalArgumentException("Can not mulligan more than 4 times");
 		}
 		if (matchRepo.getNumActiveMatches(player) > 0) {
@@ -64,6 +65,15 @@ public class CollectionService {
 		}
 
 		return collectionRepo.getCollection(player);
+	}
+
+	public int getTimesMulliganed(Player player) {
+		if (matchRepo.getNumActiveMatches(player) > 0) {
+			return MAX_MULLIGANS_ALLOWED;
+		} else {
+			int defaultInitialCards = (NUM_INITIAL_CARDS_PER_CATEGORY * CardCategory.values().length);
+			return defaultInitialCards - getCollection(player).size();
+		}
 	}
 
 	public List<CollectionCard> getCollection(Player player) {

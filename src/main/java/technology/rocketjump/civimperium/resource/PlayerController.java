@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import technology.rocketjump.civimperium.cards.CollectionService;
@@ -45,6 +46,32 @@ public class PlayerController {
 			return ResponseEntity.notFound().build();
 		} else {
 			Player player = getPlayer((OAuth2AuthenticationToken) principal);
+			List<CollectionCard> collection = collectionService.getCollection(player);
+			return ResponseEntity.ok(collection);
+		}
+	}
+
+	@GetMapping("/mulligan")
+	public ResponseEntity<Boolean> canPlayerMulligan(Principal principal) {
+		if (principal == null) {
+			return ResponseEntity.notFound().build();
+		} else {
+			Player player = getPlayer((OAuth2AuthenticationToken) principal);
+			if (collectionService.getTimesMulliganed(player) < CollectionService.MAX_MULLIGANS_ALLOWED) {
+				return ResponseEntity.ok(true);
+			} else {
+				return ResponseEntity.ok(false);
+			}
+		}
+	}
+
+	@PutMapping("/mulligan")
+	public ResponseEntity<List<CollectionCard>> triggerMulligan(Principal principal) {
+		if (principal == null) {
+			return ResponseEntity.notFound().build();
+		} else {
+			Player player = getPlayer((OAuth2AuthenticationToken) principal);
+			collectionService.initialiseCollection(player, collectionService.getTimesMulliganed(player) + 1);
 			List<CollectionCard> collection = collectionService.getCollection(player);
 			return ResponseEntity.ok(collection);
 		}

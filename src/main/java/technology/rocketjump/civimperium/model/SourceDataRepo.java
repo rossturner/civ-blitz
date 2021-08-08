@@ -55,8 +55,9 @@ public class SourceDataRepo {
 		for (String traitType : new ArrayList<>(cardsByTraitType.keySet())) {
 			Card card = cardsByTraitType.get(traitType);
 			if (card != null && card.getGrantsTraitType().isPresent()) {
-				cardsByTraitType.remove(card.getGrantsTraitType().get());
+				Card removed = cardsByTraitType.remove(card.getGrantsTraitType().get());
 				cardsByCardName.remove(card.getCardName());
+				cardsByCategory.get(removed.getCardCategory()).remove(removed);
 			}
 		}
 

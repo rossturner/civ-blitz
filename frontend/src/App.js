@@ -5,6 +5,7 @@ import CardStore from "./cards/CardStore";
 import CivBuilder from "./CivBuilder";
 import ImpRandom from "./ImpRandom";
 import ModTester from "./ModTester";
+import PlayerCollection from "./PlayerCollection";
 
 const axios = require('axios');
 
@@ -12,10 +13,10 @@ function App() {
 
     const [currentPage, setCurrentPage] = useState('modtester');
     const [collection, setCollection] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [loggedInPlayer, setLoggedInPlayer] = useState();
 
     useEffect(() => {
-        setLoading(true);
         axios.get("/api/cards")
             .then((response) => {
                 if (!CardStore.initialised) {
@@ -29,6 +30,18 @@ function App() {
             .catch((error) => {
                 console.error('Error loading cards', error);
             });
+
+        axios.get("/api/player")
+            .then((response) => {
+                if (response.data) {
+                    console.log('Retrieved logged in player', response.data);
+                    setLoggedInPlayer(response.data)
+                    setCurrentPage('collection');
+                }
+            })
+            .catch((error) => {
+                console.error('Error retrieving login state (expecting 204 when not logged in)', error);
+            })
     }, []);
 
     if (loading) {
@@ -36,8 +49,11 @@ function App() {
     }
     return (
         <div>
-            <TopLevelMenu onItemClick={(name) => setCurrentPage(name)}/>
+            <TopLevelMenu loggedInPlayer={loggedInPlayer} onItemClick={(name) => setCurrentPage(name)}/>
 
+            {currentPage === 'collection' &&
+            <PlayerCollection loggedInPlayer={loggedInPlayer} />
+            }
 
             {currentPage === 'civbuilder' &&
             <CivBuilder collection={collection} setCollection={setCollection}/>
