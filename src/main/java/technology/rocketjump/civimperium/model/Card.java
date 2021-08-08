@@ -16,6 +16,7 @@ public class Card {
 
 	protected Optional<String> grantsTraitType = Optional.empty();
 	protected String subtype;
+	protected String mediaName;
 
 	public Card() {
 
@@ -31,6 +32,7 @@ public class Card {
 		this.civilizationFriendlyName = original.civilizationFriendlyName;
 		this.grantsTraitType = original.grantsTraitType;
 		this.subtype = original.subtype;
+		this.mediaName = original.mediaName;
 	}
 
 	@Override
@@ -121,5 +123,13 @@ public class Card {
 
 	public String getSubtype() {
 		return subtype;
+	}
+
+	public void setMediaName(String mediaName) {
+		this.mediaName = mediaName;
+	}
+
+	public String getMediaName() {
+		return mediaName;
 	}
 }

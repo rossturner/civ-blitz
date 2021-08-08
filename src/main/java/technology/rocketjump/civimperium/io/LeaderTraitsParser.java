@@ -41,6 +41,7 @@ public class LeaderTraitsParser {
 				card.setCivilizationType(civilizationType);
 				card.setLeaderType(Optional.of(record.get("LeaderType")));
 				card.setTraitType(traitType);
+				card.setMediaName(record.get("MediaName"));
 				card.setCardCategory(CardCategory.LeaderAbility);
 				card.setCivilizationFriendlyName(civFriendlyName);
 				card.setCardName(getLeaderNameFrom(record.get("Name")));

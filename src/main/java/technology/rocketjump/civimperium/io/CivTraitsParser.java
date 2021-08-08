@@ -38,6 +38,7 @@ public class CivTraitsParser {
 				Card card = new Card();
 				card.setCivilizationType(civilizationType);
 				card.setTraitType(record.get("TraitType"));
+				card.setMediaName(record.get("MediaName"));
 				card.setCardCategory(CardCategory.parseAcronym(record.get("CardType")));
 				card.setCivilizationFriendlyName(friendlyCivName);
 
