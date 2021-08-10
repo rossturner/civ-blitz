@@ -23,14 +23,13 @@ public class DiscordHttpClient {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 	private final String discordClientId;
 	private final String discordClientSecret;
-	private final String discordTokenUri;
+	private final String getTokenUrl = "https://discordapp.com/api/v8/oauth2/token";
 	private final String getCurrentUserUrl = "https://discordapp.com/api/users/@me";
 
 	@Autowired
 	public DiscordHttpClient(Environment env) {
 		this.discordClientId = env.getProperty("spring.security.oauth2.client.registration.discord.client-id");
 		this.discordClientSecret = env.getProperty("spring.security.oauth2.client.registration.discord.client-secret");
-		this.discordTokenUri = env.getProperty("spring.security.oauth2.client.provider.discord.tokenUri");
 	}
 
 	public DiscordAccessToken getToken(String code) throws JsonProcessingException {
@@ -46,12 +45,12 @@ public class DiscordHttpClient {
 
 		String currentRequestUri = ServletUriComponentsBuilder.fromCurrentRequest().toUriString();
 		String redirectUri = currentRequestUri.substring(0, currentRequestUri.indexOf("?"));
-		LOGGER.info("Sending POST to " + discordTokenUri + " with redirectUri " + redirectUri);
+		LOGGER.info("Sending POST to " + getTokenUrl + " with redirectUri " + redirectUri);
 		map.add("redirect_uri", redirectUri);
 
 		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
-		ResponseEntity<String> response = restTemplate.postForEntity(discordTokenUri, request, String.class);
+		ResponseEntity<String> response = restTemplate.postForEntity(getTokenUrl, request, String.class);
 
 		if (response.getStatusCode().is2xxSuccessful()) {
 			return objectMapper.readValue(response.getBody(), DiscordAccessToken.class);
