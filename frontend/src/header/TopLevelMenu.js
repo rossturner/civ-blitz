@@ -4,6 +4,14 @@ import React from "react";
 
 const TopLevelMenu = ({loggedInPlayer, onItemClick}) => {
 
+    const randomString = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    document.cookie = 'state='+randomString;
+
+    let baseUrl = (window.location.protocol + '//' + window.location.host).replace('3000', '8080');
+    const encodedBaseUrl = encodeURIComponent(baseUrl);
+    const discordLoginUrl = 'https://discord.com/api/oauth2/authorize?client_id=873320729351958539&redirect_uri='+
+        encodedBaseUrl+'%2Fapi%2Flogin%2Fdiscord&response_type=code&scope=identify&state='+randomString;
+
     return (
         <Menu fixed='top' inverted>
             <Container>
@@ -13,7 +21,7 @@ const TopLevelMenu = ({loggedInPlayer, onItemClick}) => {
                 </Menu.Item>
 
                 {!loggedInPlayer &&
-                    <Menu.Item as='a' header href='/oauth2/authorization/discord'>
+                    <Menu.Item as='a' header href={discordLoginUrl}>
                         <Image src='/images/Discord-Logo-Color.png' height={20}/>
                         &nbsp;
                         Login

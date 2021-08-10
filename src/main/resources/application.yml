@@ -25,7 +25,7 @@ spring:
             scope:
               - identify
             redirectUri: "{baseUrl}/login/oauth2/code/discord"
-            clientName: FourScouts client
+            clientName: Imperium client
         provider:
           discord:
             authorizationUri: https://discordapp.com/api/oauth2/authorize

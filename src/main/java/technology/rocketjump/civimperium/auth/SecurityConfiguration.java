@@ -1,7 +1,9 @@
 package technology.rocketjump.civimperium.auth;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.RequestEntity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -15,18 +17,30 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequestEnti
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import java.util.Arrays;
+
 import static technology.rocketjump.civimperium.auth.OAuth2UserAgentUtils.withUserAgent;
 
 @Configuration
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+	@Autowired
+	private Environment environment;
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
+		if (!isProduction(environment)) {
+			http.cors().and().csrf().disable();
+		}
 		http
-				.cors().and().csrf().disable()
 				.oauth2Login()
 				.tokenEndpoint().accessTokenResponseClient(accessTokenResponseClient())
 				.and()
 				.userInfoEndpoint().userService(userService());
+	}
+
+	public static boolean isProduction(Environment environment) {
+		return Arrays.asList(environment.getActiveProfiles()).contains("prod");
 	}
 
 	@Bean

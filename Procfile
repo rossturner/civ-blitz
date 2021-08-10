@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -jar target/civimperium.jar
+web: java -Dserver.port=$PORT -Dspring.profiles.active=prod -jar target/civimperium.jar

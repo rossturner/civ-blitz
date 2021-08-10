@@ -1,4 +1,4 @@
-package technology.rocketjump.civimperium.resource;
+package technology.rocketjump.civimperium.controllers;
 
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
