@@ -6,6 +6,7 @@ import CivBuilder from "./CivBuilder";
 import ImpRandom from "./ImpRandom";
 import ModTester from "./ModTester";
 import PlayerCollection from "./PlayerCollection";
+import jwt from "jsonwebtoken";
 
 const axios = require('axios');
 
@@ -17,6 +18,28 @@ function App() {
     const [loggedInPlayer, setLoggedInPlayer] = useState();
 
     useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        let jsonWebToken = urlParams.get('token');
+        if (jsonWebToken) {
+            window.localStorage.setItem('token', jsonWebToken);
+        } else {
+            jsonWebToken = window.localStorage.getItem('token');
+            // TODO check for expiry and trigger refresh of token here
+        }
+
+        if (jsonWebToken) {
+            axios.defaults.headers.common['Authorization'] = jsonWebToken;
+            const decoded = jwt.decode(jsonWebToken);
+            console.log('token: ', decoded);
+
+            setLoggedInPlayer({
+                discordUsername: decoded.username,
+                discordId: decoded.sub
+            });
+            setCurrentPage('collection');
+        }
+
+
         axios.get("/api/cards")
             .then((response) => {
                 if (!CardStore.initialised) {
@@ -31,17 +54,6 @@ function App() {
                 console.error('Error loading cards', error);
             });
 
-        axios.get("/api/player")
-            .then((response) => {
-                if (response.data) {
-                    console.log('Retrieved logged in player', response.data);
-                    setLoggedInPlayer(response.data)
-                    setCurrentPage('collection');
-                }
-            })
-            .catch((error) => {
-                console.error('Error retrieving login state (expecting 204 when not logged in)', error);
-            })
     }, []);
 
     if (loading) {

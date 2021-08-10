@@ -19,7 +19,7 @@ public class PlayerService {
 		this.collectionService = collectionService;
 	}
 
-	public Player getPlayer(String discordId, String discordUsername) {
+	public synchronized Player getPlayer(String discordId, String discordUsername) {
 		Optional<Player> existingPlayer = playerRepo.getPlayerByDiscordId(discordId);
 		if (existingPlayer.isPresent()) {
 			return existingPlayer.get();

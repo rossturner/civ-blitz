@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import technology.rocketjump.civimperium.auth.JwtService;
 import technology.rocketjump.civimperium.discord.DiscordAccessToken;
 import technology.rocketjump.civimperium.discord.DiscordHttpClient;
 import technology.rocketjump.civimperium.discord.DiscordUserInfo;
@@ -19,11 +20,13 @@ public class LoginController {
 
 	private final Environment environment;
 	private final DiscordHttpClient discordHttpClient;
+	private final JwtService jwtService;
 
 	@Autowired
-	public LoginController(Environment environment, DiscordHttpClient discordHttpClient) {
+	public LoginController(Environment environment, DiscordHttpClient discordHttpClient, JwtService jwtService) {
 		this.environment = environment;
 		this.discordHttpClient = discordHttpClient;
+		this.jwtService = jwtService;
 	}
 
 
@@ -39,14 +42,10 @@ public class LoginController {
 
 		DiscordAccessToken token = discordHttpClient.getToken(oauthCode);
 		DiscordUserInfo discordUser = discordHttpClient.getCurrentUserInfo(token);
-		// Get discord user info
-
-		// Set token and user info in JWT
-
-		// set JWT as cookie
+		String jwt = jwtService.create(token, discordUser);
 
 		HttpHeaders responseHeaders = new HttpHeaders();
-		responseHeaders.set("Location", "/");
+		responseHeaders.set("Location", "/?token="+jwt);
 
 		return ResponseEntity.status(HttpStatus.FOUND).headers(responseHeaders).build();
 	}
