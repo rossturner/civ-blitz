@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static technology.rocketjump.civimperium.codegen.tables.Player.PLAYER;
@@ -13,6 +15,11 @@ import static technology.rocketjump.civimperium.codegen.tables.Player.PLAYER;
 public class PlayerRepo {
 
 	private final DSLContext create;
+
+	private static final List<String> adminDiscordIds = Arrays.asList(
+			"291857466491273218", // Zsinj
+			"149222835850706944" // Harringzord
+	);
 
 	@Autowired
 	public PlayerRepo(DSLContext create) {
@@ -31,7 +38,7 @@ public class PlayerRepo {
 		newPlayer.setBalance(0.0);
 		newPlayer.setRankingScore(0.0);
 		newPlayer.setTotalPointsEarned(0.0);
-		if (discordId.equals("291857466491273218")) {
+		if (adminDiscordIds.contains(discordId)) {
 			newPlayer.setIsAdmin(true);
 		} else {
 			newPlayer.setIsAdmin(false);
