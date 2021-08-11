@@ -12,14 +12,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
 @Component
 public class DiscordHttpClient {
-
-	private static Logger LOGGER = Logger.getLogger("technology.rocketjump.civimperium.discord.DiscordHttpClient");
 
 	private final RestTemplate restTemplate = new RestTemplate();
 	private final ObjectMapper objectMapper = new ObjectMapper();
@@ -48,10 +42,6 @@ public class DiscordHttpClient {
 		String currentRequestUri = ServletUriComponentsBuilder.fromCurrentRequest().toUriString();
 		String redirectUri = currentRequestUri.substring(0, currentRequestUri.indexOf("?"));
 		map.add("redirect_uri", redirectUri);
-		LOGGER.info("Sending POST to " + getTokenUrl + " with data:");
-		for (Map.Entry<String, List<String>> entry : map.entrySet()) {
-			LOGGER.info(entry.getKey() + ": " + entry.getValue().get(0));
-		}
 
 		HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 

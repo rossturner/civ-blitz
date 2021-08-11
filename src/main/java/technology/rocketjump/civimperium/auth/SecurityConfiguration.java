@@ -29,10 +29,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		if (!isProduction(environment)) {
-			http.cors().and().csrf().disable();
-		}
 		http
+				.cors().and().csrf().disable()
 				.oauth2Login()
 				.tokenEndpoint().accessTokenResponseClient(accessTokenResponseClient())
 				.and()
