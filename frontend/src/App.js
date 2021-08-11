@@ -7,12 +7,11 @@ import ImpRandom from "./ImpRandom";
 import ModTester from "./ModTester";
 import PlayerCollection from "./PlayerCollection";
 import jwt from "jsonwebtoken";
+import {Route, Switch, withRouter} from "react-router-dom";
+import axios from 'axios';
 
-const axios = require('axios');
+const App = ({history}) => {
 
-function App() {
-
-    const [currentPage, setCurrentPage] = useState('modtester');
     const [collection, setCollection] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loggedInPlayer, setLoggedInPlayer] = useState();
@@ -30,13 +29,11 @@ function App() {
         if (jsonWebToken) {
             axios.defaults.headers.common['Authorization'] = jsonWebToken;
             const decoded = jwt.decode(jsonWebToken);
-            console.log('token: ', decoded);
-
             setLoggedInPlayer({
                 discordUsername: decoded.username,
                 discordId: decoded.sub
             });
-            setCurrentPage('collection');
+            history.push('/collection');
         }
 
 
@@ -61,22 +58,22 @@ function App() {
     }
     return (
         <div>
-            <TopLevelMenu loggedInPlayer={loggedInPlayer} onItemClick={(name) => setCurrentPage(name)}/>
+            <TopLevelMenu loggedInPlayer={loggedInPlayer}/>
 
-            {currentPage === 'collection' &&
-            <PlayerCollection loggedInPlayer={loggedInPlayer} />
-            }
-
-            {currentPage === 'civbuilder' &&
-            <CivBuilder collection={collection} setCollection={setCollection}/>
-            }
-
-            {currentPage === 'modtester' &&
-            <ModTester/>
-            }
+            <Switch>
+                <Route path="/collection">
+                    <PlayerCollection loggedInPlayer={loggedInPlayer}/>
+                </Route>
+                <Route path="/civbuilder">
+                    <CivBuilder collection={collection} setCollection={setCollection}/>
+                </Route>
+                <Route path="/">
+                    <ModTester/>
+                </Route>
+            </Switch>
 
         </div>
     );
 }
 
-export default App;
+export default withRouter(App);

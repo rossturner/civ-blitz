@@ -1,8 +1,9 @@
 import {Container, Image, Menu} from "semantic-ui-react";
 import React from "react";
+import {Link} from "react-router-dom";
 
 
-const TopLevelMenu = ({loggedInPlayer, onItemClick}) => {
+const TopLevelMenu = ({loggedInPlayer}) => {
 
     const randomString = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     document.cookie = 'state='+randomString;
@@ -15,9 +16,11 @@ const TopLevelMenu = ({loggedInPlayer, onItemClick}) => {
     return (
         <Menu fixed='top' inverted>
             <Container>
-                <Menu.Item as='a'>
+                <Menu.Item>
+                    <Link to='/'>
                     {/*<Image size='mini' src='/logo.png' style={{ marginRight: '1.5em' }} />*/}
                     Civ Imperium
+                    </Link>
                 </Menu.Item>
 
                 {!loggedInPlayer &&
@@ -28,16 +31,22 @@ const TopLevelMenu = ({loggedInPlayer, onItemClick}) => {
                     </Menu.Item>
                 }
                 {loggedInPlayer &&
-                    <Menu.Item as='a' header onClick={() => onItemClick('collection')}>
-                        {loggedInPlayer.discordUsername}'s Collection
+                    <Menu.Item header>
+                        <Link to='/collection'>
+                            {loggedInPlayer.discordUsername}'s Collection
+                        </Link>
                     </Menu.Item>
                 }
 
-                <Menu.Item as='a' header onClick={() => onItemClick('modtester')}>
+                <Menu.Item header>
+                    <Link to='/civbuilder'>
                     Mod Tester
+                    </Link>
                 </Menu.Item>
-                <Menu.Item as='a' header onClick={() => onItemClick('civbuilder')}>
+                <Menu.Item header>
+                    <Link to='/'>
                     Civ Builder Proof of Concept
+                    </Link>
                 </Menu.Item>
 
             </Container>
