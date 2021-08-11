@@ -27,6 +27,10 @@ public class PlayerService {
 	public synchronized Player getPlayer(String discordId, String discordUsername, String discordAvatar) {
 		Optional<Player> existingPlayer = playerRepo.getPlayerByDiscordId(discordId);
 		if (existingPlayer.isPresent()) {
+			if (existingPlayer.get().getDiscordAvatar() == null && discordAvatar != null) {
+				playerRepo.updateAvatar(discordId, discordAvatar);
+				existingPlayer.get().setDiscordAvatar(discordAvatar);
+			}
 			return existingPlayer.get();
 		} else {
 			Player player = playerRepo.createPlayer(discordId, discordUsername, discordAvatar);

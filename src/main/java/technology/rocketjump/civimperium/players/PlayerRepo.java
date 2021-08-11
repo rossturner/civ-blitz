@@ -46,4 +46,8 @@ public class PlayerRepo {
 		create.newRecord(PLAYER, newPlayer).store();
 		return newPlayer;
 	}
+
+	public void updateAvatar(String discordId, String discordAvatar) {
+		create.update(PLAYER).set(PLAYER.DISCORD_AVATAR, discordAvatar).where(PLAYER.PLAYER_ID.eq(discordId)).execute();
+	}
 }
