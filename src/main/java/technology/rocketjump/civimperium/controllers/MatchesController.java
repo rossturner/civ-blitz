@@ -35,7 +35,7 @@ public class MatchesController {
 			return ResponseEntity.notFound().build();
 		} else {
 			ImperiumToken token = jwtService.parse(jwToken);
-			Player player = playerService.getPlayer(token.getDiscordId(), token.getDiscordUsername());
+			Player player = playerService.getPlayer(token);
 			if (!player.getIsAdmin()) {
 				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 			} else if (!payload.containsKey("timeslot")) {

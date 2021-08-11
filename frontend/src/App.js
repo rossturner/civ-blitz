@@ -11,6 +11,7 @@ import {Route, Switch, withRouter} from "react-router-dom";
 import axios from 'axios';
 import Footer from "./header/Footer";
 import AdminPage from "./admin/AdminPage";
+import MatchesPage from "./matches/MatchesPage";
 
 const App = ({history}) => {
 
@@ -34,6 +35,7 @@ const App = ({history}) => {
             setLoggedInPlayer({
                 discordUsername: decoded.username,
                 discordId: decoded.sub,
+                discordAvatar: decoded.avatar,
                 isAdmin: decoded.is_admin
             });
             history.push('/collection');
@@ -62,6 +64,8 @@ const App = ({history}) => {
         history.push('/');
     }
 
+    console.log('player', loggedInPlayer);
+
     if (loading) {
         return <div>Loading...</div>
     }
@@ -78,6 +82,9 @@ const App = ({history}) => {
                 </Route>
                 <Route path="/civbuilder">
                     <CivBuilder collection={collection} setCollection={setCollection}/>
+                </Route>
+                <Route path="/matches">
+                    <MatchesPage />
                 </Route>
                 <Route path="/admin">
                     <AdminPage />

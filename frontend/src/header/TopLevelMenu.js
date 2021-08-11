@@ -37,6 +37,13 @@ const TopLevelMenu = ({loggedInPlayer}) => {
                         </Link>
                     </Menu.Item>
                 }
+                {loggedInPlayer &&
+                <Menu.Item header>
+                    <Link to='/matches'>
+                        Matches
+                    </Link>
+                </Menu.Item>
+                }
 
                 <Menu.Item header>
                     <Link to='/civbuilder'>

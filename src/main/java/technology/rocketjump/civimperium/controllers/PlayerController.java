@@ -33,7 +33,7 @@ public class PlayerController {
 			return ResponseEntity.noContent().build();
 		} else {
 			ImperiumToken token = jwtService.parse(jwToken);
-			Player player = getPlayer(token);
+			Player player = playerService.getPlayer(token);
 			return ResponseEntity.ok(player);
 		}
 	}
@@ -44,7 +44,7 @@ public class PlayerController {
 			return ResponseEntity.notFound().build();
 		} else {
 			ImperiumToken token = jwtService.parse(jwToken);
-			Player player = getPlayer(token);
+			Player player = playerService.getPlayer(token);
 			List<CollectionCard> collection = collectionService.getCollection(player);
 			return ResponseEntity.ok(collection);
 		}
@@ -56,7 +56,7 @@ public class PlayerController {
 			return ResponseEntity.notFound().build();
 		} else {
 			ImperiumToken token = jwtService.parse(jwToken);
-			Player player = getPlayer(token);
+			Player player = playerService.getPlayer(token);
 			if (collectionService.getTimesMulliganed(player) < CollectionService.MAX_MULLIGANS_ALLOWED) {
 				return ResponseEntity.ok(true);
 			} else {
@@ -71,17 +71,11 @@ public class PlayerController {
 			return ResponseEntity.notFound().build();
 		} else {
 			ImperiumToken token = jwtService.parse(jwToken);
-			Player player = getPlayer(token);
+			Player player = playerService.getPlayer(token);
 			collectionService.initialiseCollection(player, collectionService.getTimesMulliganed(player) + 1);
 			List<CollectionCard> collection = collectionService.getCollection(player);
 			return ResponseEntity.ok(collection);
 		}
-	}
-
-	private Player getPlayer(ImperiumToken token) {
-		String discordId = token.getDiscordId();
-		String discordUsername = token.getDiscordUsername();
-		return playerService.getPlayer(discordId, discordUsername);
 	}
 
 }

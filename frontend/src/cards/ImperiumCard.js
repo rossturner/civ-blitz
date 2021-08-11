@@ -6,7 +6,6 @@ import React from "react";
 
 const ImperiumCard = ({cardJson, onClick}) => {
 
-    console.log(cardJson);
     const footer = (
         <div>
             <Image src={process.env.PUBLIC_URL + '/media/'+CardStore.getMediaNameForCivType(cardJson.civilizationType)+'.png'} width={30} />

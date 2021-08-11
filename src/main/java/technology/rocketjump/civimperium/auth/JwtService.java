@@ -29,6 +29,7 @@ public class JwtService {
 				.withExpiresAt(new Date(accessToken.getExpires_at() * 1000L))
 				.withSubject(player.getPlayerId())
 				.withClaim("username", player.getDiscordUsername())
+				.withClaim("avatar", player.getDiscordAvatar())
 				.withClaim("is_admin", player.getIsAdmin())
 				.withClaim("access_token", accessToken.getAccess_token())
 				.withClaim("refresh_token", accessToken.getRefresh_token())
@@ -40,6 +41,7 @@ public class JwtService {
 		ImperiumToken imperiumToken = new ImperiumToken();
 		imperiumToken.setDiscordId(decoded.getSubject());
 		imperiumToken.setDiscordUsername(decoded.getClaim("username").asString());
+		imperiumToken.setDiscordAvatar(decoded.getClaim("avatar").asString());
 		imperiumToken.setDiscordAccessToken(decoded.getClaim("access_token").asString());
 		imperiumToken.setDiscordRefreshToken(decoded.getClaim("refresh_token").asString());
 		return imperiumToken;

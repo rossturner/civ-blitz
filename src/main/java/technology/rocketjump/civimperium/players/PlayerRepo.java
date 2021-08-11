@@ -23,10 +23,11 @@ public class PlayerRepo {
 		return create.selectFrom(PLAYER).where(PLAYER.PLAYER_ID.eq(discordId)).fetchOptionalInto(Player.class);
 	}
 
-	public Player createPlayer(String discordId, String discordUsername) {
+	public Player createPlayer(String discordId, String discordUsername, String discordAvatar) {
 		Player newPlayer = new Player();
 		newPlayer.setPlayerId(discordId);
 		newPlayer.setDiscordUsername(discordUsername);
+		newPlayer.setDiscordAvatar(discordAvatar);
 		newPlayer.setBalance(0.0);
 		newPlayer.setRankingScore(0.0);
 		newPlayer.setTotalPointsEarned(0.0);

@@ -46,7 +46,7 @@ public class LoginController {
 
 		DiscordAccessToken token = discordHttpClient.getToken(oauthCode);
 		DiscordUserInfo discordUser = discordHttpClient.getCurrentUserInfo(token);
-		Player player = playerService.getPlayer(discordUser.getId(), discordUser.getUsername());
+		Player player = playerService.getPlayer(discordUser.getId(), discordUser.getUsername(), discordUser.getAvatar());
 		String jwt = jwtService.create(token, player);
 
 		HttpHeaders responseHeaders = new HttpHeaders();

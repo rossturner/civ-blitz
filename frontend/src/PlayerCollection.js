@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 import ImpRandom from "./ImpRandom";
 import ImperiumCardGroup from "./cards/ImperiumCardGroup";
 import axios from "axios";
+import PlayerAvatar from "./player/PlayerAvatar";
 
 
 const PlayerCollection = ({loggedInPlayer}) => {
@@ -64,7 +65,10 @@ const PlayerCollection = ({loggedInPlayer}) => {
 
             {!loading &&
                 <React.Fragment>
-                    <Header as='h2'>{loggedInPlayer.discordUsername}'s Collection</Header>
+                    <Header as='h2'>
+                        <PlayerAvatar size='large' loggedInPlayer={loggedInPlayer} />
+                        {loggedInPlayer.discordUsername}'s Collection
+                    </Header>
 
                     {canMulligan &&
                     <Modal

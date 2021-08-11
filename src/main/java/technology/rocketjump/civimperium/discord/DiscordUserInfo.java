@@ -7,7 +7,7 @@ public class DiscordUserInfo {
 
 	private String id;
 	private String username;
-	private String avatar; // might want to show this in UI at some point
+	private String avatar;
 
 	public String getId() {
 		return id;

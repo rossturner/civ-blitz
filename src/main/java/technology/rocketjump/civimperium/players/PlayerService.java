@@ -2,6 +2,7 @@ package technology.rocketjump.civimperium.players;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import technology.rocketjump.civimperium.auth.ImperiumToken;
 import technology.rocketjump.civimperium.cards.CollectionService;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
 
@@ -19,12 +20,16 @@ public class PlayerService {
 		this.collectionService = collectionService;
 	}
 
-	public synchronized Player getPlayer(String discordId, String discordUsername) {
+	public Player getPlayer(ImperiumToken token) {
+		return getPlayer(token.getDiscordId(), token.getDiscordUsername(), token.getDiscordAvatar());
+	}
+
+	public synchronized Player getPlayer(String discordId, String discordUsername, String discordAvatar) {
 		Optional<Player> existingPlayer = playerRepo.getPlayerByDiscordId(discordId);
 		if (existingPlayer.isPresent()) {
 			return existingPlayer.get();
 		} else {
-			Player player = playerRepo.createPlayer(discordId, discordUsername);
+			Player player = playerRepo.createPlayer(discordId, discordUsername, discordAvatar);
 			collectionService.initialiseCollection(player, 0);
 			return player;
 		}

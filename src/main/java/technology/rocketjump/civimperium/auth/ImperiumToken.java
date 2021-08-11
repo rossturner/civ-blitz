@@ -4,6 +4,7 @@ public class ImperiumToken {
 
 	private String discordId;
 	private String discordUsername;
+	private String discordAvatar;
 	private String discordAccessToken;
 	private String discordRefreshToken;
 
@@ -37,5 +38,13 @@ public class ImperiumToken {
 
 	public void setDiscordRefreshToken(String discordRefreshToken) {
 		this.discordRefreshToken = discordRefreshToken;
+	}
+
+	public String getDiscordAvatar() {
+		return discordAvatar;
+	}
+
+	public void setDiscordAvatar(String discordAvatar) {
+		this.discordAvatar = discordAvatar;
 	}
 }
