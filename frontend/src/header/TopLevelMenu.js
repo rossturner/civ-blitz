@@ -49,6 +49,14 @@ const TopLevelMenu = ({loggedInPlayer}) => {
                     </Link>
                 </Menu.Item>
 
+                {loggedInPlayer && loggedInPlayer.isAdmin &&
+                <Menu.Item header>
+                    <Link to='/admin'>
+                        Admin area
+                    </Link>
+                </Menu.Item>
+                }
+
             </Container>
         </Menu>
     );

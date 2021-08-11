@@ -108,4 +108,28 @@ public class ResourceFiles {
 			throw new RuntimeException(e);
 		}
 	}
+
+	@Value("classpath:adjective_noun/adjectives.txt")
+	private Resource adjectivesFile;
+
+	@Bean(name = "adjectives")
+	public String adjectives() {
+		try (InputStream is = adjectivesFile.getInputStream()) {
+			return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Value("classpath:adjective_noun/nouns.txt")
+	private Resource nounsFile;
+
+	@Bean(name = "nouns")
+	public String nouns() {
+		try (InputStream is = nounsFile.getInputStream()) {
+			return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

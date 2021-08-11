@@ -30,6 +30,11 @@ public class PlayerRepo {
 		newPlayer.setBalance(0.0);
 		newPlayer.setRankingScore(0.0);
 		newPlayer.setTotalPointsEarned(0.0);
+		if (discordId.equals("291857466491273218")) {
+			newPlayer.setIsAdmin(true);
+		} else {
+			newPlayer.setIsAdmin(false);
+		}
 		create.newRecord(PLAYER, newPlayer).store();
 		return newPlayer;
 	}

@@ -8,9 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import technology.rocketjump.civimperium.auth.JwtService;
+import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
 import technology.rocketjump.civimperium.discord.DiscordAccessToken;
 import technology.rocketjump.civimperium.discord.DiscordHttpClient;
 import technology.rocketjump.civimperium.discord.DiscordUserInfo;
+import technology.rocketjump.civimperium.players.PlayerService;
 
 import static technology.rocketjump.civimperium.auth.SecurityConfiguration.isProduction;
 
@@ -21,12 +23,14 @@ public class LoginController {
 	private final Environment environment;
 	private final DiscordHttpClient discordHttpClient;
 	private final JwtService jwtService;
+	private final PlayerService playerService;
 
 	@Autowired
-	public LoginController(Environment environment, DiscordHttpClient discordHttpClient, JwtService jwtService) {
+	public LoginController(Environment environment, DiscordHttpClient discordHttpClient, JwtService jwtService, PlayerService playerService) {
 		this.environment = environment;
 		this.discordHttpClient = discordHttpClient;
 		this.jwtService = jwtService;
+		this.playerService = playerService;
 	}
 
 
@@ -42,7 +46,8 @@ public class LoginController {
 
 		DiscordAccessToken token = discordHttpClient.getToken(oauthCode);
 		DiscordUserInfo discordUser = discordHttpClient.getCurrentUserInfo(token);
-		String jwt = jwtService.create(token, discordUser);
+		Player player = playerService.getPlayer(discordUser.getId(), discordUser.getUsername());
+		String jwt = jwtService.create(token, player);
 
 		HttpHeaders responseHeaders = new HttpHeaders();
 		responseHeaders.set("Location", "/?token="+jwt);

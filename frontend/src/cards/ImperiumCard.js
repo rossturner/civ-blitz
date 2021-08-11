@@ -2,9 +2,11 @@ import {Card, Image} from "semantic-ui-react";
 import './ImperiumCard.css'
 import CardInfo from "./CardInfo";
 import CardStore from "./CardStore";
+import React from "react";
 
 const ImperiumCard = ({cardJson, onClick}) => {
 
+    console.log(cardJson);
     const footer = (
         <div>
             <Image src={process.env.PUBLIC_URL + '/media/'+CardStore.getMediaNameForCivType(cardJson.civilizationType)+'.png'} width={30} />
@@ -15,6 +17,9 @@ const ImperiumCard = ({cardJson, onClick}) => {
     const header = (
         <Card.Header>
             {cardJson.cardName}
+            {cardJson.quantity > 1 &&
+            <React.Fragment>&nbsp;(x{cardJson.quantity})</React.Fragment>
+            }
             <Image src={process.env.PUBLIC_URL + '/media/'+cardJson.mediaName+'.png'} />
         </Card.Header>
     );

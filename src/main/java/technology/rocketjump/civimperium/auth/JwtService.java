@@ -5,8 +5,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
 import technology.rocketjump.civimperium.discord.DiscordAccessToken;
-import technology.rocketjump.civimperium.discord.DiscordUserInfo;
 
 import java.util.Date;
 
@@ -24,11 +24,12 @@ public class JwtService {
 		this.algorithm = Algorithm.HMAC256(secret);
 	}
 
-	public String create(DiscordAccessToken accessToken, DiscordUserInfo userInfo) {
+	public String create(DiscordAccessToken accessToken, Player player) {
 		return JWT.create()
 				.withExpiresAt(new Date(accessToken.getExpires_at() * 1000L))
-				.withSubject(userInfo.getId())
-				.withClaim("username", userInfo.getUsername())
+				.withSubject(player.getPlayerId())
+				.withClaim("username", player.getDiscordUsername())
+				.withClaim("is_admin", player.getIsAdmin())
 				.withClaim("access_token", accessToken.getAccess_token())
 				.withClaim("refresh_token", accessToken.getRefresh_token())
 				.sign(algorithm);

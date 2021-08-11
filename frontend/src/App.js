@@ -9,6 +9,8 @@ import PlayerCollection from "./PlayerCollection";
 import jwt from "jsonwebtoken";
 import {Route, Switch, withRouter} from "react-router-dom";
 import axios from 'axios';
+import Footer from "./header/Footer";
+import AdminPage from "./admin/AdminPage";
 
 const App = ({history}) => {
 
@@ -31,7 +33,8 @@ const App = ({history}) => {
             const decoded = jwt.decode(jsonWebToken);
             setLoggedInPlayer({
                 discordUsername: decoded.username,
-                discordId: decoded.sub
+                discordId: decoded.sub,
+                isAdmin: decoded.is_admin
             });
             history.push('/collection');
         }
@@ -51,7 +54,13 @@ const App = ({history}) => {
                 console.error('Error loading cards', error);
             });
 
-    }, []);
+    }, [history]);
+
+    const logout = () => {
+        window.localStorage.clear();
+        setLoggedInPlayer(undefined);
+        history.push('/');
+    }
 
     if (loading) {
         return <div>Loading...</div>
@@ -61,17 +70,23 @@ const App = ({history}) => {
             <TopLevelMenu loggedInPlayer={loggedInPlayer}/>
 
             <Switch>
+                <Route exact path="/">
+                    <ModTester/>
+                </Route>
                 <Route path="/collection">
                     <PlayerCollection loggedInPlayer={loggedInPlayer}/>
                 </Route>
                 <Route path="/civbuilder">
                     <CivBuilder collection={collection} setCollection={setCollection}/>
                 </Route>
-                <Route path="/">
-                    <ModTester/>
+                <Route path="/admin">
+                    <AdminPage />
                 </Route>
             </Switch>
 
+            {loggedInPlayer &&
+            <Footer onLogout={logout} />
+            }
         </div>
     );
 }
