@@ -66,7 +66,7 @@ const PlayerCollection = ({loggedInPlayer}) => {
             {!loading &&
                 <React.Fragment>
                     <Header as='h2'>
-                        <PlayerAvatar size='large' loggedInPlayer={loggedInPlayer} />
+                        <PlayerAvatar size='large' player={loggedInPlayer} />
                         {loggedInPlayer.discordUsername}'s Collection
                     </Header>
 

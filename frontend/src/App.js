@@ -38,7 +38,6 @@ const App = ({history}) => {
                 discordAvatar: decoded.avatar,
                 isAdmin: decoded.is_admin
             });
-            history.push('/collection');
         }
 
 
@@ -84,7 +83,7 @@ const App = ({history}) => {
                     <CivBuilder collection={collection} setCollection={setCollection}/>
                 </Route>
                 <Route path="/matches">
-                    <MatchesPage />
+                    <MatchesPage loggedInPlayer={loggedInPlayer} />
                 </Route>
                 <Route path="/admin">
                     <AdminPage />
