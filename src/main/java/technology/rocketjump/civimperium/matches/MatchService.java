@@ -64,4 +64,15 @@ public class MatchService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 		}
 	}
+
+	public Optional<Match> getById(int matchId) {
+		return matchRepo.getMatchById(matchId);
+	}
+
+	public Match update(Match match, String name, String timeslot) {
+		match.setMatchName(name);
+		match.setTimeslot(timeslot);
+		matchRepo.update(match);
+		return match;
+	}
 }

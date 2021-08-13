@@ -2,6 +2,7 @@ import {Button, Container, Header, Input, Message, Segment, Table} from "semanti
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {useHistory} from "react-router-dom";
+import {DateTime} from "luxon";
 
 
 const AdminPage = () => {
@@ -25,7 +26,7 @@ const AdminPage = () => {
 
     const createMatch = () => {
         setErrorText('');
-        axios.post('/api/matches', {timeslot: matchTimeslot, name: matchName})
+        axios.post('/api/matches', {matchTimeslot, matchName})
             .then((response) => {
                 history.push("/matches");
             })
@@ -38,7 +39,7 @@ const AdminPage = () => {
         return (<Table.Row key={index}>
             <Table.Cell>{auditItem.discordUsername}</Table.Cell>
             <Table.Cell>{auditItem.action}</Table.Cell>
-            <Table.Cell>{auditItem.datetime}</Table.Cell>
+            <Table.Cell>{DateTime.fromISO(auditItem.datetime).toLocaleString(DateTime.DATETIME_MED)}</Table.Cell>
         </Table.Row>);
     });
 

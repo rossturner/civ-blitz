@@ -115,4 +115,12 @@ public class MatchRepo {
 				.and(MATCH_SIGNUP.PLAYER_ID.eq(player.getPlayerId()))
 				.execute();
 	}
+
+	public void update(Match match) {
+		create.update(MATCH)
+				.set(MATCH.MATCH_NAME, match.getMatchName())
+				.set(MATCH.TIMESLOT, match.getTimeslot())
+				.where(MATCH.MATCH_ID.eq(match.getMatchId()))
+				.execute();
+	}
 }

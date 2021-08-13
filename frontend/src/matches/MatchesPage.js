@@ -2,12 +2,15 @@ import {Button, Container, Header, List, Loader, Segment} from "semantic-ui-reac
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import PlayerAvatar from "../player/PlayerAvatar";
+import EditMatchModal from "./EditMatchModal";
 
 
 const MatchesPage = ({loggedInPlayer}) => {
 
     const [loading, setLoading] = useState(true);
     const [matchList, setMatchList] = useState([]);
+    const [editingMatch, setEditingMatch] = useState({});
+    const userIsAdmin = loggedInPlayer && loggedInPlayer.isAdmin;
 
     useEffect(() => {
         axios.get('/api/matches')
@@ -19,6 +22,12 @@ const MatchesPage = ({loggedInPlayer}) => {
                 console.error('Error retrieving matches', error);
             })
     }, [loading]);
+
+    const onMatchUpdated = () => {
+        setEditingMatch({});
+        setLoading(true);
+    }
+
 
     const matchSections = matchList.map(match => {
         const playerSections = match.signups.map(signup => {
@@ -50,6 +59,7 @@ const MatchesPage = ({loggedInPlayer}) => {
 
         return <Segment key={match.matchId}>
             <Header as='h3'>{match.matchName}</Header>
+            {userIsAdmin && <Button onClick={() => setEditingMatch(match)} floated='right' content='Edit' size='tiny' icon='edit' />}
             <p>Status: {match.matchState}</p>
             <p>Timeslot: {match.timeslot}</p>
             <p>Players:</p>
@@ -80,6 +90,8 @@ const MatchesPage = ({loggedInPlayer}) => {
                 {!loading &&
                 <React.Fragment>
                     {matchSections}
+
+                    <EditMatchModal editingMatch={editingMatch} onMatchUpdated={onMatchUpdated} />
 
                     {matchList.length === 0 &&
                     <p>No matches are scheduled at this time, go and ask an Imperium admin to set one up</p>

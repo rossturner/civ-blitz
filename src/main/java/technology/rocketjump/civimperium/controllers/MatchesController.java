@@ -15,6 +15,7 @@ import technology.rocketjump.civimperium.players.PlayerService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/matches")
@@ -43,11 +44,11 @@ public class MatchesController {
 			Player player = playerService.getPlayer(token);
 			if (!player.getIsAdmin()) {
 				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-			} else if (!payload.containsKey("timeslot")) {
+			} else if (!payload.containsKey("matchTimeslot")) {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 			} else {
-				String timeslot = payload.get("timeslot").toString();
-				String name = payload.containsKey("name") ? payload.get("name").toString() : null;
+				String timeslot = payload.get("matchTimeslot").toString();
+				String name = payload.containsKey("matchName") ? payload.get("matchName").toString() : null;
 				Match match = matchService.create(name, timeslot);
 				auditLogger.record(player, "Created a new match: " + match.getMatchName());
 				return match;
@@ -58,6 +59,42 @@ public class MatchesController {
 	@GetMapping
 	public List<MatchWithPlayers> getUncompletedMatches() {
 		return matchService.getUncompletedMatches();
+	}
+
+	@PostMapping("/{matchId}")
+	public Match editMatch(@RequestHeader("Authorization") String jwToken,
+							 @RequestBody Map<String, Object> payload, @PathVariable int matchId) {
+		if (jwToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		} else {
+			ImperiumToken token = jwtService.parse(jwToken);
+			Player player = playerService.getPlayer(token);
+			if (!player.getIsAdmin()) {
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+			} else {
+				Optional<Match> originalMatch = matchService.getById(matchId);
+				if (originalMatch.isEmpty()) {
+					throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+				} else {
+					Match original = originalMatch.get();
+
+					String timeslot = payload.get("matchTimeslot").toString();
+					String name = payload.get("matchName").toString();
+					Match match = matchService.update(new Match(original), name, timeslot);
+
+					StringBuilder auditDescription = new StringBuilder();
+					auditDescription.append("Edited match ").append(original.getMatchName());
+					if (!original.getMatchName().equals(match.getMatchName())) {
+						auditDescription.append(", changed name from '").append(original.getMatchName()).append("' to '").append(match.getMatchName()).append("'");
+					}
+					if (!original.getTimeslot().equals(match.getTimeslot())) {
+						auditDescription.append(", changed timeslot from '").append(original.getTimeslot()).append("' to '").append(match.getTimeslot()).append("'");
+					}
+					auditLogger.record(player, auditDescription.toString());
+					return match;
+				}
+			}
+		}
 	}
 
 	@PutMapping("/{matchId}/players")
