@@ -26,13 +26,16 @@ public class MatchService {
 	}
 
 
-	public Match create(String timeslot) {
-		String matchName;
-		Optional<Match> existingMatchWithSameName;
-		do {
-			matchName = adjectiveNounNameGenerator.generateName(random);
-			existingMatchWithSameName = matchRepo.getMatchByName(matchName);
-		} while (existingMatchWithSameName.isPresent());
+	public Match create(String matchName, String timeslot) {
+		if (matchName == null || matchName.isBlank()) {
+			Optional<Match> existingMatchWithSameName;
+			do {
+				matchName = adjectiveNounNameGenerator.generateName(random);
+				existingMatchWithSameName = matchRepo.getMatchByName(matchName);
+			} while (existingMatchWithSameName.isPresent());
+		} else if (matchRepo.getMatchByName(matchName).isPresent()) {
+			throw new ResponseStatusException(HttpStatus.CONFLICT, "A match with this name already exists");
+		}
 
 		return matchRepo.createMatch(matchName, timeslot);
 	}
