@@ -46,23 +46,23 @@ const TopLevelMenu = ({loggedInPlayer}) => {
                 }
 
                 <Menu.Item header>
-                    <Link to='/civbuilder'>
+                    <Link to='/modtester'>
                     Mod Tester
                     </Link>
                 </Menu.Item>
                 <Menu.Item header>
-                    <Link to='/'>
+                    <Link to='/civbuilder'>
                     Civ Builder Proof of Concept
                     </Link>
                 </Menu.Item>
 
-                {loggedInPlayer && loggedInPlayer.isAdmin &&
-                <Menu.Item header>
-                    <Link to='/admin'>
-                        Admin area
-                    </Link>
-                </Menu.Item>
-                }
+                {/*{loggedInPlayer && loggedInPlayer.isAdmin &&*/}
+                {/*<Menu.Item header>*/}
+                {/*    <Link to='/admin'>*/}
+                {/*        Admin area*/}
+                {/*    </Link>*/}
+                {/*</Menu.Item>*/}
+                {/*}*/}
 
             </Container>
         </Menu>

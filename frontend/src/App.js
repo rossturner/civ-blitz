@@ -12,6 +12,7 @@ import axios from 'axios';
 import Footer from "./header/Footer";
 import AdminPage from "./admin/AdminPage";
 import MatchesPage from "./matches/MatchesPage";
+import HomePage from "./HomePage";
 
 const App = ({history}) => {
 
@@ -74,10 +75,13 @@ const App = ({history}) => {
 
             <Switch>
                 <Route exact path="/">
-                    <ModTester/>
+                    <HomePage />
                 </Route>
                 <Route path="/collection">
                     <PlayerCollection loggedInPlayer={loggedInPlayer}/>
+                </Route>
+                <Route path="/modtester">
+                    <ModTester/>
                 </Route>
                 <Route path="/civbuilder">
                     <CivBuilder collection={collection} setCollection={setCollection}/>
@@ -90,9 +94,7 @@ const App = ({history}) => {
                 </Route>
             </Switch>
 
-            {loggedInPlayer &&
-            <Footer onLogout={logout} />
-            }
+            <Footer onLogout={logout} loggedInPlayer={loggedInPlayer} />
         </div>
     );
 }

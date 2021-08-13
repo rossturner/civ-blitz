@@ -82,7 +82,7 @@ const MatchesPage = ({loggedInPlayer}) => {
                     {matchSections}
 
                     {matchList.length === 0 &&
-                    <p>No matches at this time</p>
+                    <p>Civ Imperium is still under development, check back later!</p>
                     }
                 </React.Fragment>
                 }
