@@ -22,11 +22,11 @@ const HomePage = () => {
                     points which can be spent to further grow their collection of cards.
                 </p>
                 <p>
-                    Civ Imperium is a creation of <a href='https://discord.gg/Bq6p7yJHKd' target='_blank'>the Disczord community</a>,
-                    home of Twitch streamer <a href='https://www.twitch.tv/harringzord' target='_blank'>Harringzord</a>.
+                    Civ Imperium is a creation of <a href='https://discord.gg/Bq6p7yJHKd' target='_blank' rel="noreferrer">the Disczord community</a>,
+                    home of Twitch streamer <a href='https://www.twitch.tv/harringzord' target='_blank' rel="noreferrer">Harringzord</a>.
                 </p>
                 <p>
-                    If that sounds like something you'd like to take part in, join <a href='https://discord.gg/Bq6p7yJHKd' target='_blank'>the Discord server</a>,
+                    If that sounds like something you'd like to take part in, join <a href='https://discord.gg/Bq6p7yJHKd' target='_blank' rel="noreferrer">the Discord server</a>,
                     read the welcome page, and sit back for a bit as Civ Imperium is still under development! We're looking at kicking
                     off the first match(es) at the end of August/start of September. Actual game rules for Civ Imperium still to come.
                 </p>

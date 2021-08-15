@@ -43,10 +43,37 @@ public class MatchRepo {
 				.fetchOptionalInto(Match.class);
 	}
 
-	public Optional<Match> getMatchById(int matchId) {
-		return create.selectFrom(MATCH)
+	public Optional<MatchWithPlayers> getMatchById(int matchId) {
+		Map<Match, List<MatchSignup>> results = create.select(MATCH.fields()).select(MATCH_SIGNUP.fields())
+				.from(MATCH.leftJoin(MATCH_SIGNUP).on(MATCH.MATCH_ID.eq(MATCH_SIGNUP.MATCH_ID)))
 				.where(MATCH.MATCH_ID.eq(matchId))
-				.fetchOptionalInto(Match.class);
+				.fetchGroups(
+						r -> r.into(MATCH).into(Match.class),
+						r -> r.into(MATCH_SIGNUP).into(MatchSignup.class)
+				);
+
+		Set<String> playerIds = new HashSet<>();
+		results.values().stream().flatMap(Collection::stream)
+				.forEach(signup -> {
+					if (signup.getPlayerId() != null) {
+						playerIds.add(signup.getPlayerId());
+					}
+				});
+
+		Map<String, Player> playersById = new HashMap<>();
+		create.selectFrom(PLAYER)
+				.where(PLAYER.PLAYER_ID.in(playerIds))
+				.fetchInto(Player.class)
+				.forEach(player -> playersById.put(player.getPlayerId(), player));
+
+
+		return results.entrySet()
+				.stream().map(entry -> new MatchWithPlayers(entry.getKey(),
+						entry.getValue().stream()
+								.filter(signup -> signup.getPlayerId() != null)
+								.map(signup -> new MatchSignupWithPlayer(signup, playersById.get(signup.getPlayerId())))
+								.collect(Collectors.toList())))
+				.findFirst();
 	}
 
 	public Match createMatch(String matchName, String timeslot) {
@@ -120,6 +147,7 @@ public class MatchRepo {
 		create.update(MATCH)
 				.set(MATCH.MATCH_NAME, match.getMatchName())
 				.set(MATCH.TIMESLOT, match.getTimeslot())
+				.set(MATCH.MATCH_STATE, match.getMatchState())
 				.where(MATCH.MATCH_ID.eq(match.getMatchId()))
 				.execute();
 	}

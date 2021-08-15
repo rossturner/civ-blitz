@@ -16,7 +16,6 @@ const AdminPage = () => {
     useEffect(() => {
         axios.get('/api/admin/audit_logs')
             .then((response) => {
-                console.log(response.data);
                 setAuditLogs(response.data)
             })
             .catch((error) => {

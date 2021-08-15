@@ -13,6 +13,7 @@ import Footer from "./header/Footer";
 import AdminPage from "./admin/AdminPage";
 import MatchesPage from "./matches/MatchesPage";
 import HomePage from "./HomePage";
+import MatchPage from "./matches/MatchPage";
 
 const App = ({history}) => {
 
@@ -64,8 +65,6 @@ const App = ({history}) => {
         history.push('/');
     }
 
-    console.log('player', loggedInPlayer);
-
     if (loading) {
         return <div>Loading...</div>
     }
@@ -86,8 +85,11 @@ const App = ({history}) => {
                 <Route path="/civbuilder">
                     <CivBuilder collection={collection} setCollection={setCollection}/>
                 </Route>
-                <Route path="/matches">
+                <Route exact path="/matches">
                     <MatchesPage loggedInPlayer={loggedInPlayer} />
+                </Route>
+                <Route path="/matches/:matchId">
+                    <MatchPage loggedInPlayer={loggedInPlayer} />
                 </Route>
                 <Route path="/admin">
                     <AdminPage />

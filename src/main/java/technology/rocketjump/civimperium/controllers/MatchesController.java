@@ -10,6 +10,7 @@ import technology.rocketjump.civimperium.auth.JwtService;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Match;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
 import technology.rocketjump.civimperium.matches.MatchService;
+import technology.rocketjump.civimperium.matches.MatchState;
 import technology.rocketjump.civimperium.model.MatchWithPlayers;
 import technology.rocketjump.civimperium.players.PlayerService;
 
@@ -34,6 +35,11 @@ public class MatchesController {
 		this.auditLogger = auditLogger;
 	}
 
+	@GetMapping
+	public List<MatchWithPlayers> getUncompletedMatches() {
+		return matchService.getUncompletedMatches();
+	}
+
 	@PostMapping
 	public Match createMatch(@RequestHeader("Authorization") String jwToken,
 							 @RequestBody Map<String, Object> payload) {
@@ -56,9 +62,9 @@ public class MatchesController {
 		}
 	}
 
-	@GetMapping
-	public List<MatchWithPlayers> getUncompletedMatches() {
-		return matchService.getUncompletedMatches();
+	@GetMapping("/{matchId}")
+	public Match getMatch(@PathVariable int matchId) {
+		return matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 
 	@PostMapping("/{matchId}")
@@ -72,7 +78,7 @@ public class MatchesController {
 			if (!player.getIsAdmin()) {
 				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 			} else {
-				Optional<Match> originalMatch = matchService.getById(matchId);
+				Optional<MatchWithPlayers> originalMatch = matchService.getById(matchId);
 				if (originalMatch.isEmpty()) {
 					throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 				} else {
@@ -97,7 +103,7 @@ public class MatchesController {
 		}
 	}
 
-	@PutMapping("/{matchId}/players")
+	@PostMapping("/{matchId}/players")
 	public void signupToMatch(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId) {
 		if (jwToken == null) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
@@ -107,6 +113,28 @@ public class MatchesController {
 			matchService.signup(matchId, player);
 		}
 	}
+
+	@PutMapping("/{matchId}/{matchState}")
+	public Match switchMatchState(@RequestHeader("Authorization") String jwToken,
+								  @RequestBody Map<String, Object> payload, @PathVariable int matchId, @PathVariable MatchState matchState) {
+		if (jwToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		} else {
+			ImperiumToken token = jwtService.parse(jwToken);
+			Player player = playerService.getPlayer(token);
+			if (!player.getIsAdmin()) {
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+			} else {
+				Optional<MatchWithPlayers> match = matchService.getById(matchId);
+				if (match.isEmpty()) {
+					throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+				} else {
+					return matchService.switchState(match.get(), matchState, payload);
+				}
+			}
+		}
+	}
+
 
 	@DeleteMapping("/{matchId}/players")
 	public void resignFromMatch(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId) {

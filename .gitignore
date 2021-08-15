@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 
 persistent_db
+*account.txt
 
 ### STS ###
 .apt_generated
