@@ -151,4 +151,15 @@ public class MatchRepo {
 				.where(MATCH.MATCH_ID.eq(match.getMatchId()))
 				.execute();
 	}
+
+	public void updateSignup(MatchSignup matchSignup) {
+		create.update(MATCH_SIGNUP)
+				.set(MATCH_SIGNUP.CARD_CIV_ABILITY, matchSignup.getCardCivAbility())
+				.set(MATCH_SIGNUP.CARD_LEADER_ABILITY, matchSignup.getCardLeaderAbility())
+				.set(MATCH_SIGNUP.CARD_UNIQUE_INFRASTRUTURE, matchSignup.getCardUniqueInfrastruture())
+				.set(MATCH_SIGNUP.CARD_UNIQUE_UNIT, matchSignup.getCardUniqueUnit())
+				.where(MATCH_SIGNUP.MATCH_ID.eq(matchSignup.getMatchId())
+						.and(MATCH_SIGNUP.PLAYER_ID.eq(matchSignup.getPlayerId())))
+				.execute();
+	}
 }

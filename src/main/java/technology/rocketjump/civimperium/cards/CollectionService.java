@@ -86,4 +86,12 @@ public class CollectionService {
 		return result;
 	}
 
+	public void addToCollection(Card card, Player player) {
+		collectionRepo.addToCollection(card, player);
+	}
+
+	public void removeFromCollection(Card card, Player player) {
+		collectionRepo.removeFromCollection(card, player);
+	}
+
 }

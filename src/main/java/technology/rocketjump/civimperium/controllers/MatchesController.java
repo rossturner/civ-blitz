@@ -11,12 +11,15 @@ import technology.rocketjump.civimperium.codegen.tables.pojos.Match;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
 import technology.rocketjump.civimperium.matches.MatchService;
 import technology.rocketjump.civimperium.matches.MatchState;
+import technology.rocketjump.civimperium.model.MatchSignupWithPlayer;
 import technology.rocketjump.civimperium.model.MatchWithPlayers;
 import technology.rocketjump.civimperium.players.PlayerService;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static technology.rocketjump.civimperium.matches.MatchState.DRAFT;
 
 @RestController
 @RequestMapping("/api/matches")
@@ -36,8 +39,20 @@ public class MatchesController {
 	}
 
 	@GetMapping
-	public List<MatchWithPlayers> getUncompletedMatches() {
-		return matchService.getUncompletedMatches();
+	public List<MatchWithPlayers> getUncompletedMatches(@RequestHeader("Authorization") String jwToken) {
+		List<MatchWithPlayers> matches = matchService.getUncompletedMatches();
+		String currentPlayerId = jwToken == null ? null : jwtService.parse(jwToken).getDiscordId();
+		matches.forEach(match -> {
+			if (match.getMatchState().equals(DRAFT)) {
+				// Hide other players' selections in draft stage
+				match.signups.forEach(signup -> {
+					if (!signup.getPlayerId().equals(currentPlayerId)) {
+						signup.clearAllCards();
+					}
+				});
+			}
+		});
+		return matches;
 	}
 
 	@PostMapping
@@ -63,8 +78,18 @@ public class MatchesController {
 	}
 
 	@GetMapping("/{matchId}")
-	public Match getMatch(@PathVariable int matchId) {
-		return matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+	public Match getMatch(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId) {
+		MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		if (match.getMatchState().equals(DRAFT)) {
+			// Hide other players' selections in draft stage
+			String currentPlayerId = jwToken == null ? null : jwtService.parse(jwToken).getDiscordId();
+			match.signups.forEach(signup -> {
+				if (!signup.getPlayerId().equals(currentPlayerId)) {
+					signup.clearAllCards();
+				}
+			});
+		}
+		return match;
 	}
 
 	@PostMapping("/{matchId}")
@@ -99,6 +124,42 @@ public class MatchesController {
 					auditLogger.record(player, auditDescription.toString());
 					return match;
 				}
+			}
+		}
+	}
+
+	@PostMapping("/{matchId}/cards")
+	public MatchSignupWithPlayer addCardToMatchDeck(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId,
+													@RequestBody Map<String, Object> payload) {
+		if (jwToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		} else {
+			ImperiumToken token = jwtService.parse(jwToken);
+			Player player = playerService.getPlayer(token);
+			Optional<MatchWithPlayers> match = matchService.getById(matchId);
+			if (match.isEmpty()) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			} else {
+				String cardTraitType = payload.get("cardTraitType").toString();
+				return matchService.addCardToMatchDeck(match.get(), player, cardTraitType);
+			}
+		}
+	}
+
+	@PostMapping("/{matchId}/cards/remove")
+	public MatchSignupWithPlayer removeCardFromMatchDeck(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId,
+														 @RequestBody Map<String, Object> payload) {
+		if (jwToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		} else {
+			ImperiumToken token = jwtService.parse(jwToken);
+			Player player = playerService.getPlayer(token);
+			Optional<MatchWithPlayers> match = matchService.getById(matchId);
+			if (match.isEmpty()) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			} else {
+				String cardTraitType = payload.get("cardTraitType").toString();
+				return matchService.removeCardFromMatchDeck(match.get(), player, cardTraitType);
 			}
 		}
 	}

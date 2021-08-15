@@ -63,8 +63,11 @@ const CardStore = {
 
     getMediaNameForCivType: (civType) => {
         return mediaByCivType[civType];
-    }
+    },
 
+    getCardByTraitType: (traitType) => {
+        return byTraitType[traitType];
+    }
 };
 
 export default CardStore;

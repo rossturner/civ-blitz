@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import technology.rocketjump.civimperium.cards.CollectionService;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Match;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
-import technology.rocketjump.civimperium.model.MatchSignupWithPlayer;
-import technology.rocketjump.civimperium.model.MatchWithPlayers;
+import technology.rocketjump.civimperium.model.*;
 
 import java.util.List;
 import java.util.Map;
@@ -22,12 +22,17 @@ public class MatchService {
 
 	private final AdjectiveNounNameGenerator adjectiveNounNameGenerator;
 	private final MatchRepo matchRepo;
+	private final CollectionService collectionService;
+	private final SourceDataRepo sourceDataRepo;
 	private Random random = new Random();
 
 	@Autowired
-	public MatchService(AdjectiveNounNameGenerator adjectiveNounNameGenerator, MatchRepo matchRepo) {
+	public MatchService(AdjectiveNounNameGenerator adjectiveNounNameGenerator, MatchRepo matchRepo,
+						CollectionService collectionService, SourceDataRepo sourceDataRepo) {
 		this.adjectiveNounNameGenerator = adjectiveNounNameGenerator;
 		this.matchRepo = matchRepo;
+		this.collectionService = collectionService;
+		this.sourceDataRepo = sourceDataRepo;
 	}
 
 
@@ -106,5 +111,50 @@ public class MatchService {
 
 		match.setMatchState(DRAFT);
 		matchRepo.update(match);
+	}
+
+	public synchronized MatchSignupWithPlayer addCardToMatchDeck(MatchWithPlayers match, Player player, String cardTraitType) {
+		if (!match.getMatchState().equals(DRAFT)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can only add to deck during draft phase");
+		}
+
+		List<CollectionCard> playerCollection = collectionService.getCollection(player);
+		CollectionCard cardInCollection = playerCollection.stream().filter(c -> c.getTraitType().equals(cardTraitType)).findFirst()
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Card does not exist in player's collection"));
+		if (cardInCollection.getQuantity() < 1) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Card has no quantity in player's collection");
+		}
+
+		MatchSignupWithPlayer matchSignup = match.signups.stream().filter(signup -> signup.getPlayerId().equals(player.getPlayerId())).findFirst()
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Player is not part of specified match"));
+
+		String existingCardSelection = matchSignup.getCard(cardInCollection.getCardCategory());
+		if (existingCardSelection != null) {
+			removeCardFromMatchDeck(match, player, existingCardSelection);
+		}
+
+		matchSignup.setCard(cardInCollection);
+		matchRepo.updateSignup(matchSignup);
+		collectionService.removeFromCollection(cardInCollection, player);
+		return matchSignup;
+	}
+
+	public synchronized MatchSignupWithPlayer removeCardFromMatchDeck(MatchWithPlayers match, Player player, String cardTraitType) {
+		if (!match.getMatchState().equals(DRAFT)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can only remove from deck during draft phase");
+		}
+
+		MatchSignupWithPlayer matchSignup = match.signups.stream().filter(signup -> signup.getPlayerId().equals(player.getPlayerId())).findFirst()
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Player is not part of specified match"));
+
+		Card card = sourceDataRepo.getByTraitType(cardTraitType);
+		if (matchSignup.getCard(card.getCardCategory()) == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Card is not already part of selected deck");
+		}
+
+		matchSignup.removeCard(card);
+		matchRepo.updateSignup(matchSignup);
+		collectionService.addToCollection(card, player);
+		return matchSignup;
 	}
 }

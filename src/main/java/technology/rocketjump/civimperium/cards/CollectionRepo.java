@@ -49,4 +49,21 @@ public class CollectionRepo {
 			create.newRecord(COLLECTION, collectionEntry).store();
 		}
 	}
+
+	public void removeFromCollection(Card card, Player player) {
+		Optional<CollectionRecord> existingEntry = create.selectFrom(COLLECTION)
+				.where(COLLECTION.PLAYER_ID.eq(player.getPlayerId())
+						.and(COLLECTION.CARD_TRAIT_TYPE.eq(card.getTraitType())))
+				.fetchOptional();
+
+		if (existingEntry.isPresent()) {
+			CollectionRecord collectionRecord = existingEntry.get();
+			collectionRecord.setQuantity(collectionRecord.getQuantity() - 1);
+			if (collectionRecord.getQuantity() == 0) {
+				collectionRecord.delete();
+			} else {
+				collectionRecord.store();
+			}
+		}
+	}
 }

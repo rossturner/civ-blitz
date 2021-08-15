@@ -4,6 +4,7 @@ import axios from "axios";
 import PlayerAvatar from "../player/PlayerAvatar";
 import {useParams} from "react-router-dom";
 import MatchHeader from "./MatchHeader";
+import MatchCivBuilder from "./MatchCivBuilder";
 
 
 const MatchPage = ({loggedInPlayer}) => {
@@ -64,7 +65,12 @@ const MatchPage = ({loggedInPlayer}) => {
                         </List>
 
                         {currentPlayerSignup &&
-                        <p>You are playing in this match</p>
+                        <React.Fragment>
+                            <Header as='h3'>{loggedInPlayer.discordUsername}'s civ</Header>
+
+                            <MatchCivBuilder match={match} loggedInPlayer={loggedInPlayer} onCommitChange={() => setLoading(true)} />
+
+                        </React.Fragment>
                         }
 
                     </React.Fragment>

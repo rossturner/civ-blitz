@@ -1,6 +1,5 @@
 
 
-export const CATEGORIES = ["CivilizationAbility", "", "UniqueUnit", "UniqueInfrastructure"];
 const CardInfo = {
 
     getCategoryName: (category) => {
@@ -13,6 +12,21 @@ const CardInfo = {
                 return 'Unique Unit';
             case 'UniqueInfrastructure':
                 return 'Unique Infrastructure';
+            default:
+                return 'Unknown';
+        }
+    },
+
+    getSignupPropName: (category) => {
+        switch (category) {
+            case 'CivilizationAbility':
+                return 'cardCivAbility';
+            case 'LeaderAbility':
+                return 'cardLeaderAbility';
+            case 'UniqueUnit':
+                return 'cardUniqueUnit';
+            case 'UniqueInfrastructure':
+                return 'cardUniqueInfrastruture';
             default:
                 return 'Unknown';
         }
