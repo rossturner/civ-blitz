@@ -182,6 +182,38 @@ public class MatchesController {
 		}
 	}
 
+	@PostMapping("/{matchId}/commit")
+	public MatchSignupWithPlayer commitSignup(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId) {
+		if (jwToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		} else {
+			ImperiumToken token = jwtService.parse(jwToken);
+			Player player = playerService.getPlayer(token);
+			Optional<MatchWithPlayers> match = matchService.getById(matchId);
+			if (match.isEmpty()) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			} else {
+				return matchService.commitPlayer(match.get(), player);
+			}
+		}
+	}
+
+	@DeleteMapping("/{matchId}/commit")
+	public MatchSignupWithPlayer uncommitSignup(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId) {
+		if (jwToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		} else {
+			ImperiumToken token = jwtService.parse(jwToken);
+			Player player = playerService.getPlayer(token);
+			Optional<MatchWithPlayers> match = matchService.getById(matchId);
+			if (match.isEmpty()) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			} else {
+				return matchService.uncommitPlayer(match.get(), player);
+			}
+		}
+	}
+
 	@PostMapping("/{matchId}/players")
 	public void signupToMatch(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId) {
 		if (jwToken == null) {

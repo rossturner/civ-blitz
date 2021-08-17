@@ -3,8 +3,9 @@ import './ImperiumCard.css'
 import CardInfo from "./CardInfo";
 import CardStore from "./CardStore";
 import React from "react";
+import PropTypes from 'prop-types';
 
-const ImperiumCard = ({cardJson, onClick}) => {
+const ImperiumCard = ({cardJson, onClick, clickDisabled}) => {
 
     const footer = (
         <div>
@@ -25,8 +26,7 @@ const ImperiumCard = ({cardJson, onClick}) => {
 
     return <Card
         className='imperium-card'
-        link
-        onClick={onClick}
+        onClick={clickDisabled ? null : () => onClick(cardJson)}
         color={CardInfo.getCategoryColor(cardJson.cardCategory)}
         header={header}
         meta={CardInfo.getCategoryName(cardJson.cardCategory)}
@@ -34,5 +34,15 @@ const ImperiumCard = ({cardJson, onClick}) => {
         extra={footer}
     />
 };
+
+ImperiumCard.propTypes = {
+    cardJson: PropTypes.object,
+    onClick: PropTypes.func,
+    clickDisabled: PropTypes.bool
+}
+
+ImperiumCard.defaultPropts = {
+    clickDisabled: false
+}
 
 export default ImperiumCard;

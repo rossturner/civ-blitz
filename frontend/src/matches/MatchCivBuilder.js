@@ -31,7 +31,7 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
     }, [match, loggedInPlayer]);
 
     const collectionCardClicked = (card) => {
-        axios.post('/api/matches/'+match.matchId+'/cards', {cardTraitType: card.traitType})
+        axios.post('/api/matches/' + match.matchId + '/cards', {cardTraitType: card.traitType})
             .then(response => {
                 setCurrentPlayerSignup(response.data);
                 setLoadingCollection(true);
@@ -39,12 +39,14 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
             .catch(console.error)
     };
     const civCardClicked = (card) => {
-        axios.post('/api/matches/'+match.matchId+'/cards/remove', {cardTraitType: card.traitType})
-            .then(response => {
-                setCurrentPlayerSignup(response.data);
-                setLoadingCollection(true);
-            })
-            .catch(console.error)
+        if (!currentPlayerSignup.committed) {
+            axios.post('/api/matches/' + match.matchId + '/cards/remove', {cardTraitType: card.traitType})
+                .then(response => {
+                    setCurrentPlayerSignup(response.data);
+                    setLoadingCollection(true);
+                })
+                .catch(console.error)
+        }
     };
     const civConfirmed = () => {
         // const updatedCivs = [].concat(storedCivilizations);
@@ -86,7 +88,7 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
     }
 
     const startBiasChanged = (newStartBias) => {
-        axios.post('/api/matches/'+match.matchId+'/bias', {startBiasCivType: newStartBias})
+        axios.post('/api/matches/' + match.matchId + '/bias', {startBiasCivType: newStartBias})
             .then(response => {
                 setCurrentPlayerSignup(response.data);
             })
@@ -98,19 +100,20 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
         const propName = CardInfo.getSignupPropName(category);
         if (currentPlayerSignup[propName]) {
             const card = CardStore.getCardByTraitType(currentPlayerSignup[propName]);
-            return <ImperiumCard cardJson={card} onClick={() => civCardClicked(card)} />;
+            return <ImperiumCard cardJson={card} onClick={civCardClicked}
+                                 clickDisabled={currentPlayerSignup.committed}/>;
         } else {
             return <Card
                 className='imperium-card'
                 color={CardInfo.getCategoryColor(category)}
                 meta={CardInfo.getCategoryName(category)}
                 description={(<Placeholder>
-                    <Placeholder.Image />
+                    <Placeholder.Image/>
                     <Placeholder.Paragraph>
-                        <Placeholder.Line />
-                        <Placeholder.Line />
-                        <Placeholder.Line />
-                        <Placeholder.Line />
+                        <Placeholder.Line/>
+                        <Placeholder.Line/>
+                        <Placeholder.Line/>
+                        <Placeholder.Line/>
                     </Placeholder.Paragraph>
                 </Placeholder>)}
             />;
@@ -119,38 +122,60 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
     const canCommit = !currentPlayerSignup.committed && currentPlayerSignup.startBiasCivType &&
         CATEGORIES.every(category => currentPlayerSignup[CardInfo.getSignupPropName(category)]);
 
+    const doCommit = () => {
+        axios.post('/api/matches/' + match.matchId + '/commit')
+            .then(response => {
+                setCurrentPlayerSignup(response.data);
+                onCommitChange();
+            })
+            .catch(console.error)
+    }
+
+    const undoCommit = () => {
+        axios.delete('/api/matches/' + match.matchId + '/commit')
+            .then(response => {
+                setCurrentPlayerSignup(response.data);
+                onCommitChange();
+            })
+            .catch(console.error)
+    }
+
     return (
         <React.Fragment>
             <Container>
 
-                <List horizontal style={{'marginBottom': '1em'}}>
-                    {startBiasOptions.length > 0 &&
-                    <List.Item>
-                        <Select placeholder='Select start bias...' value={currentPlayerSignup.startBiasCivType}
-                                disabled={currentPlayerSignup.committed}
-                                options={startBiasOptions} onChange={(event, {value}) => startBiasChanged(value)}/>
-                    </List.Item>
-                    }
-                    {canCommit &&
-                    <List.Item>
-                        <Button primary>Commit</Button>
-                    </List.Item>
-                    }
-                    {currentPlayerSignup.committed &&
-                    <List.Item>
-                        <Button negative>Uncommit</Button>
-                    </List.Item>
-                    }
-                </List>
+                <Container style={{'marginBottom': '1em'}}>
+                    <List horizontal>
+                        {startBiasOptions.length > 0 &&
+                        <List.Item>
+                            <Select placeholder='Select start bias...' value={currentPlayerSignup.startBiasCivType}
+                                    disabled={currentPlayerSignup.committed}
+                                    options={startBiasOptions} onChange={(event, {value}) => startBiasChanged(value)}/>
+                        </List.Item>
+                        }
+                        {canCommit &&
+                        <List.Item>
+                            <Button primary onClick={doCommit}>Commit</Button>
+                        </List.Item>
+                        }
+                        {currentPlayerSignup.committed &&
+                        <List.Item>
+                            <Button negative onClick={undoCommit}>Uncommit</Button>
+                        </List.Item>
+                        }
+                    </List>
+                </Container>
                 <Card.Group>
                     {civItems}
                 </Card.Group>
             </Container>
 
+            {!currentPlayerSignup.committed &&
             <Container style={{marginTop: '1em'}}>
                 <Header as='h3'>Available collection</Header>
-                <ImperiumCardGroup cards={collection} cardClicked={collectionCardClicked} />
+                <ImperiumCardGroup cards={collection} cardClicked={collectionCardClicked}/>
             </Container>
+            }
         </React.Fragment>
     );
 }
