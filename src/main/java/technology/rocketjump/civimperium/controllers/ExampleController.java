@@ -2,10 +2,9 @@ package technology.rocketjump.civimperium.controllers;
 
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import technology.rocketjump.civimperium.mapgen.MapSettings;
+import technology.rocketjump.civimperium.mapgen.MapSettingsGenerator;
 import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.model.SourceDataRepo;
@@ -27,14 +26,16 @@ public class ExampleController {
 	private final SourceDataRepo sourceDataRepo;
 	private final CompleteModGenerator completeModGenerator;
 	private final ModHeaderGenerator modHeaderGenerator;
+	private final MapSettingsGenerator mapSettingsGenerator;
 	private final DSLContext create;
 
 	@Autowired
 	public ExampleController(SourceDataRepo sourceDataRepo, CompleteModGenerator completeModGenerator,
-							 ModHeaderGenerator modHeaderGenerator, DSLContext create) {
+							 ModHeaderGenerator modHeaderGenerator, MapSettingsGenerator mapSettingsGenerator, DSLContext create) {
 		this.sourceDataRepo = sourceDataRepo;
 		this.completeModGenerator = completeModGenerator;
 		this.modHeaderGenerator = modHeaderGenerator;
+		this.mapSettingsGenerator = mapSettingsGenerator;
 		this.create = create;
 	}
 
@@ -53,6 +54,11 @@ public class ExampleController {
 //
 //		return create.selectFrom(CONTRACT).fetchInto(Contract.class);
 		return List.of();
+	}
+
+	@GetMapping("/map")
+	public MapSettings generateMapSettings(@RequestParam(name="players") int players) {
+		return mapSettingsGenerator.generate(players);
 	}
 
 	@GetMapping("/user")
