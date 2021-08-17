@@ -258,6 +258,36 @@
                                             <expressions>match_state</expressions>
                                             <enumConverter>true</enumConverter>
                                         </forcedType>
+                                        <forcedType>
+                                            <userType>technology.rocketjump.civimperium.mapgen.MapType</userType>
+                                            <expressions>map_type</expressions>
+                                            <enumConverter>true</enumConverter>
+                                        </forcedType>
+                                        <forcedType>
+                                            <userType>technology.rocketjump.civimperium.mapgen.MapSize</userType>
+                                            <expressions>map_size</expressions>
+                                            <enumConverter>true</enumConverter>
+                                        </forcedType>
+                                        <forcedType>
+                                            <userType>technology.rocketjump.civimperium.mapgen.WorldAge</userType>
+                                            <expressions>world_age</expressions>
+                                            <enumConverter>true</enumConverter>
+                                        </forcedType>
+                                        <forcedType>
+                                            <userType>technology.rocketjump.civimperium.mapgen.SeaLevelSetting</userType>
+                                            <expressions>sea_level</expressions>
+                                            <enumConverter>true</enumConverter>
+                                        </forcedType>
+                                        <forcedType>
+                                            <userType>technology.rocketjump.civimperium.mapgen.TemperatureSetting</userType>
+                                            <expressions>temperature</expressions>
+                                            <enumConverter>true</enumConverter>
+                                        </forcedType>
+                                        <forcedType>
+                                            <userType>technology.rocketjump.civimperium.mapgen.RainfallSetting</userType>
+                                            <expressions>rainfall</expressions>
+                                            <enumConverter>true</enumConverter>
+                                        </forcedType>
                                     </forcedTypes>
                                 </database>
                                 <generate>

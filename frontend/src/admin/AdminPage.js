@@ -50,9 +50,9 @@ const AdminPage = () => {
                 <Segment>
                     <Header as='h3'>Create a new match for signups</Header>
 
-                    <Input value={matchName} onChange={(event, data) => setMatchName(data.value)} fluid placeholder='(Optional) Name for the match, will be generated if left blank, must be unique' />
-
                     <Input value={matchTimeslot} onChange={(event, data) => setMatchTimeslot(data.value)} fluid placeholder='Describe the timeslot this match will be played in' />
+
+                    <Input value={matchName} onChange={(event, data) => setMatchName(data.value)} fluid placeholder='(Optional) Name for the match, will be generated if left blank, must be unique' />
 
                     <Button primary onClick={createMatch} disabled={matchTimeslot.length === 0}>Create match</Button>
 

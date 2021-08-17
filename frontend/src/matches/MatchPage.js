@@ -5,6 +5,7 @@ import PlayerAvatar from "../player/PlayerAvatar";
 import {useParams} from "react-router-dom";
 import MatchHeader from "./MatchHeader";
 import MatchCivBuilder from "./MatchCivBuilder";
+import MapSettings from "./MapSettings";
 
 
 const MatchPage = ({loggedInPlayer}) => {
@@ -52,6 +53,10 @@ const MatchPage = ({loggedInPlayer}) => {
                     <MatchHeader match={match} loggedInPlayer={loggedInPlayer} onMatchUpdated={() => setLoading(true)} />
 
                     {match.matchState === 'SIGNUPS' && match.signups.map(signupToPlayerSection)}
+
+                    {match.matchState !== 'SIGNUPS' &&
+                    <MapSettings match={match} />
+                    }
 
                     {match.matchState === 'DRAFT' &&
                     <React.Fragment>

@@ -7,6 +7,8 @@ import org.springframework.web.server.ResponseStatusException;
 import technology.rocketjump.civimperium.cards.CollectionService;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Match;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
+import technology.rocketjump.civimperium.mapgen.MapSettings;
+import technology.rocketjump.civimperium.mapgen.MapSettingsGenerator;
 import technology.rocketjump.civimperium.model.*;
 
 import java.util.List;
@@ -24,15 +26,17 @@ public class MatchService {
 	private final MatchRepo matchRepo;
 	private final CollectionService collectionService;
 	private final SourceDataRepo sourceDataRepo;
+	private final MapSettingsGenerator mapSettingsGenerator;
 	private Random random = new Random();
 
 	@Autowired
 	public MatchService(AdjectiveNounNameGenerator adjectiveNounNameGenerator, MatchRepo matchRepo,
-						CollectionService collectionService, SourceDataRepo sourceDataRepo) {
+						CollectionService collectionService, SourceDataRepo sourceDataRepo, MapSettingsGenerator mapSettingsGenerator) {
 		this.adjectiveNounNameGenerator = adjectiveNounNameGenerator;
 		this.matchRepo = matchRepo;
 		this.collectionService = collectionService;
 		this.sourceDataRepo = sourceDataRepo;
+		this.mapSettingsGenerator = mapSettingsGenerator;
 	}
 
 
@@ -90,9 +94,9 @@ public class MatchService {
 		MatchState currentState = match.getMatchState();
 		if (currentState.equals(SIGNUPS) && newState.equals(DRAFT)) {
 			proceedToDraft(match, payload);
+		} else if (currentState.equals(DRAFT) && newState.equals(SIGNUPS)) {
+			revertToSignups(match);
 		} else {
-			// TODO remove cards from signups when going back to signup phase
-
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not yet implemented, transition from " + currentState + " to " + newState);
 		}
 		return match;
@@ -100,6 +104,9 @@ public class MatchService {
 
 	private void proceedToDraft(Match match, Map<String, Object> payload) {
 		List<String> selectedPlayerIds = (List<String>) payload.get("playerIds");
+		if (selectedPlayerIds.size() < 2) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Must be a minimum of 2 selected players");
+		}
 		// At this stage, may only be removing signups
 		MatchWithPlayers matchWithPlayers = matchRepo.getMatchById(match.getMatchId())
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -110,8 +117,35 @@ public class MatchService {
 			}
 		}
 
-
+		int numPlayers = selectedPlayerIds.size();
+		if (Boolean.TRUE.equals(match.getSpectator())) {
+			numPlayers++;
+		}
+		MapSettings mapSettings = mapSettingsGenerator.generate(numPlayers);
+		apply(mapSettings, match);
 		match.setMatchState(DRAFT);
+		matchRepo.update(match);
+	}
+
+	private void revertToSignups(Match match) {
+		MatchWithPlayers matchWithPlayers = matchRepo.getMatchById(match.getMatchId())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+		for (MatchSignupWithPlayer signup : matchWithPlayers.signups) {
+			signup = uncommitPlayer(matchWithPlayers, signup.getPlayer());
+
+			for (CardCategory category : CardCategory.values()) {
+				String selectedCard = signup.getCard(category);
+				if (selectedCard != null) {
+					removeCardFromMatchDeck(matchWithPlayers, signup.getPlayer(), selectedCard);
+				}
+			}
+
+			signup.setStartBiasCivType(null);
+			matchRepo.updateSignup(signup);
+		}
+
+		match.setMatchState(SIGNUPS);
 		matchRepo.update(match);
 	}
 
@@ -233,5 +267,16 @@ public class MatchService {
 	private MatchSignupWithPlayer getSignup(MatchWithPlayers match, Player player) {
 		return match.signups.stream().filter(signup -> signup.getPlayerId().equals(player.getPlayerId())).findFirst()
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Player is not part of specified match"));
+	}
+
+	private void apply(MapSettings mapSettings, Match match) {
+		match.setMapType(mapSettings.mapType);
+		match.setMapSize(mapSettings.mapSize);
+		match.setWorldAge(mapSettings.worldAge);
+		match.setSeaLevel(mapSettings.seaLevel);
+		match.setTemperature(mapSettings.temperature);
+		match.setRainfall(mapSettings.rainfall);
+		match.setCityStates(mapSettings.numCityStates);
+		match.setDisasterIntensity(mapSettings.disasterIntensity);
 	}
 }

@@ -23,7 +23,9 @@ const EditMatchModal = ({match, onMatchUpdated}) => {
                 onMatchUpdated(response.data);
                 setShowModal(false);
             })
-            .catch(console.error);
+            .catch((error) => {
+                setErrorText(error.response.data.message);
+            })
     };
 
     const togglePlayerSelection = (signup) => {
