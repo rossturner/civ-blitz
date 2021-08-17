@@ -1,4 +1,4 @@
-import {Card, Container, Header, Placeholder} from "semantic-ui-react";
+import {Button, Card, Container, Header, List, Placeholder, Select} from "semantic-ui-react";
 import React, {useEffect, useState} from "react";
 import ImperiumCardGroup from "../cards/ImperiumCardGroup";
 import axios from "axios";
@@ -10,22 +10,21 @@ import ImperiumCard from "../cards/ImperiumCard";
 
 const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
 
-    const [loading, setLoading] = useState(true);
+    const [loadingCollection, setLoadingCollection] = useState(true);
     const [collection, setCollection] = useState([]);
     const [currentPlayerSignup, setCurrentPlayerSignup] = useState({});
-
 
     useEffect(() => {
         axios.get('/api/player/collection')
             .then((response) => {
                 response.data.sort(ImpRandom.cardSort);
                 setCollection(response.data);
-                setLoading(false);
+                setLoadingCollection(false);
             })
             .catch((error) => {
                 console.error('Error retrieving match', error);
             })
-    }, [loading]);
+    }, [loadingCollection]);
 
     useEffect(() => {
         setCurrentPlayerSignup(match.signups.find(s => s.playerId === loggedInPlayer.discordId));
@@ -35,16 +34,17 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
         axios.post('/api/matches/'+match.matchId+'/cards', {cardTraitType: card.traitType})
             .then(response => {
                 setCurrentPlayerSignup(response.data);
-                setLoading(true);
+                setLoadingCollection(true);
             })
+            .catch(console.error)
     };
     const civCardClicked = (card) => {
-        console.log('card', card);
         axios.post('/api/matches/'+match.matchId+'/cards/remove', {cardTraitType: card.traitType})
             .then(response => {
                 setCurrentPlayerSignup(response.data);
-                setLoading(true);
+                setLoadingCollection(true);
             })
+            .catch(console.error)
     };
     const civConfirmed = () => {
         // const updatedCivs = [].concat(storedCivilizations);
@@ -68,6 +68,32 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
         // }
     };
 
+    const startBiases = {};
+    CATEGORIES.forEach(category => {
+        const propName = CardInfo.getSignupPropName(category);
+        if (currentPlayerSignup[propName]) {
+            const card = CardStore.getCardByTraitType(currentPlayerSignup[propName]);
+            startBiases[card.civilizationType] = card.civilizationFriendlyName;
+        }
+    });
+    const startBiasOptions = [];
+    for (const [civType, friendlyName] of Object.entries(startBiases)) {
+        startBiasOptions.push({
+            key: civType,
+            value: civType,
+            text: friendlyName
+        });
+    }
+
+    const startBiasChanged = (newStartBias) => {
+        axios.post('/api/matches/'+match.matchId+'/bias', {startBiasCivType: newStartBias})
+            .then(response => {
+                setCurrentPlayerSignup(response.data);
+            })
+            .catch(console.error)
+    };
+
+
     const civItems = CATEGORIES.map(category => {
         const propName = CardInfo.getSignupPropName(category);
         if (currentPlayerSignup[propName]) {
@@ -90,10 +116,32 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
             />;
         }
     });
+    const canCommit = !currentPlayerSignup.committed && currentPlayerSignup.startBiasCivType &&
+        CATEGORIES.every(category => currentPlayerSignup[CardInfo.getSignupPropName(category)]);
 
     return (
         <React.Fragment>
             <Container>
+
+                <List horizontal style={{'marginBottom': '1em'}}>
+                    {startBiasOptions.length > 0 &&
+                    <List.Item>
+                        <Select placeholder='Select start bias...' value={currentPlayerSignup.startBiasCivType}
+                                disabled={currentPlayerSignup.committed}
+                                options={startBiasOptions} onChange={(event, {value}) => startBiasChanged(value)}/>
+                    </List.Item>
+                    }
+                    {canCommit &&
+                    <List.Item>
+                        <Button primary>Commit</Button>
+                    </List.Item>
+                    }
+                    {currentPlayerSignup.committed &&
+                    <List.Item>
+                        <Button negative>Uncommit</Button>
+                    </List.Item>
+                    }
+                </List>
                 <Card.Group>
                     {civItems}
                 </Card.Group>

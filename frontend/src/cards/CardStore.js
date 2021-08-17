@@ -2,7 +2,7 @@ import ImpRandom from "../ImpRandom";
 
 let allCards = [];
 
-export const CATEGORIES = ["CivilizationAbility", "LeaderAbility", "UniqueUnit", "UniqueInfrastructure"];
+export const CATEGORIES = ["CivilizationAbility", "LeaderAbility", "UniqueInfrastructure", "UniqueUnit"];
 
 const byCategory = {};
 const byTraitType = {};

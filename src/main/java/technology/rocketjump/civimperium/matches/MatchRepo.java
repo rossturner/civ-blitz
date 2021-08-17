@@ -158,6 +158,7 @@ public class MatchRepo {
 				.set(MATCH_SIGNUP.CARD_LEADER_ABILITY, matchSignup.getCardLeaderAbility())
 				.set(MATCH_SIGNUP.CARD_UNIQUE_INFRASTRUTURE, matchSignup.getCardUniqueInfrastruture())
 				.set(MATCH_SIGNUP.CARD_UNIQUE_UNIT, matchSignup.getCardUniqueUnit())
+				.set(MATCH_SIGNUP.START_BIAS_CIV_TYPE, matchSignup.getStartBiasCivType())
 				.where(MATCH_SIGNUP.MATCH_ID.eq(matchSignup.getMatchId())
 						.and(MATCH_SIGNUP.PLAYER_ID.eq(matchSignup.getPlayerId())))
 				.execute();

@@ -153,8 +153,25 @@ public class MatchService {
 		}
 
 		matchSignup.removeCard(card);
+		if (card.getCivilizationType().equals(matchSignup.getStartBiasCivType())) {
+			matchSignup.setStartBiasCivType(null);
+		}
 		matchRepo.updateSignup(matchSignup);
 		collectionService.addToCollection(card, player);
+		return matchSignup;
+	}
+
+	public MatchSignupWithPlayer updateStartBias(MatchWithPlayers match, Player player, String biasCivType) {
+		if (!sourceDataRepo.civNameByCivType.containsKey(biasCivType)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unrecognised civ type " + biasCivType);
+		}
+
+		MatchSignupWithPlayer matchSignup = match.signups.stream().filter(signup -> signup.getPlayerId().equals(player.getPlayerId())).findFirst()
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Player is not part of specified match"));
+
+		matchSignup.setStartBiasCivType(biasCivType);
+		matchRepo.updateSignup(matchSignup);
+
 		return matchSignup;
 	}
 }

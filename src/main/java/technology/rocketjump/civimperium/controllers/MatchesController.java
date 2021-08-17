@@ -164,6 +164,24 @@ public class MatchesController {
 		}
 	}
 
+	@PostMapping("/{matchId}/bias")
+	public MatchSignupWithPlayer setBiasForSignup(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId,
+													@RequestBody Map<String, Object> payload) {
+		if (jwToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		} else {
+			ImperiumToken token = jwtService.parse(jwToken);
+			Player player = playerService.getPlayer(token);
+			Optional<MatchWithPlayers> match = matchService.getById(matchId);
+			if (match.isEmpty()) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			} else {
+				String biasCivType = payload.get("startBiasCivType").toString();
+				return matchService.updateStartBias(match.get(), player, biasCivType);
+			}
+		}
+	}
+
 	@PostMapping("/{matchId}/players")
 	public void signupToMatch(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId) {
 		if (jwToken == null) {
