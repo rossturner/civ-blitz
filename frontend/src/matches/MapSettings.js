@@ -1,44 +1,58 @@
-import {Table} from "semantic-ui-react";
+import {List} from "semantic-ui-react";
 
 const MapSettings = ({match}) => {
 
     return (
-        <Table basic='very' celled collapsing>
-            <Table.Body>
-                <Table.Row>
-                    <Table.Cell>Map Type</Table.Cell>
-                    <Table.Cell>{match.mapType.replaceAll('_', ' ')}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                    <Table.Cell>Map Size</Table.Cell>
-                    <Table.Cell>{match.mapSize}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                    <Table.Cell>World Age</Table.Cell>
-                    <Table.Cell>{match.worldAge}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                    <Table.Cell>Sea Level</Table.Cell>
-                    <Table.Cell>{match.seaLevel}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                    <Table.Cell>Temperature</Table.Cell>
-                    <Table.Cell>{match.temperature}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                    <Table.Cell>Rainfall</Table.Cell>
-                    <Table.Cell>{match.rainfall}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                    <Table.Cell>City States</Table.Cell>
-                    <Table.Cell>{match.cityStates}</Table.Cell>
-                </Table.Row>
-                <Table.Row>
-                    <Table.Cell>Disaster Intensity</Table.Cell>
-                    <Table.Cell>{match.disasterIntensity}</Table.Cell>
-                </Table.Row>
-            </Table.Body>
-        </Table>
+        <List horizontal>
+            <List.Item>
+                <List.Content>
+                    <List.Header>Map Type</List.Header>
+                    {match.mapType.replaceAll('_', ' ')}
+                </List.Content>
+            </List.Item>
+            <List.Item>
+                <List.Content>
+                    <List.Header>Map Size</List.Header>
+                    {match.mapSize}
+                </List.Content>
+            </List.Item>
+            <List.Item>
+                <List.Content>
+                    <List.Header>World Age</List.Header>
+                    {match.worldAge}
+                </List.Content>
+            </List.Item>
+            <List.Item>
+                <List.Content>
+                    <List.Header>Sea Level</List.Header>
+                    {match.seaLevel}
+                </List.Content>
+            </List.Item>
+            <List.Item>
+                <List.Content>
+                    <List.Header>Temperature</List.Header>
+                    {match.temperature}
+                </List.Content>
+            </List.Item>
+            <List.Item>
+                <List.Content>
+                    <List.Header>Rainfall</List.Header>
+                    {match.rainfall}
+                </List.Content>
+            </List.Item>
+            <List.Item>
+                <List.Content>
+                    <List.Header>City States</List.Header>
+                    {match.cityStates}
+                </List.Content>
+            </List.Item>
+            <List.Item>
+                <List.Content>
+                    <List.Header>Disaster Intensity</List.Header>
+                    {match.disasterIntensity}
+                </List.Content>
+            </List.Item>
+        </List>
     );
 }
 

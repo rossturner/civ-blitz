@@ -132,7 +132,6 @@ public class MatchRepo {
 			newSignup.setMatchId(match.getMatchId());
 			newSignup.setPlayerId(player.getPlayerId());
 			newSignup.setCommitted(false);
-			newSignup.setCardBoosterClaimed(false);
 			newSignup.setCivAbilityIsFree(false);
 			newSignup.setLeaderAbilityIsFree(false);
 			newSignup.setUniqueInfrastructureIsFree(false);

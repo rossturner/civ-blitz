@@ -6,18 +6,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import technology.rocketjump.civimperium.cards.CollectionService;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Match;
+import technology.rocketjump.civimperium.codegen.tables.pojos.MatchSignup;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
 import technology.rocketjump.civimperium.mapgen.MapSettings;
 import technology.rocketjump.civimperium.mapgen.MapSettingsGenerator;
 import technology.rocketjump.civimperium.model.*;
+import technology.rocketjump.civimperium.players.PlayerService;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
-import static technology.rocketjump.civimperium.matches.MatchState.DRAFT;
-import static technology.rocketjump.civimperium.matches.MatchState.SIGNUPS;
+import static technology.rocketjump.civimperium.matches.MatchState.*;
 
 @Service
 public class MatchService {
@@ -27,16 +28,19 @@ public class MatchService {
 	private final CollectionService collectionService;
 	private final SourceDataRepo sourceDataRepo;
 	private final MapSettingsGenerator mapSettingsGenerator;
-	private Random random = new Random();
+	private final PlayerService playerService;
+	private final Random random = new Random();
 
 	@Autowired
 	public MatchService(AdjectiveNounNameGenerator adjectiveNounNameGenerator, MatchRepo matchRepo,
-						CollectionService collectionService, SourceDataRepo sourceDataRepo, MapSettingsGenerator mapSettingsGenerator) {
+						CollectionService collectionService, SourceDataRepo sourceDataRepo,
+						MapSettingsGenerator mapSettingsGenerator, PlayerService playerService) {
 		this.adjectiveNounNameGenerator = adjectiveNounNameGenerator;
 		this.matchRepo = matchRepo;
 		this.collectionService = collectionService;
 		this.sourceDataRepo = sourceDataRepo;
 		this.mapSettingsGenerator = mapSettingsGenerator;
+		this.playerService = playerService;
 	}
 
 
@@ -96,6 +100,8 @@ public class MatchService {
 			proceedToDraft(match, payload);
 		} else if (currentState.equals(DRAFT) && newState.equals(SIGNUPS)) {
 			revertToSignups(match);
+		} else if (currentState.equals(DRAFT) && newState.equals(IN_PROGRESS)) {
+			proceedToInProgress(match);
 		} else {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not yet implemented, transition from " + currentState + " to " + newState);
 		}
@@ -146,6 +152,19 @@ public class MatchService {
 		}
 
 		match.setMatchState(SIGNUPS);
+		matchRepo.update(match);
+	}
+
+	private void proceedToInProgress(Match match) {
+
+		MatchWithPlayers matchWithPlayers = matchRepo.getMatchById(match.getMatchId())
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+		for (MatchSignupWithPlayer signup : matchWithPlayers.signups) {
+			playerService.addBooster(signup.getPlayer());
+		}
+
+		match.setMatchState(IN_PROGRESS);
 		matchRepo.update(match);
 	}
 
@@ -269,7 +288,7 @@ public class MatchService {
 		matchSignup.setCommitted(true);
 		matchRepo.updateSignup(matchSignup);
 
-//		checkForAllCommitted(match);
+		checkForAllCommitted(match);
 
 		return matchSignup;
 	}
@@ -293,6 +312,12 @@ public class MatchService {
 	private MatchSignupWithPlayer getSignup(MatchWithPlayers match, Player player) {
 		return match.signups.stream().filter(signup -> signup.getPlayerId().equals(player.getPlayerId())).findFirst()
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Player is not part of specified match"));
+	}
+
+	private void checkForAllCommitted(MatchWithPlayers match) {
+		if (match.signups.stream().allMatch(MatchSignup::getCommitted)) {
+			switchState(match, MatchState.IN_PROGRESS, null);
+		}
 	}
 
 	private void apply(MapSettings mapSettings, Match match) {

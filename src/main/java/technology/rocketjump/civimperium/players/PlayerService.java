@@ -39,4 +39,9 @@ public class PlayerService {
 		}
 	}
 
+	public void addBooster(Player player) {
+		int currentBoosters = player.getBoostersAvailable() == null ? 0 : player.getBoostersAvailable();
+		player.setBoostersAvailable(currentBoosters + 1);
+		playerRepo.update(player);
+	}
 }

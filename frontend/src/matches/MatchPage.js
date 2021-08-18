@@ -1,4 +1,4 @@
-import {Container, Header, List, Loader} from "semantic-ui-react";
+import {Container, Header, List, Loader, Segment} from "semantic-ui-react";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import PlayerAvatar from "../player/PlayerAvatar";
@@ -6,18 +6,18 @@ import {useParams} from "react-router-dom";
 import MatchHeader from "./MatchHeader";
 import MatchCivBuilder from "./MatchCivBuilder";
 import MapSettings from "./MapSettings";
-
+import MatchCivViewer from "./MatchCivViewer";
 
 const MatchPage = ({loggedInPlayer}) => {
 
-    const { matchId } = useParams();
+    const {matchId} = useParams();
     const [loading, setLoading] = useState(true);
     const [match, setMatch] = useState({});
 
     const currentPlayerSignup = match.signups && match.signups.filter(s => s.playerId === loggedInPlayer.discordId);
 
     useEffect(() => {
-        axios.get('/api/matches/'+matchId)
+        axios.get('/api/matches/' + matchId)
             .then((response) => {
                 setMatch(response.data);
                 setLoading(false);
@@ -38,6 +38,17 @@ const MatchPage = ({loggedInPlayer}) => {
         );
     }
 
+    const sectionColors = ['red', 'green', 'blue', 'orange', 'purple', 'teal', 'violet', 'yellow', 'pink', 'grey', 'black',
+        'red', 'green', 'blue', 'orange', 'purple', 'teal', 'violet', 'yellow', 'pink', 'grey'];
+
+    const playerSections = match.signups && match.signups.map((signup, index) =>
+        <Segment inverted color={sectionColors[index]}>
+            <PlayerAvatar player={signup.player} size='mini'/>
+            <Header>{signup.player.discordUsername}</Header>
+            <MatchCivViewer signup={signup}/>
+        </Segment>
+    );
+
     return (
         <React.Fragment>
             <Container style={{marginTop: '6em'}}>
@@ -50,12 +61,12 @@ const MatchPage = ({loggedInPlayer}) => {
                 {!loading &&
                 <React.Fragment>
 
-                    <MatchHeader match={match} loggedInPlayer={loggedInPlayer} onMatchUpdated={() => setLoading(true)} />
+                    <MatchHeader match={match} loggedInPlayer={loggedInPlayer} onMatchUpdated={() => setLoading(true)}/>
 
                     {match.matchState === 'SIGNUPS' && match.signups.map(signupToPlayerSection)}
 
                     {match.matchState !== 'SIGNUPS' &&
-                    <MapSettings match={match} />
+                    <MapSettings match={match}/>
                     }
 
                     {match.matchState === 'DRAFT' &&
@@ -73,13 +84,16 @@ const MatchPage = ({loggedInPlayer}) => {
                         <React.Fragment>
                             <Header as='h3'>{loggedInPlayer.discordUsername}'s civ</Header>
 
-                            <MatchCivBuilder match={match} loggedInPlayer={loggedInPlayer} onCommitChange={() => setLoading(true)} />
+                            <MatchCivBuilder match={match} loggedInPlayer={loggedInPlayer}
+                                             onCommitChange={() => setLoading(true)}/>
 
                         </React.Fragment>
                         }
 
                     </React.Fragment>
                     }
+
+                    {match.matchState === 'IN_PROGRESS' && playerSections}
 
                 </React.Fragment>
                 }

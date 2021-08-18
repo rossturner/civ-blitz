@@ -38,6 +38,7 @@ public class PlayerRepo {
 		newPlayer.setBalance(0.0);
 		newPlayer.setRankingScore(0.0);
 		newPlayer.setTotalPointsEarned(0.0);
+		newPlayer.setBoostersAvailable(0);
 		if (adminDiscordIds.contains(discordId)) {
 			newPlayer.setIsAdmin(true);
 		} else {
@@ -49,5 +50,12 @@ public class PlayerRepo {
 
 	public void updateAvatar(String discordId, String discordAvatar) {
 		create.update(PLAYER).set(PLAYER.DISCORD_AVATAR, discordAvatar).where(PLAYER.PLAYER_ID.eq(discordId)).execute();
+	}
+
+	public void update(Player player) {
+		create.update(PLAYER)
+				.set(PLAYER.BOOSTERS_AVAILABLE, player.getBoostersAvailable())
+				.where(PLAYER.PLAYER_ID.eq(player.getPlayerId()))
+				.execute();
 	}
 }
