@@ -2,13 +2,11 @@ package technology.rocketjump.civimperium.modgenerator.sql;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.model.IconAtlasEntry;
 import technology.rocketjump.civimperium.model.SourceDataRepo;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
-
-import java.util.Map;
+import technology.rocketjump.civimperium.modgenerator.model.ModdedCivInfo;
 
 @Component
 public class IconsSqlGenerator implements ImperiumFileGenerator {
@@ -21,17 +19,13 @@ public class IconsSqlGenerator implements ImperiumFileGenerator {
 	}
 
 	@Override
-	public String getFileContents(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
-		return getIconsSql(modHeader, selectedCards);
-	}
-
-	public String getIconsSql(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
+	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
 		StringBuilder sqlBuilder = new StringBuilder();
 
 		String name = modHeader.modName.toUpperCase();
 
-		IconAtlasEntry civIconEntry = sourceDataRepo.getIconAtlasEntry(selectedCards.get(CardCategory.CivilizationAbility).getCivilizationType());
-		IconAtlasEntry leaderIconEntry = sourceDataRepo.getIconAtlasEntry(selectedCards.get(CardCategory.LeaderAbility).getLeaderType().get());
+		IconAtlasEntry civIconEntry = sourceDataRepo.getIconAtlasEntry(civInfo.selectedCards.get(CardCategory.CivilizationAbility).getCivilizationType());
+		IconAtlasEntry leaderIconEntry = sourceDataRepo.getIconAtlasEntry(civInfo.selectedCards.get(CardCategory.LeaderAbility).getLeaderType().get());
 
 		sqlBuilder.append("INSERT OR REPLACE INTO IconDefinitions\n" +
 				"\t\t(Name,\t\t\t\t\t\t\t\t\tAtlas, \t\t\t\t\t\t\t\t\t'Index')\n" +

@@ -1,18 +1,16 @@
 package technology.rocketjump.civimperium.modgenerator.sql;
 
 import org.springframework.stereotype.Component;
-import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
-
-import java.util.Map;
+import technology.rocketjump.civimperium.modgenerator.model.ModdedCivInfo;
 
 @Component
 public class ColorsSqlGenerator implements ImperiumFileGenerator {
 
 	@Override
-	public String getFileContents(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
-		return getColorsSql(modHeader, selectedCards.get(CardCategory.LeaderAbility).getLeaderType().get());
+	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
+		return getColorsSql(modHeader, civInfo.selectedCards.get(CardCategory.LeaderAbility).getLeaderType().get());
 	}
 
 	public String getColorsSql(ModHeader modHeader, String leaderType) {

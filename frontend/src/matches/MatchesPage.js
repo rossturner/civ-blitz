@@ -10,7 +10,6 @@ const MatchesPage = ({loggedInPlayer}) => {
 
     const [loading, setLoading] = useState(true);
     const [matchList, setMatchList] = useState([]);
-    const userIsAdmin = loggedInPlayer && loggedInPlayer.isAdmin;
 
     useEffect(() => {
         axios.get('/api/matches')

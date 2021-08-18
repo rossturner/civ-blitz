@@ -7,8 +7,7 @@ import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.model.SourceDataRepo;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
-
-import java.util.Map;
+import technology.rocketjump.civimperium.modgenerator.model.ModdedCivInfo;
 
 @Component
 public class CivilizationSqlGenerator implements ImperiumFileGenerator {
@@ -21,11 +20,11 @@ public class CivilizationSqlGenerator implements ImperiumFileGenerator {
 	}
 
 	@Override
-	public String getFileContents(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
+	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
 		return getCivilizationSql(modHeader,
-				selectedCards.get(CardCategory.CivilizationAbility),
-				selectedCards.get(CardCategory.LeaderAbility),
-				modHeader.getStartBiasCivType());
+				civInfo.selectedCards.get(CardCategory.CivilizationAbility),
+				civInfo.selectedCards.get(CardCategory.LeaderAbility),
+				civInfo.startBiasCivType);
 	}
 
 	public String getCivilizationSql(ModHeader modHeader, Card civAbilityCard, Card leaderAbilityCard, String startBiasCivType) {

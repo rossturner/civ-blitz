@@ -7,6 +7,7 @@ import MatchHeader from "./MatchHeader";
 import MatchCivBuilder from "./MatchCivBuilder";
 import MapSettings from "./MapSettings";
 import MatchCivViewer from "./MatchCivViewer";
+import DownloadMatchModButton from "./DownloadMatchModButton";
 
 const MatchPage = ({loggedInPlayer}) => {
 
@@ -42,7 +43,7 @@ const MatchPage = ({loggedInPlayer}) => {
         'red', 'green', 'blue', 'orange', 'purple', 'teal', 'violet', 'yellow', 'pink', 'grey'];
 
     const playerSections = match.signups && match.signups.map((signup, index) =>
-        <Segment inverted color={sectionColors[index]}>
+        <Segment key={index} inverted color={sectionColors[index]}>
             <PlayerAvatar player={signup.player} size='mini'/>
             <Header>{signup.player.discordUsername}</Header>
             <MatchCivViewer signup={signup}/>
@@ -93,7 +94,15 @@ const MatchPage = ({loggedInPlayer}) => {
                     </React.Fragment>
                     }
 
-                    {match.matchState === 'IN_PROGRESS' && playerSections}
+                    {match.matchState === 'IN_PROGRESS' &&
+                    <Container>
+                        <DownloadMatchModButton match={match} />
+
+                        {playerSections}
+
+                        <DownloadMatchModButton match={match} />
+                    </Container>
+                    }
 
                 </React.Fragment>
                 }

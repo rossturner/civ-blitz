@@ -6,8 +6,7 @@ import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.model.SourceDataRepo;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
-
-import java.util.Map;
+import technology.rocketjump.civimperium.modgenerator.model.ModdedCivInfo;
 
 @Component
 public class ConfigurationSqlGenerator implements ImperiumFileGenerator {
@@ -20,10 +19,10 @@ public class ConfigurationSqlGenerator implements ImperiumFileGenerator {
 	}
 
 	@Override
-	public String getFileContents(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
+	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
 		StringBuilder sqlBuilder = new StringBuilder();
 
-		Card civAbilityCard = selectedCards.get(CardCategory.CivilizationAbility);
+		Card civAbilityCard = civInfo.selectedCards.get(CardCategory.CivilizationAbility);
 		String civType = civAbilityCard.getCivilizationType();
 		String civName = sourceDataRepo.civNameByCivType.get(civType);
 		String civIcon = sourceDataRepo.civIconByCivType.get(civType);
@@ -32,7 +31,7 @@ public class ConfigurationSqlGenerator implements ImperiumFileGenerator {
 		String civAbilityDesc = sourceDataRepo.civAbilityDescByCivType.get(civType);
 		String civAbilityIcon = sourceDataRepo.civAbilityIconByCivType.get(civType);
 
-		Card leaderAbilityCard = selectedCards.get(CardCategory.LeaderAbility);
+		Card leaderAbilityCard = civInfo.selectedCards.get(CardCategory.LeaderAbility);
 		String leaderType = leaderAbilityCard.getLeaderType().get();
 		String leaderTrait = leaderAbilityCard.getTraitType();
 		String leaderIcon = sourceDataRepo.leaderIconByLeaderType.get(leaderType);
@@ -80,7 +79,7 @@ public class ConfigurationSqlGenerator implements ImperiumFileGenerator {
 
 		int sortIndex = 10;
 
-		for (Card card : selectedCards.values()) {
+		for (Card card : civInfo.selectedCards.values()) {
 			if (!card.getCardCategory().equals(CardCategory.LeaderAbility) && !card.getCardCategory().equals(CardCategory.CivilizationAbility)) {
 				addTraitPlayerItem(sqlBuilder, modHeader, card.getTraitType(), card.getCivilizationType(), sortIndex);
 				sortIndex += 10;

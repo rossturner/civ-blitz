@@ -66,28 +66,6 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
             .catch(console.error)
     };
 
-    const civConfirmed = () => {
-        // const updatedCivs = [].concat(storedCivilizations);
-        // updatedCivs.push({
-        //     cards: editingCiv.cards,
-        //     editiable: false
-        // });
-        // setStoredCivilizations(updatedCivs);
-        //
-        // let updatedCollection = [].concat(collection).concat(CardStore.getMoreCardsForCollection(collection));
-        // updatedCollection.sort(ImpRandom.cardSort);
-        // setCollection(updatedCollection);
-        //
-        // if (updatedCivs.length < 3) {
-        //     setEditingCiv({
-        //         cards: [],
-        //         editable: true
-        //     });
-        // } else {
-        //     setEditingCiv(null);
-        // }
-    };
-
     const startBiases = {};
     CATEGORIES.forEach(category => {
         const propName = CardInfo.getSignupPropName(category);
@@ -114,14 +92,15 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
     };
 
 
-    const civItems = CATEGORIES.map(category => {
+    const civItems = CATEGORIES.map((category, index) => {
         const propName = CardInfo.getSignupPropName(category);
         if (currentPlayerSignup[propName]) {
             const card = CardStore.getCardByTraitType(currentPlayerSignup[propName]);
-            return <ImperiumCard cardJson={card} onClick={civCardClicked}
+            return <ImperiumCard key={card.cardName} cardJson={card} onClick={civCardClicked}
                                  clickDisabled={currentPlayerSignup.committed}/>;
         } else {
             return <Card
+                key={category}
                 className='imperium-card'
                 color={CardInfo.getCategoryColor(category)}
                 meta={CardInfo.getCategoryName(category)}

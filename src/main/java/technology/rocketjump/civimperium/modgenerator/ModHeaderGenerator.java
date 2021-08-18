@@ -33,10 +33,6 @@ public class ModHeaderGenerator {
 
 
 		ModHeader modHeader = new ModHeader(name, descriptionBuilder.toString(), UUID.nameUUIDFromBytes(name.getBytes()));
-		modHeader.setStartBiasCivType(selectedCards.get(CivilizationAbility).getCivilizationType());
-		if (startBiasCivType != null) {
-			modHeader.setStartBiasCivType(startBiasCivType);
-		}
 		return modHeader;
 	}
 

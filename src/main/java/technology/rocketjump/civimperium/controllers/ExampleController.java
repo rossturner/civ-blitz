@@ -10,6 +10,7 @@ import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.model.SourceDataRepo;
 import technology.rocketjump.civimperium.modgenerator.CompleteModGenerator;
 import technology.rocketjump.civimperium.modgenerator.ModHeaderGenerator;
+import technology.rocketjump.civimperium.modgenerator.model.ModdedCivInfo;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -85,7 +86,7 @@ public class ExampleController {
 		String modName = modHeaderGenerator.createFor(selectedCards, null).modName;
 		response.addHeader("Content-Disposition", "attachment; filename=\"Imperium_"+modName+".zip\"");
 
-		return completeModGenerator.generateMod(selectedCards, null);
+		return completeModGenerator.generateMod(new ModdedCivInfo(selectedCards, null));
 	}
 
 }

@@ -5,9 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technology.rocketjump.civimperium.infrastructurefix.InfrastructureFixFileProvider;
 import technology.rocketjump.civimperium.infrastructurefix.StaticModFile;
-import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
+import technology.rocketjump.civimperium.modgenerator.model.ModdedCivInfo;
 import technology.rocketjump.civimperium.modgenerator.sql.*;
 
 import java.io.BufferedOutputStream;
@@ -15,7 +15,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -65,24 +64,24 @@ public class CompleteModGenerator {
 		fileGeneratorList.add(leaderTextSqlGenerator);
 	}
 
-	public byte[] generateMod(Map<CardCategory, Card> selectedCards, String startBiasCivType) throws IOException {
-		if (selectedCards.size() != 4) {
+	public byte[] generateMod(ModdedCivInfo civInfo) throws IOException {
+		if (civInfo.selectedCards.size() != 4) {
 			throw new IllegalArgumentException(getClass().getSimpleName() + " must be passed a map of 4 cards");
 		}
 		for (CardCategory cardCategory : CardCategory.values()) {
-			if (!selectedCards.containsKey(cardCategory)) {
+			if (!civInfo.selectedCards.containsKey(cardCategory)) {
 				throw new IllegalArgumentException(getClass().getSimpleName() + " must be passed one card in each category");
 			}
 		}
 
-		ModHeader header = modHeaderGenerator.createFor(selectedCards, startBiasCivType);
+		ModHeader header = modHeaderGenerator.createFor(civInfo.selectedCards, civInfo.startBiasCivType);
 
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
 		ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
 
 		for (ImperiumFileGenerator generator : fileGeneratorList) {
-			byte[] contentBytes = generator.getFileContents(header, selectedCards).getBytes();
+			byte[] contentBytes = generator.getFileContents(header, civInfo).getBytes();
 			zipOutputStream.putNextEntry(new ZipEntry(generator.getFilename()));
 			zipOutputStream.write(contentBytes, 0, contentBytes.length);
 		}

@@ -1,13 +1,11 @@
 package technology.rocketjump.civimperium.modgenerator;
 
 import org.springframework.stereotype.Component;
-import technology.rocketjump.civimperium.model.Card;
-import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
+import technology.rocketjump.civimperium.modgenerator.model.ModdedCivInfo;
 import technology.rocketjump.civimperium.modgenerator.sql.ImperiumFileGenerator;
 
 import java.time.Instant;
-import java.util.Map;
 
 @Component
 public class ModInfoGenerator implements ImperiumFileGenerator {
@@ -15,7 +13,7 @@ public class ModInfoGenerator implements ImperiumFileGenerator {
 	private String modName = "UNSET";
 
 	@Override
-	public String getFileContents(ModHeader modHeader, Map<CardCategory, Card> selectedCards) {
+	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
 		modName = modHeader.modName;
 		return getModInfoContent(modHeader);
 	}
