@@ -241,7 +241,9 @@ public class MatchesController {
 				if (match.isEmpty()) {
 					throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 				} else {
-					return matchService.switchState(match.get(), matchState, payload);
+					Match result = matchService.switchState(match.get(), matchState, payload);
+					auditLogger.record(player, "Changed state of match " + result.getMatchName() + " to " + result.getMatchState());
+					return result;
 				}
 			}
 		}

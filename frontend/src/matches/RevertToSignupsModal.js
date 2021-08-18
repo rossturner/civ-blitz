@@ -3,7 +3,7 @@ import {Button, Message, Modal} from "semantic-ui-react";
 import axios from "axios";
 
 
-const EditMatchModal = ({match, onMatchUpdated}) => {
+const EditMatchModal = ({match, onMatchUpdated, onCancel}) => {
 
     const [showModal, setShowModal] = useState(false);
     const [errorText, setErrorText] = useState('');
@@ -44,7 +44,7 @@ const EditMatchModal = ({match, onMatchUpdated}) => {
                 }
             </Modal.Content>
             <Modal.Actions>
-                <Button onClick={() => setShowModal(false)}>Cancel</Button>
+                <Button onClick={() => {setShowModal(false); onCancel();}}>Cancel</Button>
                 <Button onClick={onPrimaryClick} negative>Revert to signups</Button>
             </Modal.Actions>
         </Modal>

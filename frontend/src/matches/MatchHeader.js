@@ -74,8 +74,8 @@ const MatchHeader = ({match, loggedInPlayer, onMatchUpdated}) => {
             }
 
             <EditMatchModal match={editingMatch} onMatchUpdated={matchUpdated}/>
-            <ProceedToDraftModal match={matchToProceedToDraft} onMatchUpdated={matchUpdated}/>
-            <RevertToSignupsModal match={matchToRevertToSignups} onMatchUpdated={matchUpdated}/>
+            <ProceedToDraftModal match={matchToProceedToDraft} onMatchUpdated={matchUpdated} onCancel={() => setMatchToProceedToDraft({})}/>
+            <RevertToSignupsModal match={matchToRevertToSignups} onMatchUpdated={matchUpdated} onCancel={() => setMatchToRevertToSignups({})}/>
 
         </React.Fragment>
     );

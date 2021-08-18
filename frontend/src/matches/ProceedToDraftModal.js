@@ -4,7 +4,7 @@ import axios from "axios";
 import PlayerAvatar from "../player/PlayerAvatar";
 
 
-const EditMatchModal = ({match, onMatchUpdated}) => {
+const EditMatchModal = ({match, onMatchUpdated, onCancel}) => {
 
     const [showModal, setShowModal] = useState(false);
     const [selectedPlayerIds, setSelectedPlayerIds] = useState([]);
@@ -72,7 +72,7 @@ const EditMatchModal = ({match, onMatchUpdated}) => {
                 }
             </Modal.Content>
             <Modal.Actions>
-                <Button onClick={() => setShowModal(false)}>Cancel</Button>
+                <Button onClick={() => {setShowModal(false); onCancel()}}>Cancel</Button>
                 <Button onClick={onProceed} primary disabled={selectedPlayerIds.length < 2}>Proceed to Draft</Button>
             </Modal.Actions>
         </Modal>
