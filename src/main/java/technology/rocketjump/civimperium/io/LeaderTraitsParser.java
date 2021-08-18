@@ -53,6 +53,10 @@ public class LeaderTraitsParser {
 				if (!grants.isEmpty()) {
 					card.setGrantsTraitType(Optional.of(grants));
 				}
+				String freeUseOfCard = record.get("RelatedTraitType");
+				if (!freeUseOfCard.isEmpty()) {
+					card.setGrantsFreeUseOfCard(Optional.of(freeUseOfCard));
+				}
 
 				sourceDataRepo.add(card);
 

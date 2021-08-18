@@ -133,6 +133,10 @@ public class MatchRepo {
 			newSignup.setPlayerId(player.getPlayerId());
 			newSignup.setCommitted(false);
 			newSignup.setCardBoosterClaimed(false);
+			newSignup.setCivAbilityIsFree(false);
+			newSignup.setLeaderAbilityIsFree(false);
+			newSignup.setUniqueInfrastructureIsFree(false);
+			newSignup.setUniqueUnitIsFree(false);
 			create.newRecord(MATCH_SIGNUP, newSignup).store();
 		}
 	}
@@ -167,6 +171,10 @@ public class MatchRepo {
 				.set(MATCH_SIGNUP.CARD_LEADER_ABILITY, matchSignup.getCardLeaderAbility())
 				.set(MATCH_SIGNUP.CARD_UNIQUE_INFRASTRUTURE, matchSignup.getCardUniqueInfrastruture())
 				.set(MATCH_SIGNUP.CARD_UNIQUE_UNIT, matchSignup.getCardUniqueUnit())
+				.set(MATCH_SIGNUP.CIV_ABILITY_IS_FREE, matchSignup.getCivAbilityIsFree())
+				.set(MATCH_SIGNUP.LEADER_ABILITY_IS_FREE, matchSignup.getLeaderAbilityIsFree())
+				.set(MATCH_SIGNUP.UNIQUE_INFRASTRUCTURE_IS_FREE, matchSignup.getUniqueInfrastructureIsFree())
+				.set(MATCH_SIGNUP.UNIQUE_UNIT_IS_FREE, matchSignup.getUniqueUnitIsFree())
 				.set(MATCH_SIGNUP.START_BIAS_CIV_TYPE, matchSignup.getStartBiasCivType())
 				.set(MATCH_SIGNUP.COMMITTED, matchSignup.getCommitted())
 				.where(MATCH_SIGNUP.MATCH_ID.eq(matchSignup.getMatchId())

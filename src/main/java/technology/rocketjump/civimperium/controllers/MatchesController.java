@@ -47,7 +47,7 @@ public class MatchesController {
 				// Hide other players' selections in draft stage
 				match.signups.forEach(signup -> {
 					if (!signup.getPlayerId().equals(currentPlayerId)) {
-						signup.clearAllCards();
+						signup.hideAllCards();
 					}
 				});
 			}
@@ -85,7 +85,7 @@ public class MatchesController {
 			String currentPlayerId = jwToken == null ? null : jwtService.parse(jwToken).getDiscordId();
 			match.signups.forEach(signup -> {
 				if (!signup.getPlayerId().equals(currentPlayerId)) {
-					signup.clearAllCards();
+					signup.hideAllCards();
 				}
 			});
 		}
@@ -141,7 +141,8 @@ public class MatchesController {
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 			} else {
 				String cardTraitType = payload.get("cardTraitType").toString();
-				return matchService.addCardToMatchDeck(match.get(), player, cardTraitType);
+				boolean applyFreeUse = payload.containsKey("applyFreeUse") && (boolean) payload.get("applyFreeUse");
+				return matchService.addCardToMatchDeck(match.get(), player, cardTraitType, applyFreeUse);
 			}
 		}
 	}

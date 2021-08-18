@@ -24,13 +24,22 @@ const ImperiumCard = ({cardJson, onClick, clickDisabled}) => {
         </Card.Header>
     );
 
+    let description = <span>
+        {cardJson.cardDescription}
+        {cardJson.freeUseCard &&
+        <p>
+            <i>This card grants an optional free use of the {cardJson.freeUseCard.cardName} card.</i>
+        </p>
+        }
+    </span>;
+
     return <Card
         className='imperium-card'
         onClick={clickDisabled ? null : () => onClick(cardJson)}
         color={CardInfo.getCategoryColor(cardJson.cardCategory)}
         header={header}
         meta={CardInfo.getCategoryName(cardJson.cardCategory)}
-        description={cardJson.cardDescription}
+        description={description}
         extra={footer}
     />
 };

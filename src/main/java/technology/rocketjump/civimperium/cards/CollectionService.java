@@ -81,7 +81,11 @@ public class CollectionService {
 		List<CollectionCard> result = new ArrayList<>(collectionList.size());
 		for (Collection collectionEntry : collectionList) {
 			Card card = sourceDataRepo.getByTraitType(collectionEntry.getCardTraitType());
-			result.add(new CollectionCard(card, collectionEntry.getQuantity()));
+			CollectionCard collectionCard = new CollectionCard(card, collectionEntry.getQuantity());
+			if (card.getGrantsFreeUseOfCard().isPresent()) {
+				collectionCard.setFreeUseCard(sourceDataRepo.getByTraitType(card.getGrantsFreeUseOfCard().get()));
+			}
+			result.add(collectionCard);
 		}
 		return result;
 	}

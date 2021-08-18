@@ -6,6 +6,7 @@ import ImpRandom from "../ImpRandom";
 import CardInfo from "../cards/CardInfo";
 import CardStore, {CATEGORIES} from "../cards/CardStore";
 import ImperiumCard from "../cards/ImperiumCard";
+import CheckFreeUseOfCardModal from "./CheckFreeUseOfCardModal";
 
 
 const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
@@ -13,6 +14,8 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
     const [loadingCollection, setLoadingCollection] = useState(true);
     const [collection, setCollection] = useState([]);
     const [currentPlayerSignup, setCurrentPlayerSignup] = useState({});
+
+    const [cardWithFreeUseCard, setCardWithFreeUseCard] = useState({});
 
     useEffect(() => {
         axios.get('/api/player/collection')
@@ -31,13 +34,13 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
     }, [match, loggedInPlayer]);
 
     const collectionCardClicked = (card) => {
-        axios.post('/api/matches/' + match.matchId + '/cards', {cardTraitType: card.traitType})
-            .then(response => {
-                setCurrentPlayerSignup(response.data);
-                setLoadingCollection(true);
-            })
-            .catch(console.error)
+        if (card.freeUseCard) {
+            setCardWithFreeUseCard(card);
+        } else {
+            addCard(card, false);
+        }
     };
+
     const civCardClicked = (card) => {
         if (!currentPlayerSignup.committed) {
             axios.post('/api/matches/' + match.matchId + '/cards/remove', {cardTraitType: card.traitType})
@@ -48,6 +51,21 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
                 .catch(console.error)
         }
     };
+
+    const addCard = (card, applyFreeUse) => {
+        setCardWithFreeUseCard({});
+        const payload = {cardTraitType: card.traitType};
+        if (applyFreeUse) {
+            payload.applyFreeUse = true;
+        }
+        axios.post('/api/matches/' + match.matchId + '/cards', payload)
+            .then(response => {
+                setCurrentPlayerSignup(response.data);
+                setLoadingCollection(true);
+            })
+            .catch(console.error)
+    };
+
     const civConfirmed = () => {
         // const updatedCivs = [].concat(storedCivilizations);
         // updatedCivs.push({
@@ -169,6 +187,10 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
                     {civItems}
                 </Card.Group>
             </Container>
+
+            <CheckFreeUseOfCardModal cardWithFreeUseCard={cardWithFreeUseCard}
+                                     onConfirm={() => addCard(cardWithFreeUseCard, true)}
+                                     onCancel={() => addCard(cardWithFreeUseCard, false)} />
 
             {!currentPlayerSignup.committed &&
             <Container style={{marginTop: '1em'}}>

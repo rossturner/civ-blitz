@@ -149,7 +149,7 @@ public class MatchService {
 		matchRepo.update(match);
 	}
 
-	public synchronized MatchSignupWithPlayer addCardToMatchDeck(MatchWithPlayers match, Player player, String cardTraitType) {
+	public synchronized MatchSignupWithPlayer addCardToMatchDeck(MatchWithPlayers match, Player player, String cardTraitType, boolean applyFreeUse) {
 		if (!match.getMatchState().equals(DRAFT)) {
 			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Can only add to deck during draft phase");
 		}
@@ -171,9 +171,23 @@ public class MatchService {
 			removeCardFromMatchDeck(match, player, existingCardSelection);
 		}
 
+		if (applyFreeUse) {
+			String freeUseCardTraitType = cardInCollection.getGrantsFreeUseOfCard()
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Card does not come with a free use card"));
+			Card freeUseCard = sourceDataRepo.getByTraitType(freeUseCardTraitType);
+			existingCardSelection = matchSignup.getCard(freeUseCard.getCardCategory());
+			if (existingCardSelection != null) {
+				removeCardFromMatchDeck(match, player, existingCardSelection);
+			}
+
+			matchSignup.setCard(freeUseCard);
+			matchSignup.setFreeUse(freeUseCard, true);
+		}
+
 		matchSignup.setCard(cardInCollection);
 		matchRepo.updateSignup(matchSignup);
 		collectionService.removeFromCollection(cardInCollection, player);
+
 		return matchSignup;
 	}
 
@@ -196,8 +210,20 @@ public class MatchService {
 		if (card.getCivilizationType().equals(matchSignup.getStartBiasCivType())) {
 			matchSignup.setStartBiasCivType(null);
 		}
+		if (matchSignup.isFreeUse(card)) {
+			matchSignup.setFreeUse(card, false);
+		} else {
+			collectionService.addToCollection(card, player);
+		}
+		// check if need to remove free use granted card
+		if (card.getGrantsFreeUseOfCard().isPresent()) {
+			Card freeUseCard = sourceDataRepo.getByTraitType(card.getGrantsFreeUseOfCard().get());
+			if (freeUseCard.getTraitType().equals(matchSignup.getCard(freeUseCard.getCardCategory())) &&
+				matchSignup.isFreeUse(freeUseCard)) {
+				removeCardFromMatchDeck(match,player, freeUseCard.getTraitType());
+			}
+		}
 		matchRepo.updateSignup(matchSignup);
-		collectionService.addToCollection(card, player);
 		return matchSignup;
 	}
 

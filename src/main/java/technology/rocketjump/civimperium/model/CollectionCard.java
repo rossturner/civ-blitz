@@ -6,6 +6,7 @@ package technology.rocketjump.civimperium.model;
 public class CollectionCard extends Card {
 
 	private int quantity;
+	private Card freeUseCard;
 
 	public CollectionCard(Card original, int quantity) {
 		super(original);
@@ -18,5 +19,13 @@ public class CollectionCard extends Card {
 
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
+	}
+
+	public Card getFreeUseCard() {
+		return freeUseCard;
+	}
+
+	public void setFreeUseCard(Card freeUseCard) {
+		this.freeUseCard = freeUseCard;
 	}
 }

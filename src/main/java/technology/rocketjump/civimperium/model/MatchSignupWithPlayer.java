@@ -69,10 +69,45 @@ public class MatchSignupWithPlayer extends MatchSignup {
 		}
 	}
 
-	public void clearAllCards() {
+	public void hideAllCards() {
 		setCardCivAbility(null);
 		setCardLeaderAbility(null);
 		setCardUniqueUnit(null);
 		setCardUniqueInfrastruture(null);
 	}
+
+	public void setFreeUse(Card card, boolean value) {
+		switch (card.getCardCategory()) {
+			case CivilizationAbility:
+				setCivAbilityIsFree(value);
+				break;
+			case LeaderAbility:
+				setLeaderAbilityIsFree(value);
+				break;
+			case UniqueUnit:
+				setUniqueUnitIsFree(value);
+				break;
+			case UniqueInfrastructure:
+				setUniqueInfrastructureIsFree(value);
+				break;
+			default:
+				throw new IllegalArgumentException("Unrecognised card category " + card.getCardCategory());
+		}
+	}
+
+	public boolean isFreeUse(Card card) {
+		switch (card.getCardCategory()) {
+			case CivilizationAbility:
+				return getCivAbilityIsFree();
+			case LeaderAbility:
+				return getLeaderAbilityIsFree();
+			case UniqueUnit:
+				return getUniqueUnitIsFree();
+			case UniqueInfrastructure:
+				return getUniqueInfrastructureIsFree();
+			default:
+				throw new IllegalArgumentException("Unrecognised card category " + card.getCardCategory());
+		}
+	}
+
 }

@@ -15,6 +15,7 @@ public class Card {
 	protected String civilizationFriendlyName;
 
 	protected Optional<String> grantsTraitType = Optional.empty();
+	protected Optional<String> grantsFreeUseOfCard = Optional.empty();
 	protected String subtype;
 	protected String mediaName;
 
@@ -31,6 +32,7 @@ public class Card {
 		this.cardCategory = original.cardCategory;
 		this.civilizationFriendlyName = original.civilizationFriendlyName;
 		this.grantsTraitType = original.grantsTraitType;
+		this.grantsFreeUseOfCard = original.grantsFreeUseOfCard;
 		this.subtype = original.subtype;
 		this.mediaName = original.mediaName;
 	}
@@ -115,6 +117,14 @@ public class Card {
 
 	public void setGrantsTraitType(Optional<String> grantsTraitType) {
 		this.grantsTraitType = grantsTraitType;
+	}
+
+	public Optional<String> getGrantsFreeUseOfCard() {
+		return grantsFreeUseOfCard;
+	}
+
+	public void setGrantsFreeUseOfCard(Optional<String> grantsFreeUseOfCard) {
+		this.grantsFreeUseOfCard = grantsFreeUseOfCard;
 	}
 
 	public void setSubtype(String subtype) {
