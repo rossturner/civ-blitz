@@ -83,10 +83,11 @@ public class ExampleController {
 			selectedCards.put(card.getCardCategory(), card);
 		}
 
-		String modName = modHeaderGenerator.createFor(selectedCards, null).modName;
+		ModdedCivInfo civInfo = new ModdedCivInfo(selectedCards, null);
+		String modName = modHeaderGenerator.createFor(civInfo.selectedCards).modName;
 		response.addHeader("Content-Disposition", "attachment; filename=\"Imperium_"+modName+".zip\"");
 
-		return completeModGenerator.generateMod(new ModdedCivInfo(selectedCards, null));
+		return completeModGenerator.generateMod(civInfo);
 	}
 
 }

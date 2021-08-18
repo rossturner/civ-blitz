@@ -3,15 +3,16 @@ package technology.rocketjump.civimperium.modgenerator.sql;
 import org.springframework.stereotype.Component;
 import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
+import technology.rocketjump.civimperium.modgenerator.ModHeaderGenerator;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
 import technology.rocketjump.civimperium.modgenerator.model.ModdedCivInfo;
 
 @Component
-public class CivTraitsSqlGenerator implements ImperiumFileGenerator {
+public class CivTraitsSqlGenerator extends ImperiumFileGenerator {
 
 	@Override
 	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
-		String modName = modHeader.modName.toUpperCase();
+		String modName = ModHeaderGenerator.buildName(civInfo.selectedCards).toUpperCase();
 		StringBuilder sqlBuilder = new StringBuilder();
 
 		for (CardCategory cardCategory : CardCategory.values()) {

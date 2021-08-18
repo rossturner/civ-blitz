@@ -64,6 +64,43 @@ public class CompleteModGenerator {
 		fileGeneratorList.add(leaderTextSqlGenerator);
 	}
 
+	public byte[] generateMod(String matchName, List<ModdedCivInfo> moddedCivs) throws IOException {
+		for (ModdedCivInfo civInfo : moddedCivs) {
+			if (civInfo.selectedCards.size() != 4) {
+				throw new IllegalArgumentException(getClass().getSimpleName() + " must be passed a map of 4 cards");
+			}
+			for (CardCategory cardCategory : CardCategory.values()) {
+				if (!civInfo.selectedCards.containsKey(cardCategory)) {
+					throw new IllegalArgumentException(getClass().getSimpleName() + " must be passed one card in each category");
+				}
+			}
+		}
+
+		ModHeader header = modHeaderGenerator.createFor(matchName);
+
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
+		ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream);
+
+		for (ImperiumFileGenerator generator : fileGeneratorList) {
+			byte[] contentBytes = generator.getFileContents(header, moddedCivs).getBytes();
+			zipOutputStream.putNextEntry(new ZipEntry(generator.getFilename()));
+			zipOutputStream.write(contentBytes, 0, contentBytes.length);
+		}
+		for (StaticModFile fixFile : infrastructureFixFileProvider.getAll()) {
+			byte[] contentBytes = fixFile.getFileContent().getBytes();
+			zipOutputStream.putNextEntry(new ZipEntry(fixFile.getFilename()));
+			zipOutputStream.write(contentBytes, 0, contentBytes.length);
+		}
+
+		zipOutputStream.finish();
+		zipOutputStream.flush();
+		IOUtils.closeQuietly(zipOutputStream);
+		IOUtils.closeQuietly(bufferedOutputStream);
+		IOUtils.closeQuietly(byteArrayOutputStream);
+		return byteArrayOutputStream.toByteArray();
+	}
+
 	public byte[] generateMod(ModdedCivInfo civInfo) throws IOException {
 		if (civInfo.selectedCards.size() != 4) {
 			throw new IllegalArgumentException(getClass().getSimpleName() + " must be passed a map of 4 cards");
@@ -74,7 +111,7 @@ public class CompleteModGenerator {
 			}
 		}
 
-		ModHeader header = modHeaderGenerator.createFor(civInfo.selectedCards, civInfo.startBiasCivType);
+		ModHeader header = modHeaderGenerator.createFor(civInfo.selectedCards);
 
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);

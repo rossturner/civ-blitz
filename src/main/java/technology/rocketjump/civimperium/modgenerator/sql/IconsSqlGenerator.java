@@ -5,11 +5,12 @@ import org.springframework.stereotype.Component;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.model.IconAtlasEntry;
 import technology.rocketjump.civimperium.model.SourceDataRepo;
+import technology.rocketjump.civimperium.modgenerator.ModHeaderGenerator;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
 import technology.rocketjump.civimperium.modgenerator.model.ModdedCivInfo;
 
 @Component
-public class IconsSqlGenerator implements ImperiumFileGenerator {
+public class IconsSqlGenerator extends ImperiumFileGenerator {
 
 	private final SourceDataRepo sourceDataRepo;
 
@@ -22,7 +23,7 @@ public class IconsSqlGenerator implements ImperiumFileGenerator {
 	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
 		StringBuilder sqlBuilder = new StringBuilder();
 
-		String name = modHeader.modName.toUpperCase();
+		String name = ModHeaderGenerator.buildName(civInfo.selectedCards).toUpperCase();
 
 		IconAtlasEntry civIconEntry = sourceDataRepo.getIconAtlasEntry(civInfo.selectedCards.get(CardCategory.CivilizationAbility).getCivilizationType());
 		IconAtlasEntry leaderIconEntry = sourceDataRepo.getIconAtlasEntry(civInfo.selectedCards.get(CardCategory.LeaderAbility).getLeaderType().get());

@@ -6,9 +6,10 @@ import technology.rocketjump.civimperium.modgenerator.model.ModdedCivInfo;
 import technology.rocketjump.civimperium.modgenerator.sql.ImperiumFileGenerator;
 
 import java.time.Instant;
+import java.util.List;
 
 @Component
-public class ModInfoGenerator implements ImperiumFileGenerator {
+public class ModInfoGenerator extends ImperiumFileGenerator {
 
 	private String modName = "UNSET";
 
@@ -16,6 +17,11 @@ public class ModInfoGenerator implements ImperiumFileGenerator {
 	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
 		modName = modHeader.modName;
 		return getModInfoContent(modHeader);
+	}
+
+	@Override
+	public String getFileContents(ModHeader modHeader, List<ModdedCivInfo> civs) {
+		return getFileContents(modHeader, (ModdedCivInfo) null);
 	}
 
 	public String getModInfoContent(ModHeader modHeader) {

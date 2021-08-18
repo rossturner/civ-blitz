@@ -6,11 +6,12 @@ import org.springframework.stereotype.Component;
 import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.model.SourceDataRepo;
+import technology.rocketjump.civimperium.modgenerator.ModHeaderGenerator;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
 import technology.rocketjump.civimperium.modgenerator.model.ModdedCivInfo;
 
 @Component
-public class CivilizationSqlGenerator implements ImperiumFileGenerator {
+public class CivilizationSqlGenerator extends ImperiumFileGenerator {
 
 	private final SourceDataRepo sourceDataRepo;
 
@@ -21,25 +22,17 @@ public class CivilizationSqlGenerator implements ImperiumFileGenerator {
 
 	@Override
 	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
-		return getCivilizationSql(modHeader,
-				civInfo.selectedCards.get(CardCategory.CivilizationAbility),
-				civInfo.selectedCards.get(CardCategory.LeaderAbility),
-				civInfo.startBiasCivType);
-	}
-
-	public String getCivilizationSql(ModHeader modHeader, Card civAbilityCard, Card leaderAbilityCard, String startBiasCivType) {
+		Card leaderAbilityCard = civInfo.selectedCards.get(CardCategory.LeaderAbility);
 		return getCivilizationSql(
-				modHeader.modName,
+				ModHeaderGenerator.buildName(civInfo.selectedCards).toUpperCase(),
 				leaderAbilityCard.getLeaderType().get(),
 				leaderAbilityCard.getCivilizationType(),
-				civAbilityCard.getCivilizationType(),
-				startBiasCivType
+				civInfo.selectedCards.get(CardCategory.CivilizationAbility).getCivilizationType(),
+				civInfo.startBiasCivType
 		);
 	}
 
 	private String getCivilizationSql(String modName, String leaderType, String leaderCivType, String namesCivType, String startBiasCivType) {
-		modName = modName.toUpperCase();
-
 		StringBuilder sqlBuilder = new StringBuilder();
 
 		sqlBuilder.append("INSERT OR REPLACE INTO Types (Type, Kind)\n" +

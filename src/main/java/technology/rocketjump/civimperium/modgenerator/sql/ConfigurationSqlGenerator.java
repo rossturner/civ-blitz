@@ -5,11 +5,12 @@ import org.springframework.stereotype.Component;
 import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.model.SourceDataRepo;
+import technology.rocketjump.civimperium.modgenerator.ModHeaderGenerator;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
 import technology.rocketjump.civimperium.modgenerator.model.ModdedCivInfo;
 
 @Component
-public class ConfigurationSqlGenerator implements ImperiumFileGenerator {
+public class ConfigurationSqlGenerator extends ImperiumFileGenerator {
 
 	private final SourceDataRepo sourceDataRepo;
 
@@ -21,6 +22,8 @@ public class ConfigurationSqlGenerator implements ImperiumFileGenerator {
 	@Override
 	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
 		StringBuilder sqlBuilder = new StringBuilder();
+
+		String modName = ModHeaderGenerator.buildName(civInfo.selectedCards).toUpperCase();
 
 		Card civAbilityCard = civInfo.selectedCards.get(CardCategory.CivilizationAbility);
 		String civType = civAbilityCard.getCivilizationType();
@@ -61,11 +64,11 @@ public class ConfigurationSqlGenerator implements ImperiumFileGenerator {
 				" CivilizationAbilityIcon)\n" +
 				"VALUES\n" +
 				"('Players:Expansion2_Players',\n" +
-				" 'CIVILIZATION_IMP_").append(modHeader.modName.toUpperCase()).append("',\n" +
+				" 'CIVILIZATION_IMP_").append(modName).append("',\n" +
 				" '").append(portrait).append("',\n" +
 				" '").append(portraitBackground).append("',\n" +
-				" 'LEADER_IMP_").append(modHeader.modName.toUpperCase()).append("',\n" +
-				" 'LOC_LEADER_IMP_").append(modHeader.modName.toUpperCase()).append("',\n" +
+				" 'LEADER_IMP_").append(modName).append("',\n" +
+				" 'LOC_LEADER_IMP_").append(modName).append("',\n" +
 				" '").append(leaderIcon).append("',\n" +
 				" '").append(locLeaderTraitName).append("',\n" +
 				" '").append(locLeaderTraitDesc).append("',\n" +
@@ -81,13 +84,13 @@ public class ConfigurationSqlGenerator implements ImperiumFileGenerator {
 
 		for (Card card : civInfo.selectedCards.values()) {
 			if (!card.getCardCategory().equals(CardCategory.LeaderAbility) && !card.getCardCategory().equals(CardCategory.CivilizationAbility)) {
-				addTraitPlayerItem(sqlBuilder, modHeader, card.getTraitType(), card.getCivilizationType(), sortIndex);
+				addTraitPlayerItem(sqlBuilder, modName, card.getTraitType(), card.getCivilizationType(), sortIndex);
 				sortIndex += 10;
 			}
 
 			// add granted stuff, including from CA and LA
 			if (card.getGrantsTraitType().isPresent()) {
-				addTraitPlayerItem(sqlBuilder, modHeader, card.getGrantsTraitType().get(), card.getCivilizationType(), sortIndex);
+				addTraitPlayerItem(sqlBuilder, modName, card.getGrantsTraitType().get(), card.getCivilizationType(), sortIndex);
 				sortIndex += 10;
 			}
 		}
@@ -95,12 +98,12 @@ public class ConfigurationSqlGenerator implements ImperiumFileGenerator {
 		return sqlBuilder.toString();
 	}
 
-	private void addTraitPlayerItem(StringBuilder sqlBuilder, ModHeader modHeader, String traitType, String civilizationType, int sortIndex) {
+	private void addTraitPlayerItem(StringBuilder sqlBuilder, String modName, String traitType, String civilizationType, int sortIndex) {
 		String subtype = sourceDataRepo.getSubtypeByTraitType(traitType);
 
 		sqlBuilder.append("INSERT OR REPLACE INTO PlayerItems (Domain, CivilizationType, LeaderType, Type, Icon, Name, Description, SortIndex)\n" +
-				"SELECT 'Players:Expansion2_Players', 'CIVILIZATION_IMP_").append(modHeader.modName.toUpperCase())
-				.append("', 'LEADER_IMP_").append(modHeader.modName.toUpperCase())
+				"SELECT 'Players:Expansion2_Players', 'CIVILIZATION_IMP_").append(modName)
+				.append("', 'LEADER_IMP_").append(modName)
 				.append("', PlayerItems.Type, PlayerItems.Icon, PlayerItems.Name, PlayerItems.Description, ").append(sortIndex).append("\n" +
 				"FROM PlayerItems\n" +
 				"WHERE Domain = 'Players:Expansion2_Players' and CivilizationType = '").append(civilizationType).append("' and Type = '").append(subtype).append("';\n\n");

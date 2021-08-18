@@ -2,18 +2,20 @@ package technology.rocketjump.civimperium.modgenerator.sql;
 
 import org.springframework.stereotype.Component;
 import technology.rocketjump.civimperium.model.CardCategory;
+import technology.rocketjump.civimperium.modgenerator.ModHeaderGenerator;
 import technology.rocketjump.civimperium.modgenerator.model.ModHeader;
 import technology.rocketjump.civimperium.modgenerator.model.ModdedCivInfo;
 
 @Component
-public class ColorsSqlGenerator implements ImperiumFileGenerator {
+public class ColorsSqlGenerator extends ImperiumFileGenerator {
 
 	@Override
 	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
-		return getColorsSql(modHeader, civInfo.selectedCards.get(CardCategory.LeaderAbility).getLeaderType().get());
+		return getColorsSql(ModHeaderGenerator.buildName(civInfo.selectedCards).toUpperCase(),
+				civInfo.selectedCards.get(CardCategory.LeaderAbility).getLeaderType().get());
 	}
 
-	public String getColorsSql(ModHeader modHeader, String leaderType) {
+	public String getColorsSql(String modName, String leaderType) {
 		StringBuilder sqlBuilder = new StringBuilder();
 
 		sqlBuilder.append("INSERT INTO PlayerColors\n" +
@@ -30,7 +32,7 @@ public class ColorsSqlGenerator implements ImperiumFileGenerator {
 				"\n" +
 				"     Alt3PrimaryColor,\n" +
 				"     Alt3SecondaryColor)\n" +
-				"SELECT 'LEADER_IMP_").append(modHeader.modName.toUpperCase()).append("',\n" +
+				"SELECT 'LEADER_IMP_").append(modName).append("',\n" +
 				"    Usage,\n" +
 				"    PrimaryColor,\n" +
 				"    SecondaryColor,\n" +
