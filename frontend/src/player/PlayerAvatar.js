@@ -6,7 +6,7 @@ const PlayerAvatar = ({player, size, floated}) => {
     if (!player || !player.discordAvatar) {
         return null;
     } else {
-        return <Image floated={'right'} avatar size={ size ? size : 'medium'} src={'https://cdn.discordapp.com/avatars/'+
+        return <Image floated={floated} avatar size={ size ? size : 'medium'} src={'https://cdn.discordapp.com/avatars/'+
         (player.discordId || player.playerId)+'/'+player.discordAvatar+'.png'} />;
     }
 }

@@ -44,8 +44,8 @@ const MatchPage = ({loggedInPlayer}) => {
 
     const playerSections = match.signups && match.signups.map((signup, index) =>
         <Segment key={index} inverted color={sectionColors[index]}>
-            <PlayerAvatar player={signup.player} size='mini'/>
-            <Header>{signup.player.discordUsername}</Header>
+            <PlayerAvatar player={signup.player} size='mini' floated='right'/>
+            <Header style={{'marginTop': '0em'}}>{signup.player.discordUsername}</Header>
             <MatchCivViewer signup={signup}/>
         </Segment>
     );
