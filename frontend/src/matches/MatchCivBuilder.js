@@ -1,4 +1,4 @@
-import {Button, Card, Container, Header, List, Placeholder, Select} from "semantic-ui-react";
+import {Button, Card, CardGroup, Container, Header, List, Placeholder, Select} from "semantic-ui-react";
 import React, {useEffect, useState} from "react";
 import ImperiumCardGroup from "../cards/ImperiumCardGroup";
 import axios from "axios";
@@ -7,6 +7,7 @@ import CardInfo from "../cards/CardInfo";
 import CardStore, {CATEGORIES} from "../cards/CardStore";
 import ImperiumCard from "../cards/ImperiumCard";
 import CheckFreeUseOfCardModal from "./CheckFreeUseOfCardModal";
+import ObjectiveCard from "./objectives/ObjectiveCard";
 
 
 const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
@@ -14,8 +15,8 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
     const [loadingCollection, setLoadingCollection] = useState(true);
     const [collection, setCollection] = useState([]);
     const [currentPlayerSignup, setCurrentPlayerSignup] = useState({});
-
     const [cardWithFreeUseCard, setCardWithFreeUseCard] = useState({});
+    const [secretObjectives, setSecretObjectives] = useState([]);
 
     useEffect(() => {
         axios.get('/api/player/collection')
@@ -28,6 +29,18 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
                 console.error('Error retrieving match', error);
             })
     }, [loadingCollection]);
+
+    useEffect(() => {
+        if (match.matchState !== 'SIGNUPS') {
+            axios.get('/api/matches/' + match.matchId + '/secret_objectives')
+                .then((response) => {
+                    setSecretObjectives(response.data);
+                })
+                .catch((error) => {
+                    console.error('Error retrieving secret objectives', error);
+                })
+        }
+    }, [match]);
 
     useEffect(() => {
         setCurrentPlayerSignup(match.signups.find(s => s.playerId === loggedInPlayer.discordId));
@@ -116,8 +129,12 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
             />;
         }
     });
+
+    const numSelectedSecretObjectives = secretObjectives.filter(s => s.selected).length;
+
     const canCommit = !currentPlayerSignup.committed && currentPlayerSignup.startBiasCivType &&
-        CATEGORIES.every(category => currentPlayerSignup[CardInfo.getSignupPropName(category)]);
+        CATEGORIES.every(category => currentPlayerSignup[CardInfo.getSignupPropName(category)]) &&
+        numSelectedSecretObjectives === 2;
 
     const doCommit = () => {
         axios.post('/api/matches/' + match.matchId + '/commit')
@@ -137,11 +154,26 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
             .catch(console.error)
     }
 
+    const secretObjectiveClicked = (secretObjective) => {
+        axios.post('/api/matches/' + match.matchId + '/secret_objectives/' + secretObjective.enumName)
+            .then(response => {
+                setSecretObjectives(response.data);
+            })
+            .catch(console.error)
+    }
+
     return (
         <React.Fragment>
             <Container>
+                <Container>
+                    <Header as='h4'>Secret objectives (select 2)</Header>
+                    <CardGroup centered>
+                        {secretObjectives.map(s => <ObjectiveCard key={s.objectiveName} objectiveJson={s} cardClicked={secretObjectiveClicked}
+                                                                  clickDisabled={currentPlayerSignup.committed} />)}
+                    </CardGroup>
+                </Container>
 
-                <Container style={{'marginBottom': '1em'}}>
+                <Container style={{'margin': '1em'}}>
                     <List horizontal>
                         {startBiasOptions.length > 0 &&
                         <List.Item>

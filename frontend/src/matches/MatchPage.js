@@ -1,4 +1,4 @@
-import {Container, Header, List, Loader, Segment} from "semantic-ui-react";
+import {CardGroup, Container, Header, List, Loader, Segment} from "semantic-ui-react";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import PlayerAvatar from "../player/PlayerAvatar";
@@ -8,12 +8,14 @@ import MatchCivBuilder from "./MatchCivBuilder";
 import MapSettings from "./MapSettings";
 import MatchCivViewer from "./MatchCivViewer";
 import DownloadMatchModButton from "./DownloadMatchModButton";
+import ObjectiveCard from "./objectives/ObjectiveCard";
 
 const MatchPage = ({loggedInPlayer}) => {
 
     const {matchId} = useParams();
     const [loading, setLoading] = useState(true);
     const [match, setMatch] = useState({});
+    const [publicObjectives, setPublicObjectives] = useState([]);
 
     const currentPlayerSignup = match.signups && match.signups.filter(s => s.playerId === loggedInPlayer.discordId);
 
@@ -27,6 +29,18 @@ const MatchPage = ({loggedInPlayer}) => {
                 console.error('Error retrieving match', error);
             })
     }, [loading, matchId]);
+
+    useEffect(() => {
+        if (match.matchState !== 'SIGNUPS') {
+            axios.get('/api/matches/' + matchId + '/public_objectives')
+                .then((response) => {
+                    setPublicObjectives(response.data);
+                })
+                .catch((error) => {
+                    console.error('Error retrieving match objectives', error);
+                })
+        }
+    }, [match, matchId]);
 
     const signupToPlayerSection = (signup) => {
         return (
@@ -46,9 +60,10 @@ const MatchPage = ({loggedInPlayer}) => {
         <Segment key={index} inverted color={sectionColors[index]}>
             <PlayerAvatar player={signup.player} size='mini' floated='right'/>
             <Header style={{'marginTop': '0em'}}>{signup.player.discordUsername}</Header>
-            <MatchCivViewer signup={signup}/>
+            <MatchCivViewer signup={signup} loggedInPlayer={loggedInPlayer}/>
         </Segment>
     );
+    const publicObjectiveSections = publicObjectives.map(objective => <ObjectiveCard key={objective.objectiveName} objectiveJson={objective} />);
 
     return (
         <React.Fragment>
@@ -67,7 +82,19 @@ const MatchPage = ({loggedInPlayer}) => {
                     {match.matchState === 'SIGNUPS' && match.signups.map(signupToPlayerSection)}
 
                     {match.matchState !== 'SIGNUPS' &&
-                    <MapSettings match={match}/>
+                        <React.Fragment>
+                            <MapSettings match={match}/>
+
+                            <Container style={{'margin': '1em'}}>
+                                <Header>Public objectives:</Header>
+                                <p>The first player to claim 5 stars wins the game. These may be any mix of public and secret objectives.</p>
+                                <CardGroup>
+                                    {publicObjectiveSections}
+                                </CardGroup>
+                            </Container>
+
+
+                        </React.Fragment>
                     }
 
                     {match.matchState === 'DRAFT' &&

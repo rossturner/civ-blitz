@@ -288,6 +288,16 @@
                                             <expressions>rainfall</expressions>
                                             <enumConverter>true</enumConverter>
                                         </forcedType>
+                                        <forcedType>
+                                            <userType>technology.rocketjump.civimperium.matches.ImperiumObjective</userType>
+                                            <expressions>objective</expressions>
+                                            <enumConverter>true</enumConverter>
+                                        </forcedType>
+                                        <forcedType>
+                                            <userType>technology.rocketjump.civimperium.cards.CardPackType</userType>
+                                            <expressions>pack_type</expressions>
+                                            <enumConverter>true</enumConverter>
+                                        </forcedType>
                                     </forcedTypes>
                                 </database>
                                 <generate>

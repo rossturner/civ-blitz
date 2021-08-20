@@ -1,0 +1,9 @@
+
+.ui.card.objective-card {
+    width: 270px;
+}
+
+.ui.card.objective-card.unselected>.content>.header,
+.ui.card.objective-card.unselected>.content>.description {
+    color: #b0b0b0;
+}

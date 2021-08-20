@@ -5,13 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import technology.rocketjump.civimperium.cards.CollectionService;
+import technology.rocketjump.civimperium.cards.PackService;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Match;
 import technology.rocketjump.civimperium.codegen.tables.pojos.MatchSignup;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
+import technology.rocketjump.civimperium.codegen.tables.pojos.SecretObjective;
 import technology.rocketjump.civimperium.mapgen.MapSettings;
 import technology.rocketjump.civimperium.mapgen.MapSettingsGenerator;
 import technology.rocketjump.civimperium.model.*;
-import technology.rocketjump.civimperium.players.PlayerService;
 
 import java.util.List;
 import java.util.Map;
@@ -28,19 +29,22 @@ public class MatchService {
 	private final CollectionService collectionService;
 	private final SourceDataRepo sourceDataRepo;
 	private final MapSettingsGenerator mapSettingsGenerator;
-	private final PlayerService playerService;
 	private final Random random = new Random();
+	private final ObjectivesService objectivesService;
+	private final PackService packService;
 
 	@Autowired
 	public MatchService(AdjectiveNounNameGenerator adjectiveNounNameGenerator, MatchRepo matchRepo,
 						CollectionService collectionService, SourceDataRepo sourceDataRepo,
-						MapSettingsGenerator mapSettingsGenerator, PlayerService playerService) {
+						MapSettingsGenerator mapSettingsGenerator,
+						ObjectivesService objectivesService, PackService packService) {
 		this.adjectiveNounNameGenerator = adjectiveNounNameGenerator;
 		this.matchRepo = matchRepo;
 		this.collectionService = collectionService;
 		this.sourceDataRepo = sourceDataRepo;
 		this.mapSettingsGenerator = mapSettingsGenerator;
-		this.playerService = playerService;
+		this.objectivesService = objectivesService;
+		this.packService = packService;
 	}
 
 
@@ -87,7 +91,7 @@ public class MatchService {
 		return matchRepo.getMatchById(matchId);
 	}
 
-	public Match update(Match match, String name, String timeslot) {
+	public Match updateSecretObjectiveSelection(Match match, String name, String timeslot) {
 		match.setMatchName(name);
 		match.setTimeslot(timeslot);
 		matchRepo.update(match);
@@ -131,6 +135,7 @@ public class MatchService {
 		apply(mapSettings, match);
 		match.setMatchState(DRAFT);
 		matchRepo.update(match);
+		objectivesService.initialiseObjectives(matchWithPlayers);
 	}
 
 	private void revertToSignups(Match match) {
@@ -153,6 +158,7 @@ public class MatchService {
 
 		match.setMatchState(SIGNUPS);
 		matchRepo.update(match);
+		objectivesService.clearObjectives(match);
 	}
 
 	private void proceedToInProgress(Match match) {
@@ -161,7 +167,7 @@ public class MatchService {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
 		for (MatchSignupWithPlayer signup : matchWithPlayers.signups) {
-			playerService.addBooster(signup.getPlayer());
+			packService.addMatchBooster(signup);
 		}
 
 		match.setMatchState(IN_PROGRESS);
@@ -238,8 +244,8 @@ public class MatchService {
 		if (card.getGrantsFreeUseOfCard().isPresent()) {
 			Card freeUseCard = sourceDataRepo.getByTraitType(card.getGrantsFreeUseOfCard().get());
 			if (freeUseCard.getTraitType().equals(matchSignup.getCard(freeUseCard.getCardCategory())) &&
-				matchSignup.isFreeUse(freeUseCard)) {
-				removeCardFromMatchDeck(match,player, freeUseCard.getTraitType());
+					matchSignup.isFreeUse(freeUseCard)) {
+				removeCardFromMatchDeck(match, player, freeUseCard.getTraitType());
 			}
 		}
 		matchRepo.updateSignup(matchSignup);
@@ -266,6 +272,20 @@ public class MatchService {
 		return matchSignup;
 	}
 
+	public void updateSecretObjectiveSelection(SecretObjective secretObjective) {
+		MatchWithPlayers match = matchRepo.getMatchById(secretObjective.getMatchId()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		if (!match.getMatchState().equals(DRAFT)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can only modify secret objective selections during draft phase");
+		}
+
+		MatchSignupWithPlayer signup = getSignup(match, secretObjective.getPlayerId());
+		if (signup.getCommitted()) {
+			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Can not change objective selection once committed");
+		}
+
+		objectivesService.update(secretObjective);
+	}
+
 	public MatchSignupWithPlayer commitPlayer(MatchWithPlayers match, Player player) {
 		MatchSignupWithPlayer matchSignup = getSignup(match, player);
 		if (matchSignup.getCommitted()) {
@@ -283,6 +303,14 @@ public class MatchService {
 		}
 		if (matchSignup.getStartBiasCivType() == null) {
 			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Start bias must be assigned to commit");
+		}
+
+		long selectedSecretObjectives = objectivesService.getSecretObjectives(match.getMatchId(), player)
+				.stream()
+				.filter(SecretObjective::getSelected)
+				.count();
+		if (selectedSecretObjectives != 2) {
+			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Must have selected 2 secret objectives to commit");
 		}
 
 		matchSignup.setCommitted(true);
@@ -310,7 +338,11 @@ public class MatchService {
 	}
 
 	private MatchSignupWithPlayer getSignup(MatchWithPlayers match, Player player) {
-		return match.signups.stream().filter(signup -> signup.getPlayerId().equals(player.getPlayerId())).findFirst()
+		return getSignup(match, player.getPlayerId());
+	}
+
+	private MatchSignupWithPlayer getSignup(MatchWithPlayers match, String playerId) {
+		return match.signups.stream().filter(signup -> signup.getPlayerId().equals(playerId)).findFirst()
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Player is not part of specified match"));
 	}
 
