@@ -17,7 +17,7 @@ const MatchPage = ({loggedInPlayer}) => {
     const [match, setMatch] = useState({});
     const [publicObjectives, setPublicObjectives] = useState([]);
 
-    const currentPlayerSignup = match.signups && match.signups.filter(s => s.playerId === loggedInPlayer.discordId);
+    const currentPlayerSignup = match.signups && match.signups.find(s => s.playerId === loggedInPlayer.discordId);
 
     useEffect(() => {
         axios.get('/api/matches/' + matchId)
