@@ -120,6 +120,20 @@ public class MatchesController {
 		}
 	}
 
+	@GetMapping("/{matchId}/all_secret_objectives")
+	public List<SecretObjectiveResponse> getAllMatchSecretObjectives(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId) {
+		if (jwToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		} else {
+			ImperiumToken token = jwtService.parse(jwToken);
+			Player player = playerService.getPlayer(token);
+			MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+			return objectivesService.getAllSecretObjectives(match, player).stream()
+					.map(SecretObjectiveResponse::new)
+					.collect(Collectors.toList());
+		}
+	}
+
 	@PostMapping("/{matchId}/secret_objectives/{objective}")
 	public List<SecretObjectiveResponse> updateMatchSecretObjectives(@RequestHeader("Authorization") String jwToken,
 																	 @PathVariable int matchId,

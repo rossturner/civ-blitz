@@ -1,7 +1,9 @@
 package technology.rocketjump.civimperium.matches;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Match;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
 import technology.rocketjump.civimperium.codegen.tables.pojos.SecretObjective;
@@ -50,6 +52,24 @@ public class ObjectivesService {
 
 	public List<SecretObjective> getSecretObjectives(int matchId, Player player) {
 		return objectivesRepo.getSecretObjectives(matchId, player);
+	}
+
+	public List<SecretObjective> getAllSecretObjectives(MatchWithPlayers match, Player player) {
+		if (match.getMatchState().equals(MatchState.IN_PROGRESS)) {
+			if (!player.getIsAdmin()) {
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be an admin to get all secrets while match is in progress");
+			} else if (match.signups.stream().anyMatch(s -> s.getPlayer().equals(player))) {
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can not get all secrets when current player is in the match");
+			} else {
+				// Is an admin not in the match, can get all secrets
+				return objectivesRepo.getAllSecretObjectives(match.getMatchId());
+			}
+		} else if (match.getMatchState().equals(MatchState.POST_MATCH)) {
+			// At this state anyone can get all secret objectives
+			return objectivesRepo.getAllSecretObjectives(match.getMatchId());
+		} else {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can not retrieve all secret objectives in state " + match.getMatchState());
+		}
 	}
 
 	public void update(SecretObjective secretObjective) {

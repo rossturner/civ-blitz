@@ -48,6 +48,12 @@ public class ObjectivesRepo {
 				.fetchInto(SecretObjective.class);
 	}
 
+	public List<SecretObjective> getAllSecretObjectives(int matchId) {
+		return create.selectFrom(SECRET_OBJECTIVE)
+				.where(SECRET_OBJECTIVE.MATCH_ID.eq(matchId))
+				.fetchInto(SecretObjective.class);
+	}
+
 	public void update(SecretObjective secretObjective) {
 		create.update(SECRET_OBJECTIVE)
 				.set(SECRET_OBJECTIVE.SELECTED, secretObjective.getSelected())

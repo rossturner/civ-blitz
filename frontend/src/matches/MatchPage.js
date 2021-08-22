@@ -16,6 +16,7 @@ const MatchPage = ({loggedInPlayer}) => {
     const [loading, setLoading] = useState(true);
     const [match, setMatch] = useState({});
     const [publicObjectives, setPublicObjectives] = useState([]);
+    const [secretObjectives, setSecretObjectives] = useState([]);
 
     const currentPlayerSignup = match.signups && match.signups.find(s => s.playerId === loggedInPlayer.discordId);
 
@@ -40,6 +41,18 @@ const MatchPage = ({loggedInPlayer}) => {
                     console.error('Error retrieving match objectives', error);
                 })
         }
+
+        if ((match.matchState === 'IN_PROGRESS' && loggedInPlayer.isAdmin && !currentPlayerSignup) ||
+            match.matchState === 'POST_MATCH') {
+            axios.get('/api/matches/' + matchId + '/all_secret_objectives')
+                .then((response) => {
+                    console.log('all secret objectives', response.data);
+                    setSecretObjectives(response.data);
+                })
+                .catch(() => {
+                    // Ignore these errors, player might be taking part in this match
+                })
+        }
     }, [match, matchId]);
 
     const signupToPlayerSection = (signup) => {
@@ -60,7 +73,7 @@ const MatchPage = ({loggedInPlayer}) => {
         <Segment key={index} inverted color={sectionColors[index]}>
             <PlayerAvatar player={signup.player} size='mini' floated='right'/>
             <Header style={{'marginTop': '0em'}}>{signup.player.discordUsername}</Header>
-            <MatchCivViewer signup={signup} loggedInPlayer={loggedInPlayer}/>
+            <MatchCivViewer signup={signup} loggedInPlayer={loggedInPlayer} secretObjectivesProp={secretObjectives.filter(s => s.playerId === signup.playerId)}/>
         </Segment>
     );
     const publicObjectiveSections = publicObjectives.map(objective => <ObjectiveCard key={objective.objectiveName} objectiveJson={objective} />);

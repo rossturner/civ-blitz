@@ -7,9 +7,9 @@ import ObjectiveCard from "./objectives/ObjectiveCard";
 import axios from "axios";
 
 
-const MatchCivViewer = ({signup, loggedInPlayer}) => {
+const MatchCivViewer = ({signup, loggedInPlayer, secretObjectivesProp}) => {
 
-    const [secretObjectives, setSecretObjectives] = useState([]);
+    const [secretObjectives, setSecretObjectives] = useState(secretObjectivesProp || []);
 
     useEffect(() => {
         if (signup.playerId === loggedInPlayer.discordId) {
