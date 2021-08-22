@@ -46,14 +46,13 @@ const MatchPage = ({loggedInPlayer}) => {
             match.matchState === 'POST_MATCH') {
             axios.get('/api/matches/' + matchId + '/all_secret_objectives')
                 .then((response) => {
-                    console.log('all secret objectives', response.data);
                     setSecretObjectives(response.data);
                 })
                 .catch(() => {
                     // Ignore these errors, player might be taking part in this match
                 })
         }
-    }, [match, matchId]);
+    }, [match, matchId, currentPlayerSignup, loggedInPlayer]);
 
     const signupToPlayerSection = (signup) => {
         return (
