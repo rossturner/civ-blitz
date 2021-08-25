@@ -4,6 +4,7 @@ import ImpRandom from "./ImpRandom";
 import ImperiumCardGroup from "./cards/ImperiumCardGroup";
 import axios from "axios";
 import PlayerAvatar from "./player/PlayerAvatar";
+import {Link} from "react-router-dom";
 
 
 const PlayerCollection = ({loggedInPlayer}) => {
@@ -12,6 +13,7 @@ const PlayerCollection = ({loggedInPlayer}) => {
     const [loading, setLoading] = useState(true);
     const [canMulligan, setCanMulligan] = useState(false);
     const [showMulliganModal, setShowMulliganModal] = useState(false);
+    const [packsToOpen, setPacksToOpen] = useState([]);
 
     useEffect(() => {
         axios.get("/api/player/collection")
@@ -25,6 +27,12 @@ const PlayerCollection = ({loggedInPlayer}) => {
             .catch((error) => {
                 console.error('Error retrieving player cards', error);
             })
+
+        axios.get('/api/player/packs')
+            .then(response => {
+                setPacksToOpen(response.data)
+            })
+            .catch(console.error);
 
     }, []);
 
@@ -69,6 +77,11 @@ const PlayerCollection = ({loggedInPlayer}) => {
                         <PlayerAvatar size='large' player={loggedInPlayer} />
                         {loggedInPlayer.discordUsername}'s Collection
                     </Header>
+                    {packsToOpen.length > 0 &&
+                    <Button color='green' as={Link} to='/packs' style={{'marginBottom': '1em'}}>
+                        Click here to open a card pack!
+                    </Button>
+                    }
 
                     {canMulligan &&
                     <Modal

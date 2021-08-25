@@ -14,6 +14,7 @@ import AdminPage from "./admin/AdminPage";
 import MatchesPage from "./matches/MatchesPage";
 import HomePage from "./HomePage";
 import MatchPage from "./matches/MatchPage";
+import PackOpener from "./cards/PackOpener";
 
 const App = ({history}) => {
 
@@ -76,8 +77,11 @@ const App = ({history}) => {
                 <Route exact path="/">
                     <HomePage />
                 </Route>
-                <Route path="/collection">
+                <Route exact path="/collection">
                     <PlayerCollection loggedInPlayer={loggedInPlayer}/>
+                </Route>
+                <Route path="/packs">
+                    <PackOpener/>
                 </Route>
                 <Route path="/modtester">
                     <ModTester/>
