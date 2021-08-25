@@ -64,8 +64,7 @@ public class MapSettingsGenerator {
 	}
 
 	private boolean lightOnLand(MapType mapType, SeaLevelSetting seaLevelSetting) {
-		return mapType.landAmount.equals(MapType.MapLandAmount.Light) ||
-				(mapType.landAmount.equals(MapType.MapLandAmount.Average) && seaLevelSetting.equals(SeaLevelSetting.High));
+		return mapType.landAmount.equals(MapType.MapLandAmount.Light);
 	}
 
 	private MapSize pickMapSize(int numPlayers) {

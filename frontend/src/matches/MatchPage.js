@@ -100,7 +100,9 @@ const MatchPage = ({loggedInPlayer}) => {
                             <Container style={{'margin': '1em'}}>
                                 <Header>Public objectives:</Header>
                                 <p>The first player to claim 5 stars wins the game. These may be any mix of public and secret objectives.</p>
-                                <CardGroup>
+                                <p>Each 1 star objective can be claimed by up to 3 players. Each 2 star objective can be claimed by up to 2 players.
+                                    Each 3 star objective can be claimed by a single player.</p>
+                                <CardGroup centered>
                                     {publicObjectiveSections}
                                 </CardGroup>
                             </Container>

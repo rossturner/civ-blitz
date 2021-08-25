@@ -27,7 +27,7 @@ const MatchCivViewer = ({signup, loggedInPlayer, secretObjectivesProp}) => {
         if (secretObjectivesProp.length > 0) {
             setSecretObjectives(secretObjectivesProp);
         }
-    }, [secretObjectivesProp])
+    }, [secretObjectivesProp]);
 
     const civItems = CATEGORIES.map(category => {
         const propName = CardInfo.getSignupPropName(category);

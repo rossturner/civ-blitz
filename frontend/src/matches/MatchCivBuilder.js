@@ -166,7 +166,7 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
         <React.Fragment>
             <Container>
                 <Container>
-                    <Header as='h4'>Secret objectives (select 2)</Header>
+                    <Header as='h4'>Secret objectives (select 2, maximum of a single 1-star objective)</Header>
                     <CardGroup centered>
                         {secretObjectives.map(s => <ObjectiveCard key={s.objectiveName} objectiveJson={s} cardClicked={secretObjectiveClicked}
                                                                   clickDisabled={currentPlayerSignup.committed} />)}

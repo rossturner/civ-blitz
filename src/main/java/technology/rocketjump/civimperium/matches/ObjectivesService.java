@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Match;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
+import technology.rocketjump.civimperium.codegen.tables.pojos.PublicObjective;
 import technology.rocketjump.civimperium.codegen.tables.pojos.SecretObjective;
 import technology.rocketjump.civimperium.model.MatchSignupWithPlayer;
 import technology.rocketjump.civimperium.model.MatchWithPlayers;
@@ -13,12 +14,11 @@ import technology.rocketjump.civimperium.model.MatchWithPlayers;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static technology.rocketjump.civimperium.matches.ImperiumObjective.ObjectiveType.PUBLIC;
 import static technology.rocketjump.civimperium.matches.ImperiumObjective.ObjectiveType.SECRET;
 
 @Service
 public class ObjectivesService {
-
-	private static final int SECRET_OBJECTIVES_PER_PLAYER = 3;
 
 	private final ObjectivesRepo objectivesRepo;
 	private final Random random = new Random();
@@ -28,17 +28,30 @@ public class ObjectivesService {
 		this.objectivesRepo = objectivesRepo;
 	}
 
+	public List<PublicObjective> getPublicObjectives(int matchId) {
+		return objectivesRepo.getAllPublicObjectives(matchId);
+	}
+
 	public void initialiseObjectives(MatchWithPlayers match) {
 		clearObjectives(match);
+
+		List<ImperiumObjective> allPublicObjectives = Arrays.stream(ImperiumObjective.values())
+				.filter(o -> o.objectiveType.equals(PUBLIC) && o.active)
+				.collect(Collectors.toList());
+
+		objectivesRepo.addPublicObjectives(match, allPublicObjectives);
+
 		List<ImperiumObjective> allSecretObjectives = Arrays.stream(ImperiumObjective.values())
-				.filter(o -> o.objectiveType.equals(SECRET))
+				.filter(o -> o.objectiveType.equals(SECRET) && o.active)
 				.collect(Collectors.toList());
 
 		for (MatchSignupWithPlayer signup : match.signups) {
 			Set<ImperiumObjective> objectivesForPlayer = new HashSet<>();
-			while (objectivesForPlayer.size() < SECRET_OBJECTIVES_PER_PLAYER) {
-				objectivesForPlayer.add(allSecretObjectives.get(random.nextInt(allSecretObjectives.size())));
-			}
+			pickSecretObjective(1, objectivesForPlayer, allSecretObjectives);
+			pickSecretObjective(2, objectivesForPlayer, allSecretObjectives);
+			pickSecretObjective(3, objectivesForPlayer, allSecretObjectives);
+			pickSecretObjective(null, objectivesForPlayer, allSecretObjectives);
+			pickSecretObjective(null, objectivesForPlayer, allSecretObjectives);
 
 			for (ImperiumObjective objective : objectivesForPlayer) {
 				objectivesRepo.add(match, signup, objective);
@@ -74,5 +87,18 @@ public class ObjectivesService {
 
 	public void update(SecretObjective secretObjective) {
 		objectivesRepo.update(secretObjective);
+	}
+
+	private void pickSecretObjective(Integer requiredNumStars, Set<ImperiumObjective> objectivesForPlayer, List<ImperiumObjective> allSecretObjectives) {
+		ImperiumObjective selectedObjective = null;
+		while (selectedObjective == null) {
+			selectedObjective = allSecretObjectives.get(random.nextInt(allSecretObjectives.size()));
+			if (objectivesForPlayer.contains(selectedObjective)) {
+				selectedObjective = null;
+			} else if (requiredNumStars != null && requiredNumStars != selectedObjective.numStars) {
+				selectedObjective = null;
+			}
+		}
+		objectivesForPlayer.add(selectedObjective);
 	}
 }

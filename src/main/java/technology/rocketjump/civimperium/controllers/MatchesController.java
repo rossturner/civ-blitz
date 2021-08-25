@@ -15,18 +15,20 @@ import technology.rocketjump.civimperium.model.MatchSignupWithPlayer;
 import technology.rocketjump.civimperium.model.MatchWithPlayers;
 import technology.rocketjump.civimperium.players.PlayerService;
 
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static technology.rocketjump.civimperium.matches.ImperiumObjective.ObjectiveType.PUBLIC;
 import static technology.rocketjump.civimperium.matches.MatchState.DRAFT;
 
 @RestController
 @RequestMapping("/api/matches")
 public class MatchesController {
+
+	private static final Comparator<ObjectiveResponse> OBJECTIVE_SORT = (o1, o2) -> o1.getNumStars() == o2.getNumStars() ? o1.getObjectiveName().compareTo(o2.getObjectiveName()) : o1.getNumStars() - o2.getNumStars();
+	private static final Comparator<SecretObjectiveResponse> SECRET_OBJECTIVE_SORT = (o1, o2) -> o1.getNumStars() == o2.getNumStars() ? o1.getObjectiveName().compareTo(o2.getObjectiveName()) : o1.getNumStars() - o2.getNumStars();
 
 	private final JwtService jwtService;
 	private final PlayerService playerService;
@@ -100,10 +102,9 @@ public class MatchesController {
 
 	@GetMapping("/{matchId}/public_objectives")
 	public List<ObjectiveResponse> getMatchObjectives(@PathVariable int matchId) {
-		// TODO replace this with cards actually selected for the match
-		return Arrays.stream(ImperiumObjective.values()).filter(o -> o.objectiveType.equals(PUBLIC))
-				.map(ObjectiveResponse::new)
-				.sorted((o1, o2) -> o1.getNumStars() == o2.getNumStars() ? o1.getObjectiveName().compareTo(o2.getObjectiveName()) : o2.getNumStars() - o1.getNumStars())
+		return objectivesService.getPublicObjectives(matchId).stream()
+				.map((pub) -> new ObjectiveResponse(pub.getObjective()))
+				.sorted(OBJECTIVE_SORT)
 				.collect(Collectors.toList());
 	}
 
@@ -116,6 +117,7 @@ public class MatchesController {
 			Player player = playerService.getPlayer(token);
 			return objectivesService.getSecretObjectives(matchId, player).stream()
 					.map(SecretObjectiveResponse::new)
+					.sorted(SECRET_OBJECTIVE_SORT)
 					.collect(Collectors.toList());
 		}
 	}
@@ -130,6 +132,7 @@ public class MatchesController {
 			MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 			return objectivesService.getAllSecretObjectives(match, player).stream()
 					.map(SecretObjectiveResponse::new)
+					.sorted(SECRET_OBJECTIVE_SORT)
 					.collect(Collectors.toList());
 		}
 	}
@@ -154,6 +157,9 @@ public class MatchesController {
 
 				if (!secretObjective.getSelected() && secretObjectives.stream().filter(SecretObjective::getSelected).count() == 2) {
 					// already have two other objectives selected
+				} else if (!secretObjective.getSelected() && secretObjectives.stream().filter(SecretObjective::getSelected)
+						.filter(obj -> obj.getObjective().numStars == 1).count() == 1 && secretObjective.getObjective().numStars == 1) {
+					// Selecting a 1 star objective when 1 is already selected, which is not allowed
 				} else {
 					secretObjective.setSelected(!secretObjective.getSelected());
 					matchService.updateSecretObjectiveSelection(secretObjective);
