@@ -39,4 +39,7 @@ public class PlayerService {
 		}
 	}
 
+	public Optional<Player> getPlayerById(String playerId) {
+		return playerRepo.getPlayerByDiscordId(playerId);
+	}
 }

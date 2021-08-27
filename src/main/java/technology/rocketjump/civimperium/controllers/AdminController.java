@@ -1,17 +1,19 @@
 package technology.rocketjump.civimperium.controllers;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import technology.rocketjump.civimperium.auth.AuditLogger;
 import technology.rocketjump.civimperium.auth.ImperiumToken;
 import technology.rocketjump.civimperium.auth.JwtService;
 import technology.rocketjump.civimperium.codegen.tables.pojos.AuditLog;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
+import technology.rocketjump.civimperium.matches.ImperiumObjective;
+import technology.rocketjump.civimperium.matches.MatchService;
+import technology.rocketjump.civimperium.matches.ObjectivesService;
+import technology.rocketjump.civimperium.model.MatchWithPlayers;
 import technology.rocketjump.civimperium.players.PlayerService;
 
 import java.util.List;
@@ -23,12 +25,17 @@ public class AdminController {
 	private final JwtService jwtService;
 	private final PlayerService playerService;
 	private final AuditLogger auditLogger;
+	private final MatchService matchService;
+	private final ObjectivesService objectivesService;
 
 	@Autowired
-	public AdminController(JwtService jwtService, PlayerService playerService, AuditLogger auditLogger) {
+	public AdminController(JwtService jwtService, PlayerService playerService, AuditLogger auditLogger,
+						   MatchService matchService, ObjectivesService objectivesService) {
 		this.jwtService = jwtService;
 		this.playerService = playerService;
 		this.auditLogger = auditLogger;
+		this.matchService = matchService;
+		this.objectivesService = objectivesService;
 	}
 
 	@GetMapping("/audit_logs")
@@ -42,6 +49,61 @@ public class AdminController {
 				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
 			} else {
 				return auditLogger.getRecentLogs();
+			}
+		}
+	}
+
+
+	@PostMapping("{playerId}/matches/{matchId}/objectives/{objectiveId}")
+	public void forceClaimObjective(@RequestHeader("Authorization") String jwToken,
+									@PathVariable String playerId,
+									@PathVariable int matchId,
+							   @PathVariable String objectiveId) {
+		if (jwToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		} else {
+			ImperiumToken token = jwtService.parse(jwToken);
+			Player adminPlayer = playerService.getPlayer(token);
+			if (!adminPlayer.getIsAdmin()) {
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+			} else {
+				MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+				if (match.signups.stream().anyMatch(s -> s.getPlayer().equals(adminPlayer))) {
+					throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can not admin results in a game you are participating in");
+				}
+
+				Player targetPlayer = playerService.getPlayerById(playerId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+				ImperiumObjective objective = EnumUtils.getEnum(ImperiumObjective.class, objectiveId);
+
+				objectivesService.claimObjective(targetPlayer, objective, match);
+			}
+		}
+	}
+
+	@DeleteMapping("{playerId}/matches/{matchId}/objectives/{objectiveId}")
+	public void forceUnclaimObjective(@RequestHeader("Authorization") String jwToken,
+									  @PathVariable String playerId,
+									  @PathVariable int matchId,
+								 @PathVariable String objectiveId) {
+		if (jwToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		} else {
+			ImperiumToken token = jwtService.parse(jwToken);
+			Player adminPlayer = playerService.getPlayer(token);
+			if (!adminPlayer.getIsAdmin()) {
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+			} else {
+				MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+				if (match.signups.stream().anyMatch(s -> s.getPlayer().equals(adminPlayer))) {
+					throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can not admin results in a game you are participating in");
+				}
+
+				Player targetPlayer = playerService.getPlayerById(playerId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+				ImperiumObjective objective = EnumUtils.getEnum(ImperiumObjective.class, objectiveId);
+
+				objectivesService.unclaimObjective(targetPlayer, objective, match);
 			}
 		}
 	}

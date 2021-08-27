@@ -8,7 +8,7 @@ const PlayerAvatar = ({player, size, floated}) => {
     } else {
         let avatarUrl = 'https://cdn.discordapp.com/avatars/'+(player.discordId || player.playerId)+'/'+player.discordAvatar+'.png';
         if (!player.discordAvatar) {
-            avatarUrl = 'https://cdn.discordapp.com/embed/avatars/'+(parseInt(player.discordId) % 5)+'.png';
+            avatarUrl = 'https://cdn.discordapp.com/embed/avatars/'+(parseInt(player.discordId || player.playerId) % 5)+'.png';
         }
         const image = <Image floated={floated} avatar size={ size ? size : 'medium'} src={avatarUrl} />;
         return <Popup trigger={image} content={player.discordUsername} basic />;

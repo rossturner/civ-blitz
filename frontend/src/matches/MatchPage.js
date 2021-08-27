@@ -1,4 +1,4 @@
-import {CardGroup, Container, Header, List, Loader, Segment} from "semantic-ui-react";
+import {Button, CardGroup, Container, Header, List, Loader, Segment} from "semantic-ui-react";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import PlayerAvatar from "../player/PlayerAvatar";
@@ -11,6 +11,8 @@ import DownloadMatchModButton from "./DownloadMatchModButton";
 import ObjectiveCard from "./objectives/ObjectiveCard";
 import ClaimObjectiveModal from "./objectives/ClaimObjectiveModal";
 import UnclaimObjectiveModal from "./objectives/UnclaimObjectiveModal";
+import AdminClaimObjectiveModal from "./objectives/AdminClaimObjectiveModal";
+import AdminUnclaimObjectiveModal from "./objectives/AdminUnclaimObjectiveModal";
 
 const MatchPage = ({loggedInPlayer}) => {
 
@@ -21,8 +23,11 @@ const MatchPage = ({loggedInPlayer}) => {
     const [secretObjectives, setSecretObjectives] = useState([]);
     const [claimingObjective, setClaimingObjective] = useState({});
     const [unclaimingObjective, setUnclaimingObjective] = useState({});
+    const [showAdminClaimObjectiveModal, setShowAdminClaimObjectiveModal] = useState(false);
+    const [showAdminUnclaimObjectiveModal, setShowAdminUnclaimObjectiveModal] = useState(false);
 
     const currentPlayerSignup = match.signups && match.signups.find(s => s.playerId === loggedInPlayer.discordId);
+    const playedIsAdminNotInMatch = !currentPlayerSignup && loggedInPlayer.isAdmin;
 
     useEffect(() => {
         axios.get('/api/matches/' + matchId)
@@ -166,6 +171,12 @@ const MatchPage = ({loggedInPlayer}) => {
                     {match.matchState === 'IN_PROGRESS' &&
                     <Container>
                         <DownloadMatchModButton match={match} />
+                        {playedIsAdminNotInMatch &&
+                            <React.Fragment>
+                                <Button color='violet' onClick={() => setShowAdminClaimObjectiveModal(true)}>Claim an objective for a player</Button>
+                                <Button color='purple' onClick={() => setShowAdminUnclaimObjectiveModal(true)}>Remove a claimed objective from a player</Button>
+                            </React.Fragment>
+                        }
 
                         {playerSections}
 
@@ -180,6 +191,16 @@ const MatchPage = ({loggedInPlayer}) => {
                     <UnclaimObjectiveModal match={match} objective={unclaimingObjective}
                                          onConfirm={() => {setLoading(true);setUnclaimingObjective({});}}
                                          onCancel={() => setUnclaimingObjective({})} />
+                    <AdminClaimObjectiveModal match={match} open={showAdminClaimObjectiveModal}
+                                              publicObjectives={publicObjectives}
+                                              secretObjectives={secretObjectives}
+                                              onConfirm={() => {setLoading(true);setShowAdminClaimObjectiveModal(false)}}
+                                              onCancel={() => setShowAdminClaimObjectiveModal(false)}/>
+                    <AdminUnclaimObjectiveModal match={match} open={showAdminUnclaimObjectiveModal}
+                                              publicObjectives={publicObjectives}
+                                              secretObjectives={secretObjectives}
+                                              onConfirm={() => {setLoading(true);setShowAdminUnclaimObjectiveModal(false)}}
+                                              onCancel={() => setShowAdminUnclaimObjectiveModal(false)}/>
 
                 </React.Fragment>
                 }
