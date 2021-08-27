@@ -13,14 +13,17 @@ import ClaimObjectiveModal from "./objectives/ClaimObjectiveModal";
 import UnclaimObjectiveModal from "./objectives/UnclaimObjectiveModal";
 import AdminClaimObjectiveModal from "./objectives/AdminClaimObjectiveModal";
 import AdminUnclaimObjectiveModal from "./objectives/AdminUnclaimObjectiveModal";
+import MatchLeaderboard from "./MatchLeaderboard";
 
 const MatchPage = ({loggedInPlayer}) => {
 
     const {matchId} = useParams();
     const [loading, setLoading] = useState(true);
     const [match, setMatch] = useState({});
+    const [leaderboard, setLeaderboard] = useState({});
     const [publicObjectives, setPublicObjectives] = useState([]);
     const [secretObjectives, setSecretObjectives] = useState([]);
+
     const [claimingObjective, setClaimingObjective] = useState({});
     const [unclaimingObjective, setUnclaimingObjective] = useState({});
     const [showAdminClaimObjectiveModal, setShowAdminClaimObjectiveModal] = useState(false);
@@ -58,7 +61,14 @@ const MatchPage = ({loggedInPlayer}) => {
                 })
                 .catch(() => {
                     // Ignore these errors, player might be taking part in this match
+                });
+            axios.get('/api/matches/' + matchId + '/leaderboard')
+                .then((response) => {
+                    setLeaderboard(response.data);
                 })
+                .catch(() => {
+                    // Ignore these errors, might be draft phase or something
+                });
         }
     }, [match, matchId, currentPlayerSignup, loggedInPlayer]);
 
@@ -104,8 +114,9 @@ const MatchPage = ({loggedInPlayer}) => {
                     setClaimingObjective(objective);
                 }
             };
+            const clickDisabled = match.matchState !== 'IN_PROGRESS' || !currentPlayerSignup;
             return <ObjectiveCard key={objective.objectiveName} cardClicked={objectiveClicked}
-                                  clickDisabled={match.matchState !== 'IN_PROGRESS'}
+                                  clickDisabled={clickDisabled}
                                   objectiveJson={objective} claimedByPlayers={claimedByPlayers} />;
         });
     }
@@ -130,9 +141,16 @@ const MatchPage = ({loggedInPlayer}) => {
                         <React.Fragment>
                             <MapSettings match={match}/>
 
+                            {leaderboard &&
+                            <Container style={{'margin': '1em'}}>
+                                <Header>Leaderboard:</Header>
+                                <p>The first player to claim 7 stars wins the game. These may be any mix of public and secret objectives.</p>
+                                <MatchLeaderboard match={match} leaderboard={leaderboard} />
+                            </Container>
+                            }
+
                             <Container style={{'margin': '1em'}}>
                                 <Header>Public objectives:</Header>
-                                <p>The first player to claim 5 stars wins the game. These may be any mix of public and secret objectives.</p>
                                 <p>Each 1 star objective can be claimed by up to 3 players. Each 2 star objective can be claimed by up to 2 players.
                                     Each 3 star objective can be claimed by a single player.</p>
                                 <CardGroup centered>

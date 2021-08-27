@@ -101,6 +101,12 @@ public class MatchesController {
 		return match;
 	}
 
+	@GetMapping("/{matchId}/leaderboard")
+	public Map<String, Integer> getLeaderboard(@PathVariable int matchId) {
+		MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		return matchService.getLeaderboard(match);
+	}
+
 	@GetMapping("/{matchId}/public_objectives")
 	public List<ObjectiveResponse> getMatchObjectives(@PathVariable int matchId) {
 		return objectivesService.getPublicObjectives(matchId).stream()

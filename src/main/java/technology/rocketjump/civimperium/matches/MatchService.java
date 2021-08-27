@@ -14,10 +14,7 @@ import technology.rocketjump.civimperium.mapgen.MapSettings;
 import technology.rocketjump.civimperium.mapgen.MapSettingsGenerator;
 import technology.rocketjump.civimperium.model.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 import static technology.rocketjump.civimperium.matches.MatchState.*;
 
@@ -361,5 +358,35 @@ public class MatchService {
 		match.setRainfall(mapSettings.rainfall);
 		match.setCityStates(mapSettings.numCityStates);
 		match.setDisasterIntensity(mapSettings.disasterIntensity);
+	}
+
+	public Map<String, Integer> getLeaderboard(MatchWithPlayers match) {
+		Map<String, Integer> scoreboard = new LinkedHashMap<>();
+
+		List<PublicObjectiveWithClaimants> publicObjectives = objectivesService.getPublicObjectives(match.getMatchId());
+		List<SecretObjective> secretObjectives = objectivesService.getAllSecretObjectives(match, fakePlayer);
+
+		match.signups.forEach(signup -> {
+			int score = 0;
+
+			for (PublicObjectiveWithClaimants objective : publicObjectives) {
+				if (objective.getClaimedByPlayerIds().contains(signup.getPlayerId())) {
+					score += objective.getObjective().numStars;
+				}
+			}
+			for (SecretObjective secretObjective : secretObjectives) {
+				if (secretObjective.getPlayerId().equals(signup.getPlayerId()) && secretObjective.getClaimed()) {
+					score += secretObjective.getObjective().numStars;
+				}
+			}
+
+			scoreboard.put(signup.getPlayerId(), score);
+		});
+		return scoreboard;
+	}
+
+	private static Player fakePlayer = new Player();
+	static {
+		fakePlayer.setIsAdmin(true);
 	}
 }
