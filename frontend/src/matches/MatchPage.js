@@ -189,7 +189,7 @@ const MatchPage = ({loggedInPlayer}) => {
                     {(match.matchState === 'IN_PROGRESS' || match.matchState === 'POST_MATCH') &&
                     <Container>
                         <DownloadMatchModButton match={match} />
-                        {playedIsAdminNotInMatch &&
+                        {playedIsAdminNotInMatch && match.matchState === 'IN_PROGRESS' &&
                             <React.Fragment>
                                 <Button color='violet' onClick={() => setShowAdminClaimObjectiveModal(true)}>Claim an objective for a player</Button>
                                 <Button color='purple' onClick={() => setShowAdminUnclaimObjectiveModal(true)}>Remove a claimed objective from a player</Button>
