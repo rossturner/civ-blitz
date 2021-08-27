@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Match;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
-import technology.rocketjump.civimperium.codegen.tables.pojos.PublicObjective;
 import technology.rocketjump.civimperium.codegen.tables.pojos.SecretObjective;
 import technology.rocketjump.civimperium.model.MatchSignupWithPlayer;
 import technology.rocketjump.civimperium.model.MatchWithPlayers;
@@ -16,6 +15,7 @@ import java.util.stream.Collectors;
 
 import static technology.rocketjump.civimperium.matches.ImperiumObjective.ObjectiveType.PUBLIC;
 import static technology.rocketjump.civimperium.matches.ImperiumObjective.ObjectiveType.SECRET;
+import static technology.rocketjump.civimperium.matches.MatchState.IN_PROGRESS;
 
 @Service
 public class ObjectivesService {
@@ -28,7 +28,7 @@ public class ObjectivesService {
 		this.objectivesRepo = objectivesRepo;
 	}
 
-	public List<PublicObjective> getPublicObjectives(int matchId) {
+	public List<PublicObjectiveWithClaimants> getPublicObjectives(int matchId) {
 		return objectivesRepo.getAllPublicObjectives(matchId);
 	}
 
@@ -68,15 +68,12 @@ public class ObjectivesService {
 	}
 
 	public List<SecretObjective> getAllSecretObjectives(MatchWithPlayers match, Player player) {
-		if (match.getMatchState().equals(MatchState.IN_PROGRESS)) {
-			if (!player.getIsAdmin()) {
-				throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Must be an admin to get all secrets while match is in progress");
-			} else if (match.signups.stream().anyMatch(s -> s.getPlayer().equals(player))) {
-				throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can not get all secrets when current player is in the match");
-			} else {
-				// Is an admin not in the match, can get all secrets
-				return objectivesRepo.getAllSecretObjectives(match.getMatchId());
-			}
+		if (match.getMatchState().equals(IN_PROGRESS)) {
+			boolean playerIsAdminAndNotInMatch = player.getIsAdmin() &&
+					!match.signups.stream().anyMatch(s -> s.getPlayer().equals(player));
+			return objectivesRepo.getAllSecretObjectives(match.getMatchId())
+					.stream().filter(s -> s.getClaimed() || s.getPlayerId().equals(player.getPlayerId()) || playerIsAdminAndNotInMatch)
+					.collect(Collectors.toList());
 		} else if (match.getMatchState().equals(MatchState.POST_MATCH)) {
 			// At this state anyone can get all secret objectives
 			return objectivesRepo.getAllSecretObjectives(match.getMatchId());
@@ -100,5 +97,66 @@ public class ObjectivesService {
 			}
 		}
 		objectivesForPlayer.add(selectedObjective);
+	}
+
+	public void claimObjective(Player player, ImperiumObjective objective, MatchWithPlayers match) {
+		if (!match.signups.stream().anyMatch(s -> s.getPlayer().equals(player))) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Player is not part of the specified match");
+		}
+
+		if (!match.getMatchState().equals(IN_PROGRESS)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can only claim objectives while match is in progress");
+		}
+
+		if (objective.objectiveType.equals(SECRET)) {
+			List<SecretObjective> secretObjectives = getSecretObjectives(match.getMatchId(), player);
+			SecretObjective secretObjective = secretObjectives.stream().filter(s -> s.getObjective().equals(objective) && s.getSelected()).findFirst()
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "You do not have that secret objective"));
+
+			if (secretObjective.getClaimed()) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have already claimed this objective");
+			}
+
+			secretObjective.setClaimed(true);
+			objectivesRepo.update(secretObjective);
+		} else {
+			List<PublicObjectiveWithClaimants> publicObjectives = getPublicObjectives(match.getMatchId());
+			PublicObjectiveWithClaimants publicObjective = publicObjectives.stream().filter(p -> p.getObjective().equals(objective)).findAny()
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "That objective is not part of this match"));
+
+			List<String> claimedByPlayerIds = publicObjective.getClaimedByPlayerIds();
+			if (claimedByPlayerIds.contains(player.getPlayerId())) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have already claimed this objective");
+			}
+
+			if (claimedByPlayerIds.size() >= maxClaimsFor(objective)) {
+				throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Other players have already claimed this objective the maximum number of times");
+			}
+
+			objectivesRepo.createClaim(objective, player, match);
+		}
+	}
+
+	public void unclaimObjective(Player player, ImperiumObjective objective, MatchWithPlayers match) {
+		if (objective.objectiveType.equals(SECRET)) {
+			List<SecretObjective> secretObjectives = getSecretObjectives(match.getMatchId(), player);
+			SecretObjective secretObjective = secretObjectives.stream().filter(s -> s.getObjective().equals(objective) && s.getSelected()).findFirst()
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "You do not have that secret objective"));
+			secretObjective.setClaimed(false);
+			objectivesRepo.update(secretObjective);
+		} else {
+			// Just try the delete, if it doesn't exist it doesn't matter
+			objectivesRepo.deleteClaim(objective, player, match);
+		}
+	}
+
+	private int maxClaimsFor(ImperiumObjective objective) {
+		if (objective.numStars == 1) {
+			return 3;
+		} else if (objective.numStars == 2) {
+			return 2;
+		} else {
+			return 1;
+		}
 	}
 }

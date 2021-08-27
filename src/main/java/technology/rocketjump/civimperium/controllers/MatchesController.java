@@ -1,5 +1,6 @@
 package technology.rocketjump.civimperium.controllers;
 
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -103,7 +104,7 @@ public class MatchesController {
 	@GetMapping("/{matchId}/public_objectives")
 	public List<ObjectiveResponse> getMatchObjectives(@PathVariable int matchId) {
 		return objectivesService.getPublicObjectives(matchId).stream()
-				.map((pub) -> new ObjectiveResponse(pub.getObjective()))
+				.map((pub) -> new ObjectiveResponse(pub.getObjective(), pub.getClaimedByPlayerIds()))
 				.sorted(OBJECTIVE_SORT)
 				.collect(Collectors.toList());
 	}
@@ -121,6 +122,41 @@ public class MatchesController {
 					.collect(Collectors.toList());
 		}
 	}
+
+	@PostMapping("/{matchId}/objectives/{objectiveId}")
+	public void claimObjective(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId,
+														@PathVariable String objectiveId) {
+		if (jwToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		} else {
+			ImperiumToken token = jwtService.parse(jwToken);
+			Player player = playerService.getPlayer(token);
+			ImperiumObjective objective = EnumUtils.getEnum(ImperiumObjective.class, objectiveId);
+			if (objective == null) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			}
+			MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+			objectivesService.claimObjective(player, objective, match);
+		}
+	}
+
+	@DeleteMapping("/{matchId}/objectives/{objectiveId}")
+	public void unclaimObjective(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId,
+									 @PathVariable String objectiveId) {
+		if (jwToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		} else {
+			ImperiumToken token = jwtService.parse(jwToken);
+			Player player = playerService.getPlayer(token);
+			ImperiumObjective objective = EnumUtils.getEnum(ImperiumObjective.class, objectiveId);
+			if (objective == null) {
+				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+			}
+			MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+			objectivesService.unclaimObjective(player, objective, match);
+		}
+	}
+
 
 	@GetMapping("/{matchId}/all_secret_objectives")
 	public List<SecretObjectiveResponse> getAllMatchSecretObjectives(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId) {

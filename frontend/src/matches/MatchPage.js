@@ -9,6 +9,8 @@ import MapSettings from "./MapSettings";
 import MatchCivViewer from "./MatchCivViewer";
 import DownloadMatchModButton from "./DownloadMatchModButton";
 import ObjectiveCard from "./objectives/ObjectiveCard";
+import ClaimObjectiveModal from "./objectives/ClaimObjectiveModal";
+import UnclaimObjectiveModal from "./objectives/UnclaimObjectiveModal";
 
 const MatchPage = ({loggedInPlayer}) => {
 
@@ -17,6 +19,8 @@ const MatchPage = ({loggedInPlayer}) => {
     const [match, setMatch] = useState({});
     const [publicObjectives, setPublicObjectives] = useState([]);
     const [secretObjectives, setSecretObjectives] = useState([]);
+    const [claimingObjective, setClaimingObjective] = useState({});
+    const [unclaimingObjective, setUnclaimingObjective] = useState({});
 
     const currentPlayerSignup = match.signups && match.signups.find(s => s.playerId === loggedInPlayer.discordId);
 
@@ -68,14 +72,39 @@ const MatchPage = ({loggedInPlayer}) => {
     const sectionColors = ['red', 'green', 'blue', 'orange', 'purple', 'teal', 'violet', 'yellow', 'pink', 'grey', 'black',
         'red', 'green', 'blue', 'orange', 'purple', 'teal', 'violet', 'yellow', 'pink', 'grey'];
 
+    const secretObjectiveClicked = (objective) => {
+        if (objective.claimed) {
+            setUnclaimingObjective(objective);
+        } else {
+            setClaimingObjective(objective);
+        }
+    };
+
     const playerSections = match.signups && match.signups.map((signup, index) =>
         <Segment key={index} inverted color={sectionColors[index]}>
             <PlayerAvatar player={signup.player} size='mini' floated='right'/>
             <Header style={{'marginTop': '0em'}}>{signup.player.discordUsername}</Header>
-            <MatchCivViewer signup={signup} loggedInPlayer={loggedInPlayer} secretObjectivesProp={secretObjectives.filter(s => s.playerId === signup.playerId)}/>
+            <MatchCivViewer signup={signup} loggedInPlayer={loggedInPlayer}
+                            secretObjectiveClicked={secretObjectiveClicked}
+                            secretObjectivesProp={secretObjectives.filter(s => s.playerId === signup.playerId)}/>
         </Segment>
     );
-    const publicObjectiveSections = publicObjectives.map(objective => <ObjectiveCard key={objective.objectiveName} objectiveJson={objective} />);
+    let publicObjectiveSections = [];
+    if (match.matchId) {
+        publicObjectiveSections = publicObjectives.map(objective => {
+            const claimedByPlayers = objective.claimedByPlayerIds.map(id => match.signups.find(s => s.playerId === id));
+            const objectiveClicked = (objective) => {
+                if (objective.claimedByPlayerIds.includes(loggedInPlayer.discordId)) {
+                    setUnclaimingObjective(objective);
+                } else {
+                    setClaimingObjective(objective);
+                }
+            };
+            return <ObjectiveCard key={objective.objectiveName} cardClicked={objectiveClicked}
+                                  clickDisabled={match.matchState !== 'IN_PROGRESS'}
+                                  objectiveJson={objective} claimedByPlayers={claimedByPlayers} />;
+        });
+    }
 
     return (
         <React.Fragment>
@@ -144,6 +173,14 @@ const MatchPage = ({loggedInPlayer}) => {
                         <DownloadMatchModButton match={match} />
                     </Container>
                     }
+
+
+                    <ClaimObjectiveModal match={match} objective={claimingObjective}
+                                             onConfirm={() => {setLoading(true);setClaimingObjective({});}}
+                                             onCancel={() => setClaimingObjective({})} />
+                    <UnclaimObjectiveModal match={match} objective={unclaimingObjective}
+                                         onConfirm={() => {setLoading(true);setUnclaimingObjective({});}}
+                                         onCancel={() => setUnclaimingObjective({})} />
 
                 </React.Fragment>
                 }

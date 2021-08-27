@@ -1,8 +1,9 @@
 import {Card, Icon} from "semantic-ui-react";
 import './ObjectiveCard.css';
+import PlayerAvatar from "../../player/PlayerAvatar";
 
 
-const ObjectiveCard = ({objectiveJson, cardClicked, clickDisabled}) => {
+const ObjectiveCard = ({objectiveJson, cardClicked, clickDisabled, claimedByPlayers}) => {
 
     let className = 'objective-card';
     let color = undefined;
@@ -15,8 +16,10 @@ const ObjectiveCard = ({objectiveJson, cardClicked, clickDisabled}) => {
         }
     }
 
+    const claimantSections = claimedByPlayers.map(signup => <PlayerAvatar key={signup.player.playerId} player={signup.player} size='huge' />);
+
     return (
-        <Card className={className} onClick={isSecretObjective && !clickDisabled ? () => cardClicked(objectiveJson) : null} color={color}>
+        <Card className={className} onClick={!clickDisabled ? () => cardClicked(objectiveJson) : null} color={color}>
             <Card.Content>
                 <Card.Header>{objectiveJson.objectiveName}</Card.Header>
                 {isSecretObjective &&
@@ -26,6 +29,11 @@ const ObjectiveCard = ({objectiveJson, cardClicked, clickDisabled}) => {
                     {objectiveJson.description}
                 </Card.Description>
             </Card.Content>
+            {claimedByPlayers.length > 0 &&
+                <Card.Content extra>
+                    {claimantSections}
+                </Card.Content>
+            }
             <Card.Content extra>
                 <Icon color='yellow' name='star' />
                 {objectiveJson.numStars > 1 &&
@@ -40,5 +48,8 @@ const ObjectiveCard = ({objectiveJson, cardClicked, clickDisabled}) => {
     )
 };
 
+ObjectiveCard.defaultProps = {
+    claimedByPlayers: []
+};
 
 export default ObjectiveCard;

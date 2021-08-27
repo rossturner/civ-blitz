@@ -1,5 +1,7 @@
 package technology.rocketjump.civimperium.matches;
 
+import java.util.List;
+
 public class ObjectiveResponse {
 
 	private final String enumName;
@@ -7,13 +9,15 @@ public class ObjectiveResponse {
 	private final String description;
 	private final int numStars;
 	private final ImperiumObjective.ObjectiveType type;
+	private final List<String> claimedByPlayerIds;
 
-	public ObjectiveResponse(ImperiumObjective objective) {
+	public ObjectiveResponse(ImperiumObjective objective, List<String> claimedByPlayerIds) {
 		this.enumName = objective.name();
 		this.objectiveName = objective.objectiveName;
 		this.description = objective.description;
 		this.numStars = objective.numStars;
 		this.type = objective.objectiveType;
+		this.claimedByPlayerIds = claimedByPlayerIds;
 	}
 
 	public String getEnumName() {
@@ -34,5 +38,9 @@ public class ObjectiveResponse {
 
 	public ImperiumObjective.ObjectiveType getType() {
 		return type;
+	}
+
+	public List<String> getClaimedByPlayerIds() {
+		return claimedByPlayerIds;
 	}
 }

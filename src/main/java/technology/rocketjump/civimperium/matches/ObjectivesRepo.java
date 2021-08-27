@@ -5,11 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technology.rocketjump.civimperium.codegen.tables.pojos.*;
 import technology.rocketjump.civimperium.codegen.tables.records.SecretObjectiveRecord;
+import technology.rocketjump.civimperium.model.MatchWithPlayers;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import static technology.rocketjump.civimperium.codegen.Tables.PUBLIC_OBJECTIVE;
-import static technology.rocketjump.civimperium.codegen.Tables.SECRET_OBJECTIVE;
+import static technology.rocketjump.civimperium.codegen.Tables.*;
 
 @Component
 public class ObjectivesRepo {
@@ -37,6 +38,7 @@ public class ObjectivesRepo {
 		secretObjective.setPlayerId(signup.getPlayerId());
 		secretObjective.setObjective(objective);
 		secretObjective.setSelected(false);
+		secretObjective.setClaimed(false);
 		SecretObjectiveRecord secretObjectiveRecord = create.newRecord(SECRET_OBJECTIVE, secretObjective);
 		secretObjectiveRecord.store();
 		return secretObjective;
@@ -55,15 +57,24 @@ public class ObjectivesRepo {
 				.fetchInto(SecretObjective.class);
 	}
 
-	public List<PublicObjective> getAllPublicObjectives(int matchId) {
-		return create.selectFrom(PUBLIC_OBJECTIVE)
+	public List<PublicObjectiveWithClaimants> getAllPublicObjectives(int matchId) {
+		List<PublicObjective> publicObjectives = create.selectFrom(PUBLIC_OBJECTIVE)
 				.where(PUBLIC_OBJECTIVE.MATCH_ID.eq(matchId))
 				.fetchInto(PublicObjective.class);
+
+		List<ScoredObjective> scoredObjectives = create.selectFrom(SCORED_OBJECTIVE)
+				.where(SCORED_OBJECTIVE.MATCH_ID.eq(matchId))
+				.fetchInto(ScoredObjective.class);
+
+		return publicObjectives.stream().map(p ->
+				new PublicObjectiveWithClaimants(p, scoredObjectives.stream().filter(o -> o.getObjective().equals(p.getObjective())).map(ScoredObjective::getPlayerId).collect(Collectors.toList())))
+				.collect(Collectors.toList());
 	}
 
 	public void update(SecretObjective secretObjective) {
 		create.update(SECRET_OBJECTIVE)
 				.set(SECRET_OBJECTIVE.SELECTED, secretObjective.getSelected())
+				.set(SECRET_OBJECTIVE.CLAIMED, secretObjective.getClaimed())
 				.where(SECRET_OBJECTIVE.MATCH_ID.eq(secretObjective.getMatchId()))
 				.and(SECRET_OBJECTIVE.PLAYER_ID.eq(secretObjective.getPlayerId()))
 				.and(SECRET_OBJECTIVE.OBJECTIVE.eq(secretObjective.getObjective()))
@@ -78,4 +89,27 @@ public class ObjectivesRepo {
 					.execute();
 		}
 	}
+
+	public List<ScoredObjective> getAllClaims(Match match) {
+		return create.selectFrom(SCORED_OBJECTIVE)
+				.where(SCORED_OBJECTIVE.MATCH_ID.eq(match.getMatchId()))
+				.fetchInto(ScoredObjective.class);
+	}
+
+	public void createClaim(ImperiumObjective objective, Player player, Match match) {
+		ScoredObjective scoredObjective = new ScoredObjective();
+		scoredObjective.setObjective(objective);
+		scoredObjective.setPlayerId(player.getPlayerId());
+		scoredObjective.setMatchId(match.getMatchId());
+		create.newRecord(SCORED_OBJECTIVE, scoredObjective).store();
+	}
+
+	public void deleteClaim(ImperiumObjective objective, Player player, MatchWithPlayers match) {
+		create.deleteFrom(SCORED_OBJECTIVE)
+				.where(SCORED_OBJECTIVE.MATCH_ID.eq(match.getMatchId())
+						.and(SCORED_OBJECTIVE.PLAYER_ID.eq(player.getPlayerId()))
+						.and(SCORED_OBJECTIVE.OBJECTIVE.eq(objective)))
+				.execute();
+	}
+
 }
