@@ -98,7 +98,7 @@ const MatchPage = ({loggedInPlayer}) => {
         <Segment key={index} inverted color={sectionColors[index]}>
             <PlayerAvatar player={signup.player} size='mini' floated='right'/>
             <Header style={{'marginTop': '0em'}}>{signup.player.discordUsername}</Header>
-            <MatchCivViewer signup={signup} loggedInPlayer={loggedInPlayer}
+            <MatchCivViewer match={match} signup={signup} loggedInPlayer={loggedInPlayer}
                             secretObjectiveClicked={secretObjectiveClicked}
                             secretObjectivesProp={secretObjectives.filter(s => s.playerId === signup.playerId)}/>
         </Segment>
@@ -186,7 +186,7 @@ const MatchPage = ({loggedInPlayer}) => {
                     </React.Fragment>
                     }
 
-                    {match.matchState === 'IN_PROGRESS' &&
+                    {(match.matchState === 'IN_PROGRESS' || match.matchState === 'POST_MATCH') &&
                     <Container>
                         <DownloadMatchModButton match={match} />
                         {playedIsAdminNotInMatch &&

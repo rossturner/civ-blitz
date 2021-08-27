@@ -14,13 +14,17 @@ import technology.rocketjump.civimperium.mapgen.MapSettings;
 import technology.rocketjump.civimperium.mapgen.MapSettingsGenerator;
 import technology.rocketjump.civimperium.model.*;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 
 import static technology.rocketjump.civimperium.matches.MatchState.*;
 
 @Service
 public class MatchService {
 
+	private static final Integer STARS_NEEDED_TO_WIN_GAME = 7;
 	private final AdjectiveNounNameGenerator adjectiveNounNameGenerator;
 	private final MatchRepo matchRepo;
 	private final CollectionService collectionService;
@@ -29,12 +33,13 @@ public class MatchService {
 	private final Random random = new Random();
 	private final ObjectivesService objectivesService;
 	private final PackService packService;
+	private final LeaderboardService leaderboardService;
 
 	@Autowired
 	public MatchService(AdjectiveNounNameGenerator adjectiveNounNameGenerator, MatchRepo matchRepo,
 						CollectionService collectionService, SourceDataRepo sourceDataRepo,
 						MapSettingsGenerator mapSettingsGenerator,
-						ObjectivesService objectivesService, PackService packService) {
+						ObjectivesService objectivesService, PackService packService, LeaderboardService leaderboardService) {
 		this.adjectiveNounNameGenerator = adjectiveNounNameGenerator;
 		this.matchRepo = matchRepo;
 		this.collectionService = collectionService;
@@ -42,6 +47,7 @@ public class MatchService {
 		this.mapSettingsGenerator = mapSettingsGenerator;
 		this.objectivesService = objectivesService;
 		this.packService = packService;
+		this.leaderboardService = leaderboardService;
 	}
 
 
@@ -103,6 +109,10 @@ public class MatchService {
 			revertToSignups(match);
 		} else if (currentState.equals(DRAFT) && newState.equals(IN_PROGRESS)) {
 			proceedToInProgress(match);
+		} else if (currentState.equals(IN_PROGRESS) && newState.equals(POST_MATCH)) {
+			proceedToPostMatch(match);
+		} else if (currentState.equals(POST_MATCH) && newState.equals(IN_PROGRESS)) {
+			revertToInProgress(match);
 		} else {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not yet implemented, transition from " + currentState + " to " + newState);
 		}
@@ -167,6 +177,16 @@ public class MatchService {
 			packService.addMatchBooster(signup);
 		}
 
+		match.setMatchState(IN_PROGRESS);
+		matchRepo.update(match);
+	}
+
+	private void proceedToPostMatch(Match match) {
+		match.setMatchState(POST_MATCH);
+		matchRepo.update(match);
+	}
+
+	private void revertToInProgress(Match match) {
 		match.setMatchState(IN_PROGRESS);
 		matchRepo.update(match);
 	}
@@ -334,6 +354,14 @@ public class MatchService {
 		return matchSignup;
 	}
 
+	public void checkForWinner(MatchWithPlayers match) {
+		Map<String, Integer> leaderboard = leaderboardService.getLeaderboard(match);
+
+		if (leaderboard.values().stream().anyMatch(score -> score >= STARS_NEEDED_TO_WIN_GAME)) {
+			switchState(match, POST_MATCH, null);
+		}
+	}
+
 	private MatchSignupWithPlayer getSignup(MatchWithPlayers match, Player player) {
 		return getSignup(match, player.getPlayerId());
 	}
@@ -358,35 +386,5 @@ public class MatchService {
 		match.setRainfall(mapSettings.rainfall);
 		match.setCityStates(mapSettings.numCityStates);
 		match.setDisasterIntensity(mapSettings.disasterIntensity);
-	}
-
-	public Map<String, Integer> getLeaderboard(MatchWithPlayers match) {
-		Map<String, Integer> scoreboard = new LinkedHashMap<>();
-
-		List<PublicObjectiveWithClaimants> publicObjectives = objectivesService.getPublicObjectives(match.getMatchId());
-		List<SecretObjective> secretObjectives = objectivesService.getAllSecretObjectives(match, fakePlayer);
-
-		match.signups.forEach(signup -> {
-			int score = 0;
-
-			for (PublicObjectiveWithClaimants objective : publicObjectives) {
-				if (objective.getClaimedByPlayerIds().contains(signup.getPlayerId())) {
-					score += objective.getObjective().numStars;
-				}
-			}
-			for (SecretObjective secretObjective : secretObjectives) {
-				if (secretObjective.getPlayerId().equals(signup.getPlayerId()) && secretObjective.getClaimed()) {
-					score += secretObjective.getObjective().numStars;
-				}
-			}
-
-			scoreboard.put(signup.getPlayerId(), score);
-		});
-		return scoreboard;
-	}
-
-	private static Player fakePlayer = new Player();
-	static {
-		fakePlayer.setIsAdmin(true);
 	}
 }

@@ -7,7 +7,7 @@ import ObjectiveCard from "./objectives/ObjectiveCard";
 import axios from "axios";
 
 
-const MatchCivViewer = ({signup, loggedInPlayer, secretObjectivesProp, secretObjectiveClicked}) => {
+const MatchCivViewer = ({match, signup, loggedInPlayer, secretObjectivesProp, secretObjectiveClicked}) => {
 
     const [secretObjectives, setSecretObjectives] = useState(secretObjectivesProp || []);
 
@@ -65,7 +65,7 @@ const MatchCivViewer = ({signup, loggedInPlayer, secretObjectivesProp, secretObj
                         <ObjectiveCard key={s.objectiveName}
                                        objectiveJson={s}
                                        cardClicked={secretObjectiveClicked}
-                                       clickDisabled={signup.playerId !== loggedInPlayer.discordId}
+                                       clickDisabled={signup.playerId !== loggedInPlayer.discordId || match.matchState !== 'IN_PROGRESS'}
                                        claimedByPlayers={s.claimed ? [signup] : []}
                         />)}
                 </CardGroup>

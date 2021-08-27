@@ -4,7 +4,7 @@ import React, {useState} from "react";
 import EditMatchModal from "./EditMatchModal";
 import ProceedToDraftModal from "./ProceedToDraftModal";
 import axios from "axios";
-import RevertToSignupsModal from "./RevertToSignupsModal";
+import RevertMatchStateModal from "./RevertMatchStateModal";
 
 
 const MatchHeader = ({match, loggedInPlayer, onMatchUpdated}) => {
@@ -12,15 +12,15 @@ const MatchHeader = ({match, loggedInPlayer, onMatchUpdated}) => {
     const userIsAdmin = loggedInPlayer && loggedInPlayer.isAdmin;
     const [editingMatch, setEditingMatch] = useState({});
     const [matchToProceedToDraft, setMatchToProceedToDraft] = useState({});
-    const [matchToRevertToSignups, setMatchToRevertToSignups] = useState({});
+    const [revertToState, setRevertToState] = useState();
 
     const canSignUp = match.matchState === 'SIGNUPS' && loggedInPlayer && !match.signups.some(signup => signup.playerId === loggedInPlayer.discordId);
     const canResign = match.matchState === 'SIGNUPS' && loggedInPlayer && match.signups.some(signup => signup.playerId === loggedInPlayer.discordId);
 
     const matchUpdated = () => {
         setEditingMatch({});
+        setRevertToState(undefined);
         setMatchToProceedToDraft({});
-        setMatchToRevertToSignups({});
         onMatchUpdated();
     }
 
@@ -52,8 +52,15 @@ const MatchHeader = ({match, loggedInPlayer, onMatchUpdated}) => {
 
                 {match.matchState === 'DRAFT' &&
                 <List.Item>
-                    <Button negative onClick={() => setMatchToRevertToSignups(match)} floated='right'
+                    <Button negative onClick={() => setRevertToState('SIGNUPS')} floated='right'
                             content='Revert to Signups' size='tiny' icon='step backward'/>
+                </List.Item>
+                }
+
+                {match.matchState === 'POST_MATCH' &&
+                <List.Item>
+                    <Button negative onClick={() => setRevertToState('IN_PROGRESS')} floated='right'
+                            content='Revert to in progress' size='tiny' icon='step backward'/>
                 </List.Item>
                 }
 
@@ -75,7 +82,7 @@ const MatchHeader = ({match, loggedInPlayer, onMatchUpdated}) => {
 
             <EditMatchModal match={editingMatch} onMatchUpdated={matchUpdated}/>
             <ProceedToDraftModal match={matchToProceedToDraft} onMatchUpdated={matchUpdated} onCancel={() => setMatchToProceedToDraft({})}/>
-            <RevertToSignupsModal match={matchToRevertToSignups} onMatchUpdated={matchUpdated} onCancel={() => setMatchToRevertToSignups({})}/>
+            <RevertMatchStateModal match={match} targetState={revertToState} onMatchUpdated={matchUpdated} onCancel={() => setRevertToState(undefined)}/>
 
         </React.Fragment>
     );

@@ -4,7 +4,7 @@ import axios from "axios";
 import PlayerAvatar from "../player/PlayerAvatar";
 
 
-const EditMatchModal = ({match, onMatchUpdated, onCancel}) => {
+const ProceedToDraftModal = ({match, onMatchUpdated, onCancel}) => {
 
     const [showModal, setShowModal] = useState(false);
     const [selectedPlayerIds, setSelectedPlayerIds] = useState([]);
@@ -80,4 +80,4 @@ const EditMatchModal = ({match, onMatchUpdated, onCancel}) => {
 };
 
 
-export default EditMatchModal;
+export default ProceedToDraftModal;

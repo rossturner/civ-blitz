@@ -20,16 +20,14 @@ import static technology.rocketjump.civimperium.matches.MatchState.IN_PROGRESS;
 @Service
 public class ObjectivesService {
 
+	private final AllObjectivesService allObjectivesService;
 	private final ObjectivesRepo objectivesRepo;
 	private final Random random = new Random();
 
 	@Autowired
-	public ObjectivesService(ObjectivesRepo objectivesRepo) {
+	public ObjectivesService(AllObjectivesService allObjectivesService, ObjectivesRepo objectivesRepo) {
+		this.allObjectivesService = allObjectivesService;
 		this.objectivesRepo = objectivesRepo;
-	}
-
-	public List<PublicObjectiveWithClaimants> getPublicObjectives(int matchId) {
-		return objectivesRepo.getAllPublicObjectives(matchId);
 	}
 
 	public void initialiseObjectives(MatchWithPlayers match) {
@@ -65,21 +63,6 @@ public class ObjectivesService {
 
 	public List<SecretObjective> getSecretObjectives(int matchId, Player player) {
 		return objectivesRepo.getSecretObjectives(matchId, player);
-	}
-
-	public List<SecretObjective> getAllSecretObjectives(MatchWithPlayers match, Player player) {
-		if (match.getMatchState().equals(IN_PROGRESS)) {
-			boolean playerIsAdminAndNotInMatch = player.getIsAdmin() &&
-					!match.signups.stream().anyMatch(s -> s.getPlayer().equals(player));
-			return objectivesRepo.getAllSecretObjectives(match.getMatchId())
-					.stream().filter(s -> s.getClaimed() || s.getPlayerId().equals(player.getPlayerId()) || playerIsAdminAndNotInMatch)
-					.collect(Collectors.toList());
-		} else if (match.getMatchState().equals(MatchState.POST_MATCH)) {
-			// At this state anyone can get all secret objectives
-			return objectivesRepo.getAllSecretObjectives(match.getMatchId());
-		} else {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can not retrieve all secret objectives in state " + match.getMatchState());
-		}
 	}
 
 	public void update(SecretObjective secretObjective) {
@@ -120,7 +103,7 @@ public class ObjectivesService {
 			secretObjective.setClaimed(true);
 			objectivesRepo.update(secretObjective);
 		} else {
-			List<PublicObjectiveWithClaimants> publicObjectives = getPublicObjectives(match.getMatchId());
+			List<PublicObjectiveWithClaimants> publicObjectives = allObjectivesService.getPublicObjectives(match.getMatchId());
 			PublicObjectiveWithClaimants publicObjective = publicObjectives.stream().filter(p -> p.getObjective().equals(objective)).findAny()
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "That objective is not part of this match"));
 
@@ -138,6 +121,10 @@ public class ObjectivesService {
 	}
 
 	public void unclaimObjective(Player player, ImperiumObjective objective, MatchWithPlayers match) {
+		if (!match.getMatchState().equals(IN_PROGRESS)) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can only unclaim objectives while match is in progress");
+		}
+
 		if (objective.objectiveType.equals(SECRET)) {
 			List<SecretObjective> secretObjectives = getSecretObjectives(match.getMatchId(), player);
 			SecretObjective secretObjective = secretObjectives.stream().filter(s -> s.getObjective().equals(objective) && s.getSelected()).findFirst()

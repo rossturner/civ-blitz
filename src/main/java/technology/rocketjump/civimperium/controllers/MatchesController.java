@@ -35,16 +35,20 @@ public class MatchesController {
 	private final PlayerService playerService;
 	private final MatchService matchService;
 	private final ObjectivesService objectivesService;
+	private final LeaderboardService leaderboardService;
 	private final AuditLogger auditLogger;
+	private final AllObjectivesService allObjectivesService;
 
 	@Autowired
 	public MatchesController(JwtService jwtService, PlayerService playerService, MatchService matchService,
-							 ObjectivesService objectivesService, AuditLogger auditLogger) {
+							 ObjectivesService objectivesService, LeaderboardService leaderboardService, AuditLogger auditLogger, AllObjectivesService allObjectivesService) {
 		this.jwtService = jwtService;
 		this.playerService = playerService;
 		this.matchService = matchService;
 		this.objectivesService = objectivesService;
+		this.leaderboardService = leaderboardService;
 		this.auditLogger = auditLogger;
+		this.allObjectivesService = allObjectivesService;
 	}
 
 	@GetMapping
@@ -104,12 +108,12 @@ public class MatchesController {
 	@GetMapping("/{matchId}/leaderboard")
 	public Map<String, Integer> getLeaderboard(@PathVariable int matchId) {
 		MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-		return matchService.getLeaderboard(match);
+		return leaderboardService.getLeaderboard(match);
 	}
 
 	@GetMapping("/{matchId}/public_objectives")
 	public List<ObjectiveResponse> getMatchObjectives(@PathVariable int matchId) {
-		return objectivesService.getPublicObjectives(matchId).stream()
+		return allObjectivesService.getPublicObjectives(matchId).stream()
 				.map((pub) -> new ObjectiveResponse(pub.getObjective(), pub.getClaimedByPlayerIds()))
 				.sorted(OBJECTIVE_SORT)
 				.collect(Collectors.toList());
@@ -143,6 +147,7 @@ public class MatchesController {
 			}
 			MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 			objectivesService.claimObjective(player, objective, match);
+			matchService.checkForWinner(match);
 		}
 	}
 
@@ -172,7 +177,7 @@ public class MatchesController {
 			ImperiumToken token = jwtService.parse(jwToken);
 			Player player = playerService.getPlayer(token);
 			MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-			return objectivesService.getAllSecretObjectives(match, player).stream()
+			return allObjectivesService.getAllSecretObjectives(match, player).stream()
 					.map(SecretObjectiveResponse::new)
 					.sorted(SECRET_OBJECTIVE_SORT)
 					.collect(Collectors.toList());

@@ -77,6 +77,7 @@ public class AdminController {
 				ImperiumObjective objective = EnumUtils.getEnum(ImperiumObjective.class, objectiveId);
 
 				objectivesService.claimObjective(targetPlayer, objective, match);
+				matchService.checkForWinner(match);
 			}
 		}
 	}
