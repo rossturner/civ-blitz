@@ -46,8 +46,7 @@ const MatchPage = ({loggedInPlayer}) => {
                 })
         }
 
-        if ((match.matchState === 'IN_PROGRESS' && loggedInPlayer.isAdmin && !currentPlayerSignup) ||
-            match.matchState === 'POST_MATCH') {
+        if (match.matchState === 'IN_PROGRESS' || match.matchState === 'POST_MATCH') {
             axios.get('/api/matches/' + matchId + '/all_secret_objectives')
                 .then((response) => {
                     setSecretObjectives(response.data);

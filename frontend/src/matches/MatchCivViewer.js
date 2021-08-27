@@ -29,7 +29,6 @@ const MatchCivViewer = ({signup, loggedInPlayer, secretObjectivesProp, secretObj
         }
     }, [secretObjectivesProp]);
 
-    console.log('secretObjectives', secretObjectives);
     const civItems = CATEGORIES.map(category => {
         const propName = CardInfo.getSignupPropName(category);
         if (signup[propName]) {
@@ -66,7 +65,7 @@ const MatchCivViewer = ({signup, loggedInPlayer, secretObjectivesProp, secretObj
                         <ObjectiveCard key={s.objectiveName}
                                        objectiveJson={s}
                                        cardClicked={secretObjectiveClicked}
-                                       clickDisabled={!secretObjectiveClicked}
+                                       clickDisabled={signup.playerId !== loggedInPlayer.discordId}
                                        claimedByPlayers={s.claimed ? [signup] : []}
                         />)}
                 </CardGroup>
