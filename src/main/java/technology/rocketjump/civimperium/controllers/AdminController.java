@@ -1,6 +1,5 @@
 package technology.rocketjump.civimperium.controllers;
 
-import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -10,9 +9,10 @@ import technology.rocketjump.civimperium.auth.ImperiumToken;
 import technology.rocketjump.civimperium.auth.JwtService;
 import technology.rocketjump.civimperium.codegen.tables.pojos.AuditLog;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
-import technology.rocketjump.civimperium.matches.ImperiumObjective;
 import technology.rocketjump.civimperium.matches.MatchService;
-import technology.rocketjump.civimperium.matches.ObjectivesService;
+import technology.rocketjump.civimperium.matches.objectives.ObjectiveDefinition;
+import technology.rocketjump.civimperium.matches.objectives.ObjectiveDefinitionRepo;
+import technology.rocketjump.civimperium.matches.objectives.ObjectivesService;
 import technology.rocketjump.civimperium.model.MatchWithPlayers;
 import technology.rocketjump.civimperium.players.PlayerService;
 
@@ -27,15 +27,17 @@ public class AdminController {
 	private final AuditLogger auditLogger;
 	private final MatchService matchService;
 	private final ObjectivesService objectivesService;
+	private final ObjectiveDefinitionRepo objectiveDefinitionRepo;
 
 	@Autowired
 	public AdminController(JwtService jwtService, PlayerService playerService, AuditLogger auditLogger,
-						   MatchService matchService, ObjectivesService objectivesService) {
+						   MatchService matchService, ObjectivesService objectivesService, ObjectiveDefinitionRepo objectiveDefinitionRepo) {
 		this.jwtService = jwtService;
 		this.playerService = playerService;
 		this.auditLogger = auditLogger;
 		this.matchService = matchService;
 		this.objectivesService = objectivesService;
+		this.objectiveDefinitionRepo = objectiveDefinitionRepo;
 	}
 
 	@GetMapping("/audit_logs")
@@ -74,7 +76,8 @@ public class AdminController {
 				}
 
 				Player targetPlayer = playerService.getPlayerById(playerId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-				ImperiumObjective objective = EnumUtils.getEnum(ImperiumObjective.class, objectiveId);
+				ObjectiveDefinition objective = objectiveDefinitionRepo.getById(objectiveId)
+						.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can not find objective with ID " + objectiveId));
 
 				objectivesService.claimObjective(targetPlayer, objective, match);
 				matchService.checkForWinner(match);
@@ -102,7 +105,8 @@ public class AdminController {
 				}
 
 				Player targetPlayer = playerService.getPlayerById(playerId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-				ImperiumObjective objective = EnumUtils.getEnum(ImperiumObjective.class, objectiveId);
+				ObjectiveDefinition objective = objectiveDefinitionRepo.getById(objectiveId)
+						.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can not find objective with ID " + objectiveId));
 
 				objectivesService.unclaimObjective(targetPlayer, objective, match);
 			}

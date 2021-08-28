@@ -1,4 +1,6 @@
-package technology.rocketjump.civimperium.matches;
+package technology.rocketjump.civimperium.matches.objectives;
+
+import technology.rocketjump.civimperium.mapgen.StartEra;
 
 import java.util.List;
 
@@ -8,14 +10,15 @@ public class ObjectiveResponse {
 	private final String objectiveName;
 	private final String description;
 	private final int numStars;
-	private final ImperiumObjective.ObjectiveType type;
+	private final ObjectiveDefinition.ObjectiveType type;
 	private final List<String> claimedByPlayerIds;
 
-	public ObjectiveResponse(ImperiumObjective objective, List<String> claimedByPlayerIds) {
-		this.enumName = objective.name();
+	public ObjectiveResponse(ObjectiveDefinition objective, List<String> claimedByPlayerIds, StartEra startEra) {
+		this.enumName = objective.objectiveId;
 		this.objectiveName = objective.objectiveName;
 		this.description = objective.description;
-		this.numStars = objective.numStars;
+		Integer stars = objective.getStars(startEra);
+		this.numStars = stars != null ? stars : 0;
 		this.type = objective.objectiveType;
 		this.claimedByPlayerIds = claimedByPlayerIds;
 	}
@@ -36,7 +39,7 @@ public class ObjectiveResponse {
 		return numStars;
 	}
 
-	public ImperiumObjective.ObjectiveType getType() {
+	public ObjectiveDefinition.ObjectiveType getType() {
 		return type;
 	}
 

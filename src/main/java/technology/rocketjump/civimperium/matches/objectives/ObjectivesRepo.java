@@ -1,4 +1,4 @@
-package technology.rocketjump.civimperium.matches;
+package technology.rocketjump.civimperium.matches.objectives;
 
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +32,11 @@ public class ObjectivesRepo {
 				.execute();
 	}
 
-	public SecretObjective add(Match match, MatchSignup signup, ImperiumObjective objective) {
+	public SecretObjective add(Match match, MatchSignup signup, ObjectiveDefinition objective) {
 		SecretObjective secretObjective = new SecretObjective();
 		secretObjective.setMatchId(match.getMatchId());
 		secretObjective.setPlayerId(signup.getPlayerId());
-		secretObjective.setObjective(objective);
+		secretObjective.setObjective(objective.objectiveId);
 		secretObjective.setSelected(false);
 		secretObjective.setClaimed(false);
 		SecretObjectiveRecord secretObjectiveRecord = create.newRecord(SECRET_OBJECTIVE, secretObjective);
@@ -81,11 +81,11 @@ public class ObjectivesRepo {
 				.execute();
 	}
 
-	public void addPublicObjectives(Match match, List<ImperiumObjective> publicObjectives) {
-		for (ImperiumObjective objective : publicObjectives) {
+	public void addPublicObjectives(Match match, List<ObjectiveDefinition> publicObjectives) {
+		for (ObjectiveDefinition objective : publicObjectives) {
 			create.insertInto(PUBLIC_OBJECTIVE,
 					PUBLIC_OBJECTIVE.MATCH_ID, PUBLIC_OBJECTIVE.OBJECTIVE)
-					.values(match.getMatchId(), objective)
+					.values(match.getMatchId(), objective.objectiveId)
 					.execute();
 		}
 	}
@@ -96,19 +96,19 @@ public class ObjectivesRepo {
 				.fetchInto(ScoredObjective.class);
 	}
 
-	public void createClaim(ImperiumObjective objective, Player player, Match match) {
+	public void createClaim(ObjectiveDefinition objective, Player player, Match match) {
 		ScoredObjective scoredObjective = new ScoredObjective();
-		scoredObjective.setObjective(objective);
+		scoredObjective.setObjective(objective.objectiveId);
 		scoredObjective.setPlayerId(player.getPlayerId());
 		scoredObjective.setMatchId(match.getMatchId());
 		create.newRecord(SCORED_OBJECTIVE, scoredObjective).store();
 	}
 
-	public void deleteClaim(ImperiumObjective objective, Player player, MatchWithPlayers match) {
+	public void deleteClaim(ObjectiveDefinition objective, Player player, MatchWithPlayers match) {
 		create.deleteFrom(SCORED_OBJECTIVE)
 				.where(SCORED_OBJECTIVE.MATCH_ID.eq(match.getMatchId())
 						.and(SCORED_OBJECTIVE.PLAYER_ID.eq(player.getPlayerId()))
-						.and(SCORED_OBJECTIVE.OBJECTIVE.eq(objective)))
+						.and(SCORED_OBJECTIVE.OBJECTIVE.eq(objective.objectiveId)))
 				.execute();
 	}
 

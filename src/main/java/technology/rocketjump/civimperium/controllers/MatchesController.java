@@ -1,6 +1,5 @@
 package technology.rocketjump.civimperium.controllers;
 
-import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +10,10 @@ import technology.rocketjump.civimperium.auth.JwtService;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Match;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
 import technology.rocketjump.civimperium.codegen.tables.pojos.SecretObjective;
-import technology.rocketjump.civimperium.matches.*;
+import technology.rocketjump.civimperium.matches.LeaderboardService;
+import technology.rocketjump.civimperium.matches.MatchService;
+import technology.rocketjump.civimperium.matches.MatchState;
+import technology.rocketjump.civimperium.matches.objectives.*;
 import technology.rocketjump.civimperium.model.MatchSignupWithPlayer;
 import technology.rocketjump.civimperium.model.MatchWithPlayers;
 import technology.rocketjump.civimperium.players.PlayerService;
@@ -23,6 +25,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static technology.rocketjump.civimperium.matches.MatchState.DRAFT;
+import static technology.rocketjump.civimperium.matches.objectives.ObjectiveDefinition.NULL_OBJECTIVE;
 
 @RestController
 @RequestMapping("/api/matches")
@@ -38,10 +41,12 @@ public class MatchesController {
 	private final LeaderboardService leaderboardService;
 	private final AuditLogger auditLogger;
 	private final AllObjectivesService allObjectivesService;
+	private final ObjectiveDefinitionRepo objectiveDefinitionRepo;
 
 	@Autowired
 	public MatchesController(JwtService jwtService, PlayerService playerService, MatchService matchService,
-							 ObjectivesService objectivesService, LeaderboardService leaderboardService, AuditLogger auditLogger, AllObjectivesService allObjectivesService) {
+							 ObjectivesService objectivesService, LeaderboardService leaderboardService,
+							 AuditLogger auditLogger, AllObjectivesService allObjectivesService, ObjectiveDefinitionRepo objectiveDefinitionRepo) {
 		this.jwtService = jwtService;
 		this.playerService = playerService;
 		this.matchService = matchService;
@@ -49,6 +54,7 @@ public class MatchesController {
 		this.leaderboardService = leaderboardService;
 		this.auditLogger = auditLogger;
 		this.allObjectivesService = allObjectivesService;
+		this.objectiveDefinitionRepo = objectiveDefinitionRepo;
 	}
 
 	@GetMapping
@@ -113,8 +119,12 @@ public class MatchesController {
 
 	@GetMapping("/{matchId}/public_objectives")
 	public List<ObjectiveResponse> getMatchObjectives(@PathVariable int matchId) {
+		MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 		return allObjectivesService.getPublicObjectives(matchId).stream()
-				.map((pub) -> new ObjectiveResponse(pub.getObjective(), pub.getClaimedByPlayerIds()))
+				.map((pub) -> {
+					ObjectiveDefinition objective = objectiveDefinitionRepo.getById(pub.getObjective()).orElse(NULL_OBJECTIVE);
+					return new ObjectiveResponse(objective, pub.getClaimedByPlayerIds(), match.getStartEra());
+				})
 				.sorted(OBJECTIVE_SORT)
 				.collect(Collectors.toList());
 	}
@@ -126,8 +136,10 @@ public class MatchesController {
 		} else {
 			ImperiumToken token = jwtService.parse(jwToken);
 			Player player = playerService.getPlayer(token);
+			MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 			return objectivesService.getSecretObjectives(matchId, player).stream()
-					.map(SecretObjectiveResponse::new)
+					.map(secretObjective -> new SecretObjectiveResponse(secretObjective, objectiveDefinitionRepo.getById(secretObjective.getObjective()).orElse(NULL_OBJECTIVE), match.getStartEra()
+					))
 					.sorted(SECRET_OBJECTIVE_SORT)
 					.collect(Collectors.toList());
 		}
@@ -141,10 +153,7 @@ public class MatchesController {
 		} else {
 			ImperiumToken token = jwtService.parse(jwToken);
 			Player player = playerService.getPlayer(token);
-			ImperiumObjective objective = EnumUtils.getEnum(ImperiumObjective.class, objectiveId);
-			if (objective == null) {
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-			}
+			ObjectiveDefinition objective = objectiveDefinitionRepo.getById(objectiveId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 			MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 			objectivesService.claimObjective(player, objective, match);
 			matchService.checkForWinner(match);
@@ -159,10 +168,7 @@ public class MatchesController {
 		} else {
 			ImperiumToken token = jwtService.parse(jwToken);
 			Player player = playerService.getPlayer(token);
-			ImperiumObjective objective = EnumUtils.getEnum(ImperiumObjective.class, objectiveId);
-			if (objective == null) {
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-			}
+			ObjectiveDefinition objective = objectiveDefinitionRepo.getById(objectiveId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 			MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 			objectivesService.unclaimObjective(player, objective, match);
 		}
@@ -178,7 +184,8 @@ public class MatchesController {
 			Player player = playerService.getPlayer(token);
 			MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 			return allObjectivesService.getAllSecretObjectives(match, player).stream()
-					.map(SecretObjectiveResponse::new)
+					.map(secretObjective -> new SecretObjectiveResponse(secretObjective, objectiveDefinitionRepo.getById(secretObjective.getObjective()).orElse(NULL_OBJECTIVE), match.getStartEra()
+					))
 					.sorted(SECRET_OBJECTIVE_SORT)
 					.collect(Collectors.toList());
 		}
@@ -194,25 +201,37 @@ public class MatchesController {
 			ImperiumToken token = jwtService.parse(jwToken);
 			Player player = playerService.getPlayer(token);
 			List<SecretObjective> secretObjectives = objectivesService.getSecretObjectives(matchId, player);
+			MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 			Optional<SecretObjective> chosenObjective = secretObjectives
-					.stream().filter(o -> o.getObjective().name().equals(objective))
+					.stream().filter(o -> o.getObjective().equals(objective))
 					.findFirst();
 			if (chosenObjective.isEmpty()) {
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 			} else {
 				SecretObjective secretObjective = chosenObjective.get();
+				ObjectiveDefinition imperiumSecretObjective = objectiveDefinitionRepo.getById(secretObjective.getObjective())
+						.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
 
 				if (!secretObjective.getSelected() && secretObjectives.stream().filter(SecretObjective::getSelected).count() == 2) {
 					// already have two other objectives selected
-				} else if (!secretObjective.getSelected() && secretObjectives.stream().filter(SecretObjective::getSelected)
-						.filter(obj -> obj.getObjective().numStars == 1).count() == 1 && secretObjective.getObjective().numStars == 1) {
+				} else if (!secretObjective.getSelected() &&
+						secretObjectives.stream()
+								.filter(SecretObjective::getSelected)
+								.map(obj -> objectiveDefinitionRepo.getById(obj.getObjective()).orElse(NULL_OBJECTIVE))
+								.filter(obj -> obj.getStars(match.getStartEra()) == 1)
+								.count() == 1 &&
+						imperiumSecretObjective.getStars(match.getStartEra()) == 1) {
 					// Selecting a 1 star objective when 1 is already selected, which is not allowed
 				} else {
 					secretObjective.setSelected(!secretObjective.getSelected());
 					matchService.updateSecretObjectiveSelection(secretObjective);
 				}
 
-				return secretObjectives.stream().map(SecretObjectiveResponse::new).collect(Collectors.toList());
+				return secretObjectives.stream()
+						.map(so -> new SecretObjectiveResponse(so, objectiveDefinitionRepo.getById(so.getObjective()).orElse(NULL_OBJECTIVE), match.getStartEra()
+						))
+						.collect(Collectors.toList());
 			}
 		}
 	}

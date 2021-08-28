@@ -12,6 +12,7 @@ import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
 import technology.rocketjump.civimperium.codegen.tables.pojos.SecretObjective;
 import technology.rocketjump.civimperium.mapgen.MapSettings;
 import technology.rocketjump.civimperium.mapgen.MapSettingsGenerator;
+import technology.rocketjump.civimperium.matches.objectives.ObjectivesService;
 import technology.rocketjump.civimperium.model.*;
 
 import java.util.List;
@@ -101,7 +102,7 @@ public class MatchService {
 		return match;
 	}
 
-	public Match switchState(Match match, MatchState newState, Map<String, Object> payload) {
+	public Match switchState(MatchWithPlayers match, MatchState newState, Map<String, Object> payload) {
 		MatchState currentState = match.getMatchState();
 		if (currentState.equals(SIGNUPS) && newState.equals(DRAFT)) {
 			proceedToDraft(match, payload);
@@ -119,16 +120,13 @@ public class MatchService {
 		return match;
 	}
 
-	private void proceedToDraft(Match match, Map<String, Object> payload) {
+	private void proceedToDraft(MatchWithPlayers match, Map<String, Object> payload) {
 		List<String> selectedPlayerIds = (List<String>) payload.get("playerIds");
 		if (selectedPlayerIds.size() < 2) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Must be a minimum of 2 selected players");
 		}
-		// At this stage, may only be removing signups
-		MatchWithPlayers matchWithPlayers = matchRepo.getMatchById(match.getMatchId())
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-		for (MatchSignupWithPlayer signup : matchWithPlayers.signups) {
+		for (MatchSignupWithPlayer signup : match.signups) {
 			if (!selectedPlayerIds.contains(signup.getPlayerId())) {
 				resign(match.getMatchId(), signup.getPlayer());
 			}
@@ -142,7 +140,7 @@ public class MatchService {
 		apply(mapSettings, match);
 		match.setMatchState(DRAFT);
 		matchRepo.update(match);
-		objectivesService.initialiseObjectives(matchWithPlayers);
+		objectivesService.initialiseObjectives(match);
 	}
 
 	private void revertToSignups(Match match) {
@@ -378,6 +376,7 @@ public class MatchService {
 	}
 
 	private void apply(MapSettings mapSettings, Match match) {
+		match.setStartEra(mapSettings.startEra);
 		match.setMapType(mapSettings.mapType);
 		match.setMapSize(mapSettings.mapSize);
 		match.setWorldAge(mapSettings.worldAge);

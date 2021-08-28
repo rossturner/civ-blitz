@@ -1,9 +1,9 @@
-package technology.rocketjump.civimperium.matches;
+package technology.rocketjump.civimperium.matches.objectives;
 
-import static technology.rocketjump.civimperium.matches.ImperiumObjective.ObjectiveType.PUBLIC;
-import static technology.rocketjump.civimperium.matches.ImperiumObjective.ObjectiveType.SECRET;
+import static technology.rocketjump.civimperium.matches.objectives.ImperiumObjectiveOld.ObjectiveType.PUBLIC;
+import static technology.rocketjump.civimperium.matches.objectives.ImperiumObjectiveOld.ObjectiveType.SECRET;
 
-public enum ImperiumObjective {
+public enum ImperiumObjectiveOld {
 
 	// Match 2 public objectives
 	INTELLECTUAL("Intellectual ", 1, "Recruit 3 different types of Great Person", PUBLIC, true),
@@ -103,7 +103,7 @@ public enum ImperiumObjective {
 		PUBLIC, SECRET
 	}
 
-	ImperiumObjective(String objectiveName, int numStars, String description, ObjectiveType objectiveType, boolean active) {
+	ImperiumObjectiveOld(String objectiveName, int numStars, String description, ObjectiveType objectiveType, boolean active) {
 		this.objectiveName = objectiveName;
 		this.numStars = numStars;
 		this.description = description;

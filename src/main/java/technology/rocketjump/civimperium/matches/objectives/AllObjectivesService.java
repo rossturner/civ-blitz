@@ -1,4 +1,4 @@
-package technology.rocketjump.civimperium.matches;
+package technology.rocketjump.civimperium.matches.objectives;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
 import technology.rocketjump.civimperium.codegen.tables.pojos.SecretObjective;
+import technology.rocketjump.civimperium.matches.MatchState;
 import technology.rocketjump.civimperium.model.MatchWithPlayers;
 
 import java.util.List;

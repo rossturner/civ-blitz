@@ -33,3 +33,7 @@ spring:
             userInfoUri: https://discordapp.com/api/users/@me
             usernameAttribute: username
 
+google:
+  api:
+    key: SET_BY_ENV_VARIABLE
+

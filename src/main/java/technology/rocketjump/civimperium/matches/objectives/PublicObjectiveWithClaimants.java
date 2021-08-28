@@ -1,4 +1,4 @@
-package technology.rocketjump.civimperium.matches;
+package technology.rocketjump.civimperium.matches.objectives;
 
 import technology.rocketjump.civimperium.codegen.tables.pojos.PublicObjective;
 

@@ -152,6 +152,7 @@ public class MatchRepo {
 				.set(MATCH.MATCH_NAME, match.getMatchName())
 				.set(MATCH.TIMESLOT, match.getTimeslot())
 				.set(MATCH.MATCH_STATE, match.getMatchState())
+				.set(MATCH.START_ERA, match.getStartEra())
 				.set(MATCH.MAP_TYPE, match.getMapType())
 				.set(MATCH.MAP_SIZE, match.getMapSize())
 				.set(MATCH.WORLD_AGE, match.getWorldAge())

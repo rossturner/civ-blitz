@@ -4,6 +4,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import technology.rocketjump.civimperium.matches.objectives.ObjectiveDefinitionParser;
 import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.model.IconAtlasEntry;
@@ -19,6 +20,7 @@ public class SourceDataParser {
 							SubtypesParser subtypesParser, SourceDataRepo sourceDataRepo, IconParser iconParser,
 							PlayersParser playersParser, CivilizationsCsvParser civilizationsCsvParser,
 							CivilizationLeadersCsvParser civilizationLeadersCsvParser,
+							ObjectiveDefinitionParser objectiveDefinitionParser,
 							@Qualifier("leaderTraits") String leaderTraitsContent,
 							@Qualifier("civTraits") String civTraitsContent,
 							@Qualifier("subtypes") String subtypesContent,
@@ -35,6 +37,8 @@ public class SourceDataParser {
 		playersParser.parse(playersContent);
 		civilizationsCsvParser.parse(civCsvContent);
 		civilizationLeadersCsvParser.parse(civLeadersCsvContent);
+
+		objectiveDefinitionParser.readFromGoogleSheet();
 
 		sourceDataRepo.removeGrantedCards();
 		System.out.println("Cards parsed: " + sourceDataRepo.getAll().size());

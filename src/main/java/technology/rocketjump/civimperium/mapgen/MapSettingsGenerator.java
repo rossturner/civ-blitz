@@ -22,7 +22,7 @@ public class MapSettingsGenerator {
 				// Can't play on this map size with this many players, try again
 				return generate(numPlayers);
 			} else {
-				return new MapSettings(mapType, mapSize, WorldAge.Standard, SeaLevelSetting.Standard,
+				return new MapSettings(StartEra.Ancient, mapType, mapSize, WorldAge.Standard, SeaLevelSetting.Standard,
 						TemperatureSetting.Standard, RainfallSetting.Standard, mapSize.defaultCityStates, selectRandomly(DisasterIntensity.values()).value);
 			}
 		} else {
@@ -45,6 +45,7 @@ public class MapSettingsGenerator {
 			}
 
 			return new MapSettings(
+					StartEra.Ancient,
 					mapType,
 					mapSize,
 					selectRandomly(WorldAge.values()),

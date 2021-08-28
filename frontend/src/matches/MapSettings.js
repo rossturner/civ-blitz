@@ -6,6 +6,12 @@ const MapSettings = ({match}) => {
         <List horizontal>
             <List.Item>
                 <List.Content>
+                    <List.Header>Start Era</List.Header>
+                    {match.startEra}
+                </List.Content>
+            </List.Item>
+            <List.Item>
+                <List.Content>
                     <List.Header>Map Type</List.Header>
                     {match.mapType.replaceAll('_', ' ')}
                 </List.Content>
