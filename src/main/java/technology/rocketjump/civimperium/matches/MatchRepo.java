@@ -161,6 +161,7 @@ public class MatchRepo {
 				.set(MATCH.RAINFALL, match.getRainfall())
 				.set(MATCH.CITY_STATES, match.getCityStates())
 				.set(MATCH.DISASTER_INTENSITY, match.getDisasterIntensity())
+				.set(MATCH.SPECTATOR, match.getSpectator())
 				.where(MATCH.MATCH_ID.eq(match.getMatchId()))
 				.execute();
 	}

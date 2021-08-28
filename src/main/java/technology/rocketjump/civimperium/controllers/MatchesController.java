@@ -387,6 +387,21 @@ public class MatchesController {
 		}
 	}
 
+	@PostMapping("/{matchId}/spectator")
+	public void toggleSpectator(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId) {
+		if (jwToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		} else {
+			ImperiumToken token = jwtService.parse(jwToken);
+			Player player = playerService.getPlayer(token);
+			if (!player.getIsAdmin()) {
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+			} else {
+				matchService.toggleSpectator(matchId);
+			}
+		}
+	}
+
 	@PutMapping("/{matchId}/{matchState}")
 	public Match switchMatchState(@RequestHeader("Authorization") String jwToken,
 								  @RequestBody Map<String, Object> payload, @PathVariable int matchId, @PathVariable MatchState matchState) {

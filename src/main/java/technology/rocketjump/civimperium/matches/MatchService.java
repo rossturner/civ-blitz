@@ -394,4 +394,15 @@ public class MatchService {
 			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Can only delete a match in SIGNUPS phase");
 		}
 	}
+
+	public void toggleSpectator(int matchId) {
+		MatchWithPlayers match = matchRepo.getMatchById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+		if (!match.getMatchState().equals(SIGNUPS)) {
+			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Can only toggle spectator during SIGNUPS phase");
+		}
+
+		match.setSpectator(!match.getSpectator());
+		matchRepo.update(match);
+	}
 }

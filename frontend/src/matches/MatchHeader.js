@@ -40,6 +40,13 @@ const MatchHeader = ({match, loggedInPlayer, onMatchUpdated, onMatchDeleted}) =>
             })
             .catch(console.error)
     }
+    const toggleSpectator = () => {
+        axios.post('/api/matches/' + match.matchId + '/spectator')
+            .then(() => {
+                onMatchUpdated();
+            })
+            .catch(console.error)
+    }
 
     const matchDeleted = () => {
         setMatchToDelete({})
@@ -89,12 +96,16 @@ const MatchHeader = ({match, loggedInPlayer, onMatchUpdated, onMatchDeleted}) =>
             }
             <p>Status: <strong>{matchStateToString(match.matchState)}</strong></p>
             <p>Timeslot: {match.timeslot}</p>
-            <p>Players: {match.signups.length}</p>
+            <p>Players: {match.signups.length}{match.spectator && ' + Spectator'}</p>
             {canSignUp &&
             <Button primary onClick={onSignup}>Sign up to this match</Button>
             }
             {canResign &&
             <Button negative onClick={onResign}>Resign from this match</Button>
+            }
+
+            {userIsAdmin && match.matchState === 'SIGNUPS' &&
+            <Button onClick={toggleSpectator}>Toggle spectator</Button>
             }
 
             <DeleteMatchModal match={matchToDelete} onCancel={() => setMatchToDelete({})} onMatchDeleted={matchDeleted}/>

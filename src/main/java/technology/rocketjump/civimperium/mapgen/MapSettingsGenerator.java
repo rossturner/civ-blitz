@@ -26,18 +26,19 @@ public class MapSettingsGenerator {
 						TemperatureSetting.Standard, RainfallSetting.Standard, mapSize.defaultCityStates, selectRandomly(DisasterIntensity.values()).value);
 			}
 		} else {
-			mapSize = pickMapSize(numPlayers);
+			mapSize = pickSmallestPossibleMapSize(numPlayers);
+//			mapSize = pickMapSize(numPlayers);
 			SeaLevelSetting seaLevelSetting = selectRandomly(SeaLevelSetting.values());
 
-			if (lightOnLand(mapType, seaLevelSetting)) {
-				mapSize = mapSize.getBigger();
-			} else if (heavyOnLand(mapType, seaLevelSetting)) {
-				mapSize = mapSize.getSmaller();
-			}
-
-			while (mapSize.maxPlayers < numPlayers) {
-				mapSize = mapSize.getBigger();
-			}
+//			if (lightOnLand(mapType, seaLevelSetting)) {
+//				mapSize = mapSize.getBigger();
+//			} else if (heavyOnLand(mapType, seaLevelSetting)) {
+//				mapSize = mapSize.getSmaller();
+//			}
+//
+//			while (mapSize.maxPlayers < numPlayers) {
+//				mapSize = mapSize.getBigger();
+//			}
 
 			int numCityStates = mapSize.defaultCityStates - 4 + random.nextInt(8);
 			while (numCityStates > mapSize.maxCityStates) {
@@ -56,6 +57,14 @@ public class MapSettingsGenerator {
 					selectRandomly(DisasterIntensity.values()).value
 			);
 		}
+	}
+
+	private MapSize pickSmallestPossibleMapSize(int numPlayers) {
+		MapSize mapSize = Duel;
+		while (mapSize.maxPlayers < numPlayers) {
+			mapSize = mapSize.getBigger();
+		}
+		return mapSize;
 	}
 
 	private boolean heavyOnLand(MapType mapType, SeaLevelSetting seaLevelSetting) {
