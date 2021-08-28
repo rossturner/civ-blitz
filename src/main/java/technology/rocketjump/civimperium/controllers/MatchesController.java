@@ -123,6 +123,7 @@ public class MatchesController {
 			} else {
 				MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 				matchService.delete(match);
+				auditLogger.record(player, "Deleted match: " + match.getMatchName());
 			}
 		}
 	}

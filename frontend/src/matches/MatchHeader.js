@@ -5,11 +5,10 @@ import EditMatchModal from "./EditMatchModal";
 import ProceedToDraftModal from "./ProceedToDraftModal";
 import axios from "axios";
 import RevertMatchStateModal from "./RevertMatchStateModal";
-import {useHistory} from "react-router-dom";
 import DeleteMatchModal from "./DeleteMatchModal";
 
 
-const MatchHeader = ({match, loggedInPlayer, onMatchUpdated}) => {
+const MatchHeader = ({match, loggedInPlayer, onMatchUpdated, onMatchDeleted}) => {
 
     const userIsAdmin = loggedInPlayer && loggedInPlayer.isAdmin;
     const [editingMatch, setEditingMatch] = useState({});
@@ -42,10 +41,11 @@ const MatchHeader = ({match, loggedInPlayer, onMatchUpdated}) => {
             .catch(console.error)
     }
 
-    const history = useHistory();
     const matchDeleted = () => {
         setMatchToDelete({})
-        history.push('/matches');
+        if (onMatchDeleted) {
+            onMatchDeleted();
+        }
     }
 
     return (

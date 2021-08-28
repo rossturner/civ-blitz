@@ -39,7 +39,7 @@ const MatchesPage = ({loggedInPlayer}) => {
         return <Segment key={match.matchId}>
             <Header as='h3'><Link to={'/matches/'+match.matchId}>{match.matchName}</Link></Header>
 
-            <MatchHeader match={match} loggedInPlayer={loggedInPlayer} onMatchUpdated={onMatchUpdated} />
+            <MatchHeader match={match} loggedInPlayer={loggedInPlayer} onMatchUpdated={onMatchUpdated} onMatchDeleted={onMatchUpdated} />
 
             {match.signups &&
             <List horizontal>

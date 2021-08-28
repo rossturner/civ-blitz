@@ -2,7 +2,7 @@ import {Button, CardGroup, Container, Header, List, Loader, Segment} from "seman
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import PlayerAvatar from "../player/PlayerAvatar";
-import {useParams} from "react-router-dom";
+import {useHistory, useParams} from "react-router-dom";
 import MatchHeader from "./MatchHeader";
 import MatchCivBuilder from "./MatchCivBuilder";
 import MapSettings from "./MapSettings";
@@ -121,6 +121,11 @@ const MatchPage = ({loggedInPlayer}) => {
         });
     }
 
+    const history = useHistory();
+    const onMatchDeleted = () => {
+        history.push("/matches");
+    }
+
     return (
         <React.Fragment>
             <Container style={{marginTop: '6em'}}>
@@ -133,7 +138,8 @@ const MatchPage = ({loggedInPlayer}) => {
                 {!loading &&
                 <React.Fragment>
 
-                    <MatchHeader match={match} loggedInPlayer={loggedInPlayer} onMatchUpdated={() => setLoading(true)}/>
+                    <MatchHeader match={match} loggedInPlayer={loggedInPlayer} onMatchUpdated={() => setLoading(true)}
+                        onMatchDeleted={onMatchDeleted}/>
 
                     {match.matchState === 'SIGNUPS' && match.signups.map(signupToPlayerSection)}
 
