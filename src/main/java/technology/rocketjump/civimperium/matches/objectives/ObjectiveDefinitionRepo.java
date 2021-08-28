@@ -25,9 +25,11 @@ public class ObjectiveDefinitionRepo {
 	public void add(ObjectiveDefinition objective) {
 		byObjectiveId.put(objective.objectiveId, objective);
 
-		for (StartEra startEra : values()) {
-			if (objective.getStars(startEra) != null && objective.active) {
-				activeByEra.get(startEra).put(objective.objectiveId, objective);
+		if (objective.active) {
+			for (StartEra startEra : values()) {
+				if (objective.getStars(startEra) != null && objective.active) {
+					activeByEra.get(startEra).put(objective.objectiveId, objective);
+				}
 			}
 		}
 	}
