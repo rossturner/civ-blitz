@@ -81,6 +81,7 @@ public class AdminController {
 
 				objectivesService.claimObjective(targetPlayer, objective, match);
 				matchService.checkForWinner(match);
+				auditLogger.record(adminPlayer, "Claimed " + objective.objectiveName + " for " + targetPlayer.getDiscordUsername() + " in " + match.getMatchName());
 			}
 		}
 	}
@@ -109,6 +110,7 @@ public class AdminController {
 						.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can not find objective with ID " + objectiveId));
 
 				objectivesService.unclaimObjective(targetPlayer, objective, match);
+				auditLogger.record(adminPlayer, "Removed claim on " + objective.objectiveName + " for " + targetPlayer.getDiscordUsername() + " in " + match.getMatchName());
 			}
 		}
 	}

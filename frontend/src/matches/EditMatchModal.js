@@ -3,7 +3,7 @@ import {Button, Input, Modal} from "semantic-ui-react";
 import axios from "axios";
 
 
-const EditMatchModal = ({match, onMatchUpdated}) => {
+const EditMatchModal = ({match, onMatchDeleted}) => {
 
     const [showEditModal, setShowEditModal] = useState(false);
     const [matchName, setMatchName] = useState('');
@@ -20,7 +20,7 @@ const EditMatchModal = ({match, onMatchUpdated}) => {
     const save = () => {
         axios.post('/api/matches/'+match.matchId, {matchTimeslot, matchName})
             .then(response => {
-                onMatchUpdated(response.data);
+                onMatchDeleted(response.data);
                 setShowEditModal(false);
             })
             .catch(console.error);

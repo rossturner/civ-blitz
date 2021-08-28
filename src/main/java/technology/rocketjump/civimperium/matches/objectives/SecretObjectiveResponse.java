@@ -10,6 +10,7 @@ public class SecretObjectiveResponse extends SecretObjective {
 	private final String description;
 	private final int numStars;
 	private final ObjectiveDefinition.ObjectiveType type;
+	private final boolean military;
 
 	public SecretObjectiveResponse(SecretObjective secretObjective, ObjectiveDefinition objectiveDefinition, StartEra startEra) {
 		super(secretObjective);
@@ -19,6 +20,7 @@ public class SecretObjectiveResponse extends SecretObjective {
 		Integer stars = objectiveDefinition.getStars(startEra);
 		this.numStars = stars != null ? stars : 0;
 		this.type = objectiveDefinition.objectiveType;
+		this.military = objectiveDefinition.military;
 	}
 
 	public String getEnumName() {
@@ -39,5 +41,9 @@ public class SecretObjectiveResponse extends SecretObjective {
 
 	public ObjectiveDefinition.ObjectiveType getType() {
 		return type;
+	}
+
+	public boolean isMilitary() {
+		return military;
 	}
 }

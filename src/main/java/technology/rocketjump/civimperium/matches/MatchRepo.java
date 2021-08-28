@@ -181,4 +181,14 @@ public class MatchRepo {
 						.and(MATCH_SIGNUP.PLAYER_ID.eq(matchSignup.getPlayerId())))
 				.execute();
 	}
+
+	public void delete(MatchWithPlayers match) {
+		create.deleteFrom(MATCH_SIGNUP)
+				.where(MATCH_SIGNUP.MATCH_ID.eq(match.getMatchId()))
+				.execute();
+
+		create.deleteFrom(MATCH)
+				.where(MATCH.MATCH_ID.eq(match.getMatchId()))
+				.execute();
+	}
 }

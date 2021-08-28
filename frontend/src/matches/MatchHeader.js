@@ -5,6 +5,8 @@ import EditMatchModal from "./EditMatchModal";
 import ProceedToDraftModal from "./ProceedToDraftModal";
 import axios from "axios";
 import RevertMatchStateModal from "./RevertMatchStateModal";
+import {useHistory} from "react-router-dom";
+import DeleteMatchModal from "./DeleteMatchModal";
 
 
 const MatchHeader = ({match, loggedInPlayer, onMatchUpdated}) => {
@@ -12,6 +14,7 @@ const MatchHeader = ({match, loggedInPlayer, onMatchUpdated}) => {
     const userIsAdmin = loggedInPlayer && loggedInPlayer.isAdmin;
     const [editingMatch, setEditingMatch] = useState({});
     const [matchToProceedToDraft, setMatchToProceedToDraft] = useState({});
+    const [matchToDelete, setMatchToDelete] = useState({});
     const [revertToState, setRevertToState] = useState();
 
     const canSignUp = match.matchState === 'SIGNUPS' && loggedInPlayer && !match.signups.some(signup => signup.playerId === loggedInPlayer.discordId);
@@ -39,10 +42,24 @@ const MatchHeader = ({match, loggedInPlayer, onMatchUpdated}) => {
             .catch(console.error)
     }
 
+    const history = useHistory();
+    const matchDeleted = () => {
+        setMatchToDelete({})
+        history.push('/matches');
+    }
+
     return (
         <React.Fragment>
             {userIsAdmin &&
             <List floated='right'>
+
+                {match.matchState === 'SIGNUPS' &&
+                <List.Item>
+                    <Button negative onClick={() => setMatchToDelete(match)} floated='right'
+                            content='Delete Match' size='tiny' icon='trash'/>
+                </List.Item>
+                }
+
                 {match.matchState === 'SIGNUPS' &&
                 <List.Item>
                     <Button primary onClick={() => setMatchToProceedToDraft(match)} floated='right'
@@ -80,7 +97,8 @@ const MatchHeader = ({match, loggedInPlayer, onMatchUpdated}) => {
             <Button negative onClick={onResign}>Resign from this match</Button>
             }
 
-            <EditMatchModal match={editingMatch} onMatchUpdated={matchUpdated}/>
+            <DeleteMatchModal match={matchToDelete} onCancel={() => setMatchToDelete({})} onMatchDeleted={matchDeleted}/>
+            <EditMatchModal match={editingMatch} onMatchDeleted={matchUpdated}/>
             <ProceedToDraftModal match={matchToProceedToDraft} onMatchUpdated={matchUpdated} onCancel={() => setMatchToProceedToDraft({})}/>
             <RevertMatchStateModal match={match} targetState={revertToState} onMatchUpdated={matchUpdated} onCancel={() => setRevertToState(undefined)}/>
 

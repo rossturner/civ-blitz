@@ -386,4 +386,12 @@ public class MatchService {
 		match.setCityStates(mapSettings.numCityStates);
 		match.setDisasterIntensity(mapSettings.disasterIntensity);
 	}
+
+	public void delete(MatchWithPlayers match) {
+		if (match.getMatchState().equals(SIGNUPS)) {
+			matchRepo.delete(match);
+		} else {
+			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Can only delete a match in SIGNUPS phase");
+		}
+	}
 }

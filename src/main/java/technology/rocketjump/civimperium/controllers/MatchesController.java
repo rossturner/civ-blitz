@@ -111,6 +111,22 @@ public class MatchesController {
 		return match;
 	}
 
+	@DeleteMapping("/{matchId}")
+	public void deleteMatch(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId) {
+		if (jwToken == null) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		} else {
+			ImperiumToken token = jwtService.parse(jwToken);
+			Player player = playerService.getPlayer(token);
+			if (!player.getIsAdmin()) {
+				throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+			} else {
+				MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+				matchService.delete(match);
+			}
+		}
+	}
+
 	@GetMapping("/{matchId}/leaderboard")
 	public Map<String, Integer> getLeaderboard(@PathVariable int matchId) {
 		MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));

@@ -1,4 +1,4 @@
-import {Card, Icon} from "semantic-ui-react";
+import {Card, Icon, Popup} from "semantic-ui-react";
 import './ObjectiveCard.css';
 import PlayerAvatar from "../../player/PlayerAvatar";
 
@@ -21,7 +21,9 @@ const ObjectiveCard = ({objectiveJson, cardClicked, clickDisabled, claimedByPlay
     return (
         <Card className={className} onClick={!clickDisabled ? () => cardClicked(objectiveJson) : null} color={color}>
             <Card.Content>
-                <Card.Header>{objectiveJson.objectiveName}</Card.Header>
+                <Card.Header>
+                    {objectiveJson.objectiveName}
+                </Card.Header>
                 {isSecretObjective &&
                 <Card.Meta>Secret objective</Card.Meta>
                 }
@@ -43,6 +45,14 @@ const ObjectiveCard = ({objectiveJson, cardClicked, clickDisabled, claimedByPlay
                 <Icon color='yellow' name='star' />
                 }
                 {objectiveJson.numStars} star{objectiveJson.numStars > 1 ? 's' : ''}
+
+                {objectiveJson.military &&
+                <Popup
+                    trigger={<Icon className='right floated' color='red' name='military' floated='right' />}
+                    content='Military objective'
+                    basic
+                />
+                }
             </Card.Content>
         </Card>
     )

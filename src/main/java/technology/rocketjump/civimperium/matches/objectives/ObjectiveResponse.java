@@ -12,6 +12,7 @@ public class ObjectiveResponse {
 	private final int numStars;
 	private final ObjectiveDefinition.ObjectiveType type;
 	private final List<String> claimedByPlayerIds;
+	private final boolean military;
 
 	public ObjectiveResponse(ObjectiveDefinition objective, List<String> claimedByPlayerIds, StartEra startEra) {
 		this.enumName = objective.objectiveId;
@@ -21,6 +22,7 @@ public class ObjectiveResponse {
 		this.numStars = stars != null ? stars : 0;
 		this.type = objective.objectiveType;
 		this.claimedByPlayerIds = claimedByPlayerIds;
+		this.military = objective.military;
 	}
 
 	public String getEnumName() {
@@ -45,5 +47,9 @@ public class ObjectiveResponse {
 
 	public List<String> getClaimedByPlayerIds() {
 		return claimedByPlayerIds;
+	}
+
+	public boolean isMilitary() {
+		return military;
 	}
 }
