@@ -92,6 +92,7 @@ public class MatchRepo {
 		Map<Match, List<MatchSignup>> results = create.select(MATCH.fields()).select(MATCH_SIGNUP.fields())
 				.from(MATCH.leftJoin(MATCH_SIGNUP).on(MATCH.MATCH_ID.eq(MATCH_SIGNUP.MATCH_ID)))
 				.where(MATCH.MATCH_STATE.notEqual(MatchState.COMPLETED))
+				.orderBy(MATCH.MATCH_ID.desc())
 				.fetchGroups(
 						r -> r.into(MATCH).into(Match.class),
 						r -> r.into(MATCH_SIGNUP).into(MatchSignup.class)
