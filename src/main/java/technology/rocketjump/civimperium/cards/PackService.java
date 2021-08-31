@@ -38,7 +38,7 @@ public class PackService {
 
 	public void purchasePack(Player player, CardPackType packType, String category) {
 		if (player.getBalance() < packType.cost) {
-			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "You can not afford this pack");
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You can not afford this pack");
 		}
 
 		CardPack newPack = new CardPack();
