@@ -4,6 +4,7 @@ import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technology.rocketjump.civimperium.codegen.tables.pojos.AuditLog;
+import technology.rocketjump.civimperium.codegen.tables.pojos.Match;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
 
 import java.time.LocalDateTime;
@@ -21,12 +22,13 @@ public class AuditLogger {
 		this.create = create;
 	}
 
-	public void record(Player admin, String action) {
+	public void record(Player admin, String action, Match match) {
 		AuditLog newLog = new AuditLog();
 		newLog.setPlayerId(admin.getPlayerId());
 		newLog.setDiscordUsername(admin.getDiscordUsername());
 		newLog.setDatetime(LocalDateTime.now());
 		newLog.setAction(action);
+		newLog.setMatchId(match.getMatchId());
 		create.newRecord(AUDIT_LOG, newLog).store();
 	}
 

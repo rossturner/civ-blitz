@@ -1,10 +1,23 @@
-import {Header, Icon, Table} from "semantic-ui-react";
+import {Button, Header, Icon, Input, Table} from "semantic-ui-react";
+import React from 'react';
 import PlayerAvatar from "../player/PlayerAvatar";
+import axios from "axios";
+import {useHistory} from "react-router-dom";
 
 
-const MatchLeaderboard = ({match, leaderboard}) => {
+const MatchLeaderboard = ({match, leaderboard, loggedInPlayer, leaderboardChanged}) => {
 
     const tableRows = [];
+    const currentPlayerSignup = match.signups && match.signups.find(s => s.playerId === loggedInPlayer.discordId);
+    const playerIsAdminNotInMatch = !currentPlayerSignup && loggedInPlayer.isAdmin;
+    const canBeCompleted = match.matchState === 'POST_MATCH' && playerIsAdminNotInMatch;
+
+    const updateScore = (playerId, score) => {
+        const newLeaderboard = {...leaderboard}
+        newLeaderboard[playerId] = Number(score);
+        leaderboardChanged(newLeaderboard);
+    }
+
     for (const [playerId, score] of Object.entries(leaderboard)) {
         const signup = match.signups.find(signup => signup.playerId === playerId);
         const stars = [];
@@ -22,15 +35,43 @@ const MatchLeaderboard = ({match, leaderboard}) => {
                 </Header>
             </Table.Cell>
             <Table.Cell>{stars}</Table.Cell>
+            {canBeCompleted &&
+            <Table.Cell>
+                <Input type='number' value={score} onChange={(event, data) => updateScore(playerId, data.value)} />
+            </Table.Cell>
+            }
         </Table.Row>);
     }
 
+
+    const history = useHistory();
+
+    const completeMatch = () => {
+        axios.put('/api/matches/'+match.matchId+'/COMPLETED', leaderboard)
+            .then(response => {
+                history.push("/matches");
+            })
+            .catch(console.error)
+    }
+
     return (
-        <Table basic='very' celled collapsing>
-            <Table.Body>
-                {tableRows}
-            </Table.Body>
-        </Table>
+        <React.Fragment>
+            <Table basic='very' celled collapsing>
+                {canBeCompleted &&
+                <Table.Header>
+                    <Table.HeaderCell>Player</Table.HeaderCell>
+                    <Table.HeaderCell>Stars claimed from objectives</Table.HeaderCell>
+                    <Table.HeaderCell>Confirm final score</Table.HeaderCell>
+                </Table.Header>
+                }
+                <Table.Body>
+                    {tableRows}
+                </Table.Body>
+            </Table>
+            {canBeCompleted &&
+            <Button color='green' onClick={completeMatch}>Finalise match and award stars</Button>
+            }
+        </React.Fragment>
     );
 };
 

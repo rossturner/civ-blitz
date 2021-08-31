@@ -35,7 +35,7 @@ public class AllObjectivesService {
 			return objectivesRepo.getAllSecretObjectives(match.getMatchId())
 					.stream().filter(s -> s.getClaimed() || s.getPlayerId().equals(player.getPlayerId()) || playerIsAdminAndNotInMatch)
 					.collect(Collectors.toList());
-		} else if (match.getMatchState().equals(MatchState.POST_MATCH)) {
+		} else if (match.getMatchState().equals(MatchState.POST_MATCH) || match.getMatchState().equals(MatchState.COMPLETED)) {
 			// At this state anyone can get all secret objectives
 			return objectivesRepo.getAllSecretObjectives(match.getMatchId());
 		} else {

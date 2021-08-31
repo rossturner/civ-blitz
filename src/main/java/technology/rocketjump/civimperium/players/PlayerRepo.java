@@ -51,4 +51,11 @@ public class PlayerRepo {
 		create.update(PLAYER).set(PLAYER.DISCORD_AVATAR, discordAvatar).where(PLAYER.PLAYER_ID.eq(discordId)).execute();
 	}
 
+	public void updateBalances(Player player) {
+		create.update(PLAYER)
+				.set(PLAYER.BALANCE, player.getBalance())
+				.set(PLAYER.TOTAL_POINTS_EARNED, player.getTotalPointsEarned())
+				.where(PLAYER.PLAYER_ID.eq(player.getPlayerId()))
+				.execute();
+	}
 }

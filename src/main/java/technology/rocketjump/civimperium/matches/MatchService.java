@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import technology.rocketjump.civimperium.auth.AuditLogger;
 import technology.rocketjump.civimperium.cards.CollectionService;
 import technology.rocketjump.civimperium.cards.PackService;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Match;
@@ -14,6 +15,7 @@ import technology.rocketjump.civimperium.mapgen.MapSettings;
 import technology.rocketjump.civimperium.mapgen.MapSettingsGenerator;
 import technology.rocketjump.civimperium.matches.objectives.ObjectivesService;
 import technology.rocketjump.civimperium.model.*;
+import technology.rocketjump.civimperium.players.PlayerRepo;
 
 import java.util.List;
 import java.util.Map;
@@ -30,25 +32,29 @@ public class MatchService {
 	private final MatchRepo matchRepo;
 	private final CollectionService collectionService;
 	private final SourceDataRepo sourceDataRepo;
+	private final PlayerRepo playerRepo;
 	private final MapSettingsGenerator mapSettingsGenerator;
 	private final Random random = new Random();
 	private final ObjectivesService objectivesService;
 	private final PackService packService;
 	private final LeaderboardService leaderboardService;
+	private final AuditLogger auditLogger;
 
 	@Autowired
 	public MatchService(AdjectiveNounNameGenerator adjectiveNounNameGenerator, MatchRepo matchRepo,
 						CollectionService collectionService, SourceDataRepo sourceDataRepo,
-						MapSettingsGenerator mapSettingsGenerator,
-						ObjectivesService objectivesService, PackService packService, LeaderboardService leaderboardService) {
+						PlayerRepo playerRepo, MapSettingsGenerator mapSettingsGenerator,
+						ObjectivesService objectivesService, PackService packService, LeaderboardService leaderboardService, AuditLogger auditLogger) {
 		this.adjectiveNounNameGenerator = adjectiveNounNameGenerator;
 		this.matchRepo = matchRepo;
 		this.collectionService = collectionService;
 		this.sourceDataRepo = sourceDataRepo;
+		this.playerRepo = playerRepo;
 		this.mapSettingsGenerator = mapSettingsGenerator;
 		this.objectivesService = objectivesService;
 		this.packService = packService;
 		this.leaderboardService = leaderboardService;
+		this.auditLogger = auditLogger;
 	}
 
 
@@ -102,7 +108,7 @@ public class MatchService {
 		return match;
 	}
 
-	public Match switchState(MatchWithPlayers match, MatchState newState, Map<String, Object> payload) {
+	public Match switchState(MatchWithPlayers match, MatchState newState, Map<String, Object> payload, Player currentPlayer) {
 		MatchState currentState = match.getMatchState();
 		if (currentState.equals(SIGNUPS) && newState.equals(DRAFT)) {
 			proceedToDraft(match, payload);
@@ -114,6 +120,8 @@ public class MatchService {
 			proceedToPostMatch(match);
 		} else if (currentState.equals(POST_MATCH) && newState.equals(IN_PROGRESS)) {
 			revertToInProgress(match);
+		} else if (currentState.equals(POST_MATCH) && newState.equals(COMPLETED)) {
+			completeMatch(match, payload, currentPlayer);
 		} else {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not yet implemented, transition from " + currentState + " to " + newState);
 		}
@@ -187,6 +195,47 @@ public class MatchService {
 	private void revertToInProgress(Match match) {
 		match.setMatchState(IN_PROGRESS);
 		matchRepo.update(match);
+	}
+
+	private void completeMatch(MatchWithPlayers match, Map<String, Object> payload, Player currentPlayer) {
+		if (match.signups.stream().anyMatch(s -> s.getPlayerId().equals(currentPlayer.getPlayerId()))) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can not complete a match you played in");
+		}
+
+		for (MatchSignupWithPlayer signup : match.signups) {
+			if (!payload.containsKey(signup.getPlayerId())) {
+				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payload does not contain an entry for player " + signup.getPlayerId());
+			}
+		}
+
+		Map<String, Integer> leaderboard = leaderboardService.getLeaderboard(match);
+
+		StringBuilder auditBuilder = new StringBuilder();
+		for (MatchSignupWithPlayer signup : match.signups) {
+			int leaderboardStarAmount = leaderboard.get(signup.getPlayerId());
+			int awardedStarAmount = (Integer) payload.get(signup.getPlayerId());
+			if (awardedStarAmount != leaderboardStarAmount) {
+				if (awardedStarAmount < leaderboardStarAmount) {
+					auditBuilder.append("Decreased stars to ");
+				} else {
+					auditBuilder.append("Increased stars to ");
+				}
+				auditBuilder.append(awardedStarAmount).append(" from ").append(leaderboardStarAmount).append(" for ")
+						.append(signup.getPlayer().getDiscordUsername()).append("\n");
+			}
+
+			signup.getPlayer().setBalance(signup.getPlayer().getBalance() + awardedStarAmount);
+			signup.getPlayer().setTotalPointsEarned(signup.getPlayer().getTotalPointsEarned() + awardedStarAmount);
+			playerRepo.updateBalances(signup.getPlayer());
+		}
+
+		match.setMatchState(COMPLETED);
+		matchRepo.update(match);
+
+		if (auditBuilder.length() > 0) {
+			auditBuilder.append("For match ").append(match.getMatchName());
+			auditLogger.record(currentPlayer, auditBuilder.toString(), match);
+		}
 	}
 
 	public synchronized MatchSignupWithPlayer addCardToMatchDeck(MatchWithPlayers match, Player player, String cardTraitType, boolean applyFreeUse) {
@@ -356,7 +405,7 @@ public class MatchService {
 		Map<String, Integer> leaderboard = leaderboardService.getLeaderboard(match);
 
 		if (leaderboard.values().stream().anyMatch(score -> score >= STARS_NEEDED_TO_WIN_GAME)) {
-			switchState(match, POST_MATCH, null);
+			switchState(match, POST_MATCH, null, null);
 		}
 	}
 
@@ -371,7 +420,7 @@ public class MatchService {
 
 	private void checkForAllCommitted(MatchWithPlayers match) {
 		if (match.signups.stream().allMatch(MatchSignup::getCommitted)) {
-			switchState(match, MatchState.IN_PROGRESS, null);
+			switchState(match, MatchState.IN_PROGRESS, null, null);
 		}
 	}
 

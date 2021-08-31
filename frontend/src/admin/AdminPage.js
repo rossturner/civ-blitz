@@ -1,7 +1,7 @@
 import {Button, Container, Header, Input, Message, Segment, Table} from "semantic-ui-react";
 import React, {useEffect, useState} from "react";
 import axios from "axios";
-import {useHistory} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 import {DateTime} from "luxon";
 
 
@@ -37,7 +37,14 @@ const AdminPage = () => {
     const auditRows = auditLogs.map((auditItem, index) => {
         return (<Table.Row key={index}>
             <Table.Cell>{auditItem.discordUsername}</Table.Cell>
-            <Table.Cell>{auditItem.action}</Table.Cell>
+            <Table.Cell style={{'white-space': 'pre-line'}}>
+                {auditItem.matchId &&
+                <Link to={'/matches/' + auditItem.matchId}>
+                    {auditItem.action}
+                </Link>
+                }
+                {!auditItem.matchId && auditItem.action}
+            </Table.Cell>
             <Table.Cell>{DateTime.fromISO(auditItem.datetime).toLocaleString(DateTime.DATETIME_MED)}</Table.Cell>
         </Table.Row>);
     });
@@ -50,11 +57,14 @@ const AdminPage = () => {
                 <Segment>
                     <Header as='h3'>Create a new match for signups</Header>
 
-                    <Input value={matchTimeslot} onChange={(event, data) => setMatchTimeslot(data.value)} fluid placeholder='Describe the timeslot this match will be played in' />
+                    <Input value={matchTimeslot} onChange={(event, data) => setMatchTimeslot(data.value)} fluid
+                           placeholder='Describe the timeslot this match will be played in'/>
 
-                    <Input value={matchName} onChange={(event, data) => setMatchName(data.value)} fluid placeholder='(Optional) Name for the match, will be generated if left blank, must be unique' />
+                    <Input value={matchName} onChange={(event, data) => setMatchName(data.value)} fluid
+                           placeholder='(Optional) Name for the match, will be generated if left blank, must be unique'/>
 
-                    <Button primary onClick={createMatch} disabled={matchTimeslot.length === 0}>Create match</Button>
+                    <Button primary onClick={createMatch} disabled={matchTimeslot.length === 0}>Create
+                        match</Button>
 
                     {errorText &&
                     <Message negative>

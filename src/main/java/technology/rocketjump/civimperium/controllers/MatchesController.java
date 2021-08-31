@@ -2,6 +2,7 @@ package technology.rocketjump.civimperium.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import technology.rocketjump.civimperium.auth.AuditLogger;
@@ -90,7 +91,7 @@ public class MatchesController {
 				String timeslot = payload.get("matchTimeslot").toString();
 				String name = payload.containsKey("matchName") ? payload.get("matchName").toString() : null;
 				Match match = matchService.create(name, timeslot);
-				auditLogger.record(player, "Created a new match: " + match.getMatchName());
+				auditLogger.record(player, "Created a new match: " + match.getMatchName(), match);
 				return match;
 			}
 		}
@@ -123,7 +124,7 @@ public class MatchesController {
 			} else {
 				MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 				matchService.delete(match);
-				auditLogger.record(player, "Deleted match: " + match.getMatchName());
+				auditLogger.record(player, "Deleted match: " + match.getMatchName(), match);
 			}
 		}
 	}
@@ -282,7 +283,7 @@ public class MatchesController {
 					if (!original.getTimeslot().equals(match.getTimeslot())) {
 						auditDescription.append(", changed timeslot from '").append(original.getTimeslot()).append("' to '").append(match.getTimeslot()).append("'");
 					}
-					auditLogger.record(player, auditDescription.toString());
+					auditLogger.record(player, auditDescription.toString(), match);
 					return match;
 				}
 			}
@@ -403,6 +404,7 @@ public class MatchesController {
 	}
 
 	@PutMapping("/{matchId}/{matchState}")
+	@Transactional
 	public Match switchMatchState(@RequestHeader("Authorization") String jwToken,
 								  @RequestBody Map<String, Object> payload, @PathVariable int matchId, @PathVariable MatchState matchState) {
 		if (jwToken == null) {
@@ -417,8 +419,8 @@ public class MatchesController {
 				if (match.isEmpty()) {
 					throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 				} else {
-					Match result = matchService.switchState(match.get(), matchState, payload);
-					auditLogger.record(player, "Changed state of match " + result.getMatchName() + " to " + result.getMatchState());
+					Match result = matchService.switchState(match.get(), matchState, payload, player);
+					auditLogger.record(player, "Changed state of match " + result.getMatchName() + " to " + result.getMatchState(), match.get());
 					return result;
 				}
 			}

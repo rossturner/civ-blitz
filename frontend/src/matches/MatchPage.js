@@ -30,7 +30,7 @@ const MatchPage = ({loggedInPlayer}) => {
     const [showAdminUnclaimObjectiveModal, setShowAdminUnclaimObjectiveModal] = useState(false);
 
     const currentPlayerSignup = match.signups && match.signups.find(s => s.playerId === loggedInPlayer.discordId);
-    const playedIsAdminNotInMatch = !currentPlayerSignup && loggedInPlayer.isAdmin;
+    const playerIsAdminNotInMatch = !currentPlayerSignup && loggedInPlayer.isAdmin;
 
     useEffect(() => {
         axios.get('/api/matches/' + matchId)
@@ -54,7 +54,7 @@ const MatchPage = ({loggedInPlayer}) => {
                 })
         }
 
-        if (match.matchState === 'IN_PROGRESS' || match.matchState === 'POST_MATCH') {
+        if (match.matchState === 'IN_PROGRESS' || match.matchState === 'POST_MATCH' || match.matchState === 'COMPLETED') {
             axios.get('/api/matches/' + matchId + '/all_secret_objectives')
                 .then((response) => {
                     setSecretObjectives(response.data);
@@ -151,7 +151,8 @@ const MatchPage = ({loggedInPlayer}) => {
                             <Container style={{'margin': '1em'}}>
                                 <Header>Leaderboard:</Header>
                                 <p>The first player to claim 7 stars wins the game. These may be any mix of public and secret objectives.</p>
-                                <MatchLeaderboard match={match} leaderboard={leaderboard} />
+                                <MatchLeaderboard match={match} leaderboard={leaderboard} loggedInPlayer={loggedInPlayer}
+                                    leaderboardChanged={setLeaderboard}/>
                             </Container>
                             }
 
@@ -192,10 +193,10 @@ const MatchPage = ({loggedInPlayer}) => {
                     </React.Fragment>
                     }
 
-                    {(match.matchState === 'IN_PROGRESS' || match.matchState === 'POST_MATCH') &&
+                    {(match.matchState === 'IN_PROGRESS' || match.matchState === 'POST_MATCH'|| match.matchState === 'COMPLETED') &&
                     <Container>
                         <DownloadMatchModButton match={match} />
-                        {playedIsAdminNotInMatch && match.matchState === 'IN_PROGRESS' &&
+                        {playerIsAdminNotInMatch && match.matchState === 'IN_PROGRESS' &&
                             <React.Fragment>
                                 <Button color='violet' onClick={() => setShowAdminClaimObjectiveModal(true)}>Claim an objective for a player</Button>
                                 <Button color='purple' onClick={() => setShowAdminUnclaimObjectiveModal(true)}>Remove a claimed objective from a player</Button>
