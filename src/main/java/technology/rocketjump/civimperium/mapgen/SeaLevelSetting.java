@@ -2,9 +2,9 @@ package technology.rocketjump.civimperium.mapgen;
 
 public enum SeaLevelSetting implements Weightable {
 
-	High(4f),
-	Low(4f),
-	Standard(12f);
+	High(12f),
+	Low(2f),
+	Standard(4f);
 
 	private final float weighting;
 
