@@ -8,7 +8,7 @@ import RevealableCard from "./RevealableCard";
 const PackOpener = () => {
 
     const [loading, setLoading] = useState(true);
-    const [packContents, setPackContents] = useState([]);
+    const [packContents, setPackContents] = useState();
 
     useEffect(() => {
         axios.post('/api/player/packs')
@@ -24,7 +24,6 @@ const PackOpener = () => {
 
     return (
         <Container style={{marginTop: '6em'}}>
-            <Header as='h2'>Match Booster Pack</Header>
 
             {loading &&
             <p>Loading...</p>
@@ -32,13 +31,20 @@ const PackOpener = () => {
 
             {!loading &&
             <React.Fragment>
-                {packContents.length > 0 &&
+                {packContents &&
                 <React.Fragment>
-                    <p>You earned this pack due to playing in a match. Note that free use cards do not grant a replacement card
-                        to that category.</p>
+                    <Header as='h2'>
+                        {packContents.packType === 'SINGLE_CARD' && 'Single Card Pack'}
+                        {packContents.packType === 'MULTIPLE_CARDS' && 'Multiple Card Pack'}
+                        {packContents.packType === 'MATCH_BOOSTER' && 'Match Booster Pack'}
+                    </Header>
+                    {packContents.packType === 'MATCH_BOOSTER' && packContents.cards.length < 4 &&
+                    <p>You earned this pack due to playing in a match. Note that free use cards do not grant a
+                        replacement card to that category.</p>
+                    }
 
                     <CardGroup centered>
-                        {packContents.map(card => <RevealableCard key={card.cardName} cardJson={card} />)}
+                        {packContents.cards.map(card => <RevealableCard key={card.cardName} cardJson={card} />)}
                     </CardGroup>
 
                 </React.Fragment>

@@ -2,7 +2,6 @@ import {Container, Image, Menu} from "semantic-ui-react";
 import React from "react";
 import {Link} from "react-router-dom";
 
-
 const TopLevelMenu = ({loggedInPlayer}) => {
 
     const randomString = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);

@@ -2,6 +2,15 @@
 
 const CardInfo = {
 
+    getAllCategories: () => {
+        return [
+            'CivilizationAbility',
+            'LeaderAbility',
+            'UniqueUnit',
+            'UniqueInfrastructure'
+        ];
+    },
+
     getCategoryName: (category) => {
         switch (category) {
             case 'CivilizationAbility':

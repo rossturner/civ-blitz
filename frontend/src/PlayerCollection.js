@@ -1,4 +1,4 @@
-import {Button, Container, Header, Icon, Modal} from "semantic-ui-react";
+import {Button, Container, Header, Icon, Modal, Segment} from "semantic-ui-react";
 import React, {useEffect, useState} from "react";
 import ImpRandom from "./ImpRandom";
 import ImperiumCardGroup from "./cards/ImperiumCardGroup";
@@ -14,6 +14,7 @@ const PlayerCollection = ({loggedInPlayer}) => {
     const [canMulligan, setCanMulligan] = useState(false);
     const [showMulliganModal, setShowMulliganModal] = useState(false);
     const [packsToOpen, setPacksToOpen] = useState([]);
+    const [playerInfo, setPlayerInfo] = useState();
 
     useEffect(() => {
         axios.get("/api/player/collection")
@@ -27,6 +28,12 @@ const PlayerCollection = ({loggedInPlayer}) => {
             .catch((error) => {
                 console.error('Error retrieving player cards', error);
             })
+
+        axios.get('/api/player')
+            .then(response => {
+                setPlayerInfo(response.data)
+            })
+            .catch(console.error);
 
         axios.get('/api/player/packs')
             .then(response => {
@@ -81,6 +88,18 @@ const PlayerCollection = ({loggedInPlayer}) => {
                     <Button color='green' as={Link} to='/packs' style={{'marginBottom': '1em'}}>
                         Click here to open a card pack!
                     </Button>
+                    }
+                    {playerInfo &&
+                    <Segment>
+                        {playerInfo.balance > 1 &&
+                        <Button as={Link} to='/pack-shop' floated='right'>
+                            <Icon name='shop' />
+                            Go to the pack shop!
+                        </Button>
+                        }
+                        <strong>{playerInfo.balance}</strong> stars available to spend<br />
+                        {playerInfo.totalPointsEarned} stars earned in total
+                    </Segment>
                     }
 
                     {canMulligan &&

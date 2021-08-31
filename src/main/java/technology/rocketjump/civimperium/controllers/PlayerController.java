@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import technology.rocketjump.civimperium.auth.ImperiumToken;
 import technology.rocketjump.civimperium.auth.JwtService;
 import technology.rocketjump.civimperium.cards.CollectionService;
+import technology.rocketjump.civimperium.cards.PackDetails;
 import technology.rocketjump.civimperium.cards.PackService;
 import technology.rocketjump.civimperium.codegen.tables.pojos.CardPack;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
@@ -99,7 +100,7 @@ public class PlayerController {
 	}
 
 	@PostMapping("/packs")
-	public ResponseEntity<List<Card>> openNextPack(@RequestHeader("Authorization") String jwToken) {
+	public ResponseEntity<PackDetails> openNextPack(@RequestHeader("Authorization") String jwToken) {
 		if (jwToken == null) {
 			return ResponseEntity.notFound().build();
 		} else {
@@ -111,7 +112,8 @@ public class PlayerController {
 				return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 			} else {
 				CardPack nextPack = allPacks.get(0);
-				return ResponseEntity.ok(packService.openPack(nextPack, player));
+				List<Card> cards = packService.openPack(nextPack, player);
+				return ResponseEntity.ok(new PackDetails(nextPack, cards));
 			}
 
 		}
