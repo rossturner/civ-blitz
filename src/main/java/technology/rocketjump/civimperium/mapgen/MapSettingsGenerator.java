@@ -40,7 +40,7 @@ public class MapSettingsGenerator {
 //				mapSize = mapSize.getBigger();
 //			}
 
-			int numCityStates = mapSize.defaultCityStates - 4 + random.nextInt(8);
+			int numCityStates = mapSize.defaultCityStates - 2 + random.nextInt(5);
 			while (numCityStates > mapSize.maxCityStates) {
 				numCityStates--;
 			}

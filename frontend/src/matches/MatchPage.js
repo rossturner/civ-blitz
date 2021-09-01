@@ -104,22 +104,26 @@ const MatchPage = ({loggedInPlayer}) => {
         </Segment>
     );
     let publicObjectiveSections = [];
+    const objectiveToCard = (objective) => {
+        const claimedByPlayers = objective.claimedByPlayerIds.map(id => match.signups.find(s => s.playerId === id));
+        const objectiveClicked = (objective) => {
+            if (objective.claimedByPlayerIds.includes(loggedInPlayer.discordId)) {
+                setUnclaimingObjective(objective);
+            } else {
+                setClaimingObjective(objective);
+            }
+        };
+        const clickDisabled = match.matchState !== 'IN_PROGRESS' || !currentPlayerSignup;
+        return <ObjectiveCard key={objective.objectiveName} cardClicked={objectiveClicked}
+                              clickDisabled={clickDisabled}
+                              objectiveJson={objective} claimedByPlayers={claimedByPlayers} />;
+    }
     if (match.matchId) {
         publicObjectiveSections = publicObjectives.map(objective => {
-            const claimedByPlayers = objective.claimedByPlayerIds.map(id => match.signups.find(s => s.playerId === id));
-            const objectiveClicked = (objective) => {
-                if (objective.claimedByPlayerIds.includes(loggedInPlayer.discordId)) {
-                    setUnclaimingObjective(objective);
-                } else {
-                    setClaimingObjective(objective);
-                }
-            };
-            const clickDisabled = match.matchState !== 'IN_PROGRESS' || !currentPlayerSignup;
-            return <ObjectiveCard key={objective.objectiveName} cardClicked={objectiveClicked}
-                                  clickDisabled={clickDisabled}
-                                  objectiveJson={objective} claimedByPlayers={claimedByPlayers} />;
+            return objectiveToCard(objective);
         });
     }
+
 
     const history = useHistory();
     const onMatchDeleted = () => {
@@ -150,7 +154,8 @@ const MatchPage = ({loggedInPlayer}) => {
                             {leaderboard &&
                             <Container style={{'margin': '1em'}}>
                                 <Header>Leaderboard:</Header>
-                                <p>The first player to claim 7 stars wins the game. These may be any mix of public and secret objectives.</p>
+                                <p>The winner is the player with the most stars after 100 turns. These may be any mix of public and secret objectives.</p>
+                                <p>Any <b>unclaimed</b> secret objectives at game end <b>reduce</b> that players score by the star amount.</p>
                                 <MatchLeaderboard match={match} leaderboard={leaderboard} loggedInPlayer={loggedInPlayer}
                                     leaderboardChanged={setLeaderboard}/>
                             </Container>
@@ -161,7 +166,13 @@ const MatchPage = ({loggedInPlayer}) => {
                                 <p>Each 1 star objective can be claimed by up to 3 players. Each 2 star objective can be claimed by up to 2 players.
                                     Each 3 star objective can be claimed by a single player.</p>
                                 <CardGroup centered>
-                                    {publicObjectiveSections}
+                                    {publicObjectives.filter(o => o.numStars === 1).map(objectiveToCard)}
+                                </CardGroup>
+                                <CardGroup centered>
+                                    {publicObjectives.filter(o => o.numStars === 2).map(objectiveToCard)}
+                                </CardGroup>
+                                <CardGroup centered>
+                                    {publicObjectives.filter(o => o.numStars === 3).map(objectiveToCard)}
                                 </CardGroup>
                             </Container>
 

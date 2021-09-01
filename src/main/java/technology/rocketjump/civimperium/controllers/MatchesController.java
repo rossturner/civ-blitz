@@ -231,16 +231,16 @@ public class MatchesController {
 						.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
 
-				if (!secretObjective.getSelected() && secretObjectives.stream().filter(SecretObjective::getSelected).count() == 2) {
-					// already have two other objectives selected
-				} else if (!secretObjective.getSelected() &&
-						secretObjectives.stream()
-								.filter(SecretObjective::getSelected)
-								.map(obj -> objectiveDefinitionRepo.getById(obj.getObjective()).orElse(NULL_OBJECTIVE))
-								.filter(obj -> obj.getStars(match.getStartEra()) == 1)
-								.count() == 1 &&
-						imperiumSecretObjective.getStars(match.getStartEra()) == 1) {
-					// Selecting a 1 star objective when 1 is already selected, which is not allowed
+				if (!secretObjective.getSelected() && secretObjectives.stream().filter(SecretObjective::getSelected).count() == 5) {
+					// already have 5 other objectives selected
+//				} else if (!secretObjective.getSelected() &&
+//						secretObjectives.stream()
+//								.filter(SecretObjective::getSelected)
+//								.map(obj -> objectiveDefinitionRepo.getById(obj.getObjective()).orElse(NULL_OBJECTIVE))
+//								.filter(obj -> obj.getStars(match.getStartEra()) == 1)
+//								.count() == 1 &&
+//						imperiumSecretObjective.getStars(match.getStartEra()) == 1) {
+//					// Selecting a 1 star objective when 1 is already selected, which is not allowed
 				} else {
 					secretObjective.setSelected(!secretObjective.getSelected());
 					matchService.updateSecretObjectiveSelection(secretObjective);

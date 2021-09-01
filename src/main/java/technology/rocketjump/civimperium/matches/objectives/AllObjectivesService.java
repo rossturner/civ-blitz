@@ -10,6 +10,7 @@ import technology.rocketjump.civimperium.matches.MatchState;
 import technology.rocketjump.civimperium.model.MatchWithPlayers;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static technology.rocketjump.civimperium.matches.MatchState.IN_PROGRESS;
@@ -18,10 +19,12 @@ import static technology.rocketjump.civimperium.matches.MatchState.IN_PROGRESS;
 public class AllObjectivesService {
 
 	private final ObjectivesRepo objectivesRepo;
+	private final ObjectiveDefinitionRepo objectiveDefinitionRepo;
 
 	@Autowired
-	public AllObjectivesService(ObjectivesRepo objectivesRepo) {
+	public AllObjectivesService(ObjectivesRepo objectivesRepo, ObjectiveDefinitionRepo objectiveDefinitionRepo) {
 		this.objectivesRepo = objectivesRepo;
+		this.objectiveDefinitionRepo = objectiveDefinitionRepo;
 	}
 
 	public List<PublicObjectiveWithClaimants> getPublicObjectives(int matchId) {
@@ -32,8 +35,23 @@ public class AllObjectivesService {
 		if (match.getMatchState().equals(IN_PROGRESS)) {
 			boolean playerIsAdminAndNotInMatch = player.getIsAdmin() &&
 					!match.signups.stream().anyMatch(s -> s.getPlayer().equals(player));
-			return objectivesRepo.getAllSecretObjectives(match.getMatchId())
-					.stream().filter(s -> s.getClaimed() || s.getPlayerId().equals(player.getPlayerId()) || playerIsAdminAndNotInMatch)
+
+			return objectivesRepo.getAllSecretObjectives(match.getMatchId()).stream()
+					.map(secretObjective -> {
+						if (isObjectiveVisible(secretObjective, player, playerIsAdminAndNotInMatch)) {
+							return secretObjective;
+						} else {
+							Optional<ObjectiveDefinition> definition = objectiveDefinitionRepo.getById(secretObjective.getObjective());
+							if (definition.isEmpty()) {
+								return null;
+							} else {
+								Integer numStars = definition.get().getStars(match.getStartEra());
+								SecretObjective hidden = new SecretObjective(secretObjective);
+								hidden.setObjective("HIDDEN_"+numStars);
+								return hidden;
+							}
+						}
+					})
 					.collect(Collectors.toList());
 		} else if (match.getMatchState().equals(MatchState.POST_MATCH) || match.getMatchState().equals(MatchState.COMPLETED)) {
 			// At this state anyone can get all secret objectives
@@ -41,6 +59,10 @@ public class AllObjectivesService {
 		} else {
 			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can not retrieve all secret objectives in state " + match.getMatchState());
 		}
+	}
+
+	private boolean isObjectiveVisible(SecretObjective s, Player player, boolean playerIsAdminAndNotInMatch) {
+		return s.getClaimed() || s.getPlayerId().equals(player.getPlayerId()) || playerIsAdminAndNotInMatch;
 	}
 
 }

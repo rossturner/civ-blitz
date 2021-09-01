@@ -58,6 +58,7 @@ public class ObjectivesService {
 			pickObjective(3, objectivesForPlayer, allSecretObjectives, match.getStartEra());
 			pickObjective(null, objectivesForPlayer, allSecretObjectives, match.getStartEra());
 			pickObjective(null, objectivesForPlayer, allSecretObjectives, match.getStartEra());
+			pickObjective(null, objectivesForPlayer, allSecretObjectives, match.getStartEra());
 
 			for (ObjectiveDefinition objective : objectivesForPlayer) {
 				objectivesRepo.add(match, signup, objective);
@@ -85,8 +86,6 @@ public class ObjectivesService {
 		pickObjective(1, selectedObjectives, allPublicObjectives, startEra);
 		pickObjective(2, selectedObjectives, allPublicObjectives, startEra);
 		pickObjective(2, selectedObjectives, allPublicObjectives, startEra);
-		pickObjective(2, selectedObjectives, allPublicObjectives, startEra);
-		pickObjective(3, selectedObjectives, allPublicObjectives, startEra);
 		pickObjective(3, selectedObjectives, allPublicObjectives, startEra);
 		pickObjective(3, selectedObjectives, allPublicObjectives, startEra);
 

@@ -20,6 +20,16 @@ public class ObjectiveDefinitionRepo {
 		for (StartEra value : StartEra.values()) {
 			activeByEra.put(value, new HashMap<>());
 		}
+
+		for (int cursor = 1; cursor <= 3; cursor++) {
+			ObjectiveDefinition hiddenDefinition = new ObjectiveDefinition(
+					"???", "HIDDEN_"+cursor, "???", ObjectiveDefinition.ObjectiveType.SECRET, false, false
+			);
+			for (StartEra startEra : values()) {
+				hiddenDefinition.setStars(startEra, cursor);
+			}
+			add(hiddenDefinition);
+		}
 	}
 
 	public void add(ObjectiveDefinition objective) {
