@@ -174,7 +174,6 @@ public class MatchesController {
 			ObjectiveDefinition objective = objectiveDefinitionRepo.getById(objectiveId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 			MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 			objectivesService.claimObjective(player, objective, match);
-			matchService.checkForWinner(match);
 		}
 	}
 

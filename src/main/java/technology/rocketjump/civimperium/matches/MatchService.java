@@ -404,14 +404,6 @@ public class MatchService {
 		return matchSignup;
 	}
 
-	public void checkForWinner(MatchWithPlayers match) {
-		Map<String, Integer> leaderboard = leaderboardService.getLeaderboard(match);
-
-		if (leaderboard.values().stream().anyMatch(score -> score >= STARS_NEEDED_TO_WIN_GAME)) {
-			switchState(match, POST_MATCH, null, null);
-		}
-	}
-
 	private MatchSignupWithPlayer getSignup(MatchWithPlayers match, Player player) {
 		return getSignup(match, player.getPlayerId());
 	}

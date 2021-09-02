@@ -26,12 +26,14 @@ const RevertMatchStateModal = ({match, targetState, onMatchUpdated, onCancel}) =
             })
     };
 
+    const directionVerb = targetState === 'POST_MATCH' ? 'Proceed' : 'Revert';
+
     return (
         <Modal
             onClose={() => setShowModal(false)}
             open={showModal}
         >
-            <Modal.Header>Revert to {matchStateToString(targetState)} phase?</Modal.Header>
+            <Modal.Header>{directionVerb} to {matchStateToString(targetState)} phase?</Modal.Header>
             <Modal.Content>
                 <Modal.Description>
                     {targetState === 'IN_PROGRESS' &&
@@ -40,6 +42,9 @@ const RevertMatchStateModal = ({match, targetState, onMatchUpdated, onCancel}) =
                     }
                     {targetState === 'SIGNUPS' &&
                     <p>This will <strong>revert</strong> <i>{match.matchName}</i> to the signups phase - all decks will be cancelled and cards returned to players.</p>
+                    }
+                    {targetState === 'POST_MATCH' &&
+                    <p>This will advance <i>{match.matchName}</i> to the post-match phase - no more objectives can be claimed after this point.</p>
                     }
                     <p>Please be sure you wish to proceed.</p>
                 </Modal.Description>
@@ -52,7 +57,9 @@ const RevertMatchStateModal = ({match, targetState, onMatchUpdated, onCancel}) =
             </Modal.Content>
             <Modal.Actions>
                 <Button onClick={() => {setShowModal(false); onCancel();}}>Cancel</Button>
-                <Button onClick={onPrimaryClick} negative>Revert to {matchStateToString(targetState)}</Button>
+                <Button onClick={onPrimaryClick} primary={directionVerb === 'Proceed'} negative={directionVerb !== 'Proceed'}>
+                    {directionVerb} to {matchStateToString(targetState)}
+                </Button>
             </Modal.Actions>
         </Modal>
     );

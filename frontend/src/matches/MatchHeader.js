@@ -81,6 +81,13 @@ const MatchHeader = ({match, loggedInPlayer, onMatchUpdated, onMatchDeleted}) =>
                 </List.Item>
                 }
 
+                {match.matchState === 'IN_PROGRESS' &&
+                <List.Item>
+                    <Button primary onClick={() => setRevertToState('POST_MATCH')} floated='right'
+                            content='Proceed to Post-match' size='tiny' icon='step forward'/>
+                </List.Item>
+                }
+
                 {match.matchState === 'POST_MATCH' &&
                 <List.Item>
                     <Button negative onClick={() => setRevertToState('IN_PROGRESS')} floated='right'
