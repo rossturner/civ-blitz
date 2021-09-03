@@ -18,6 +18,7 @@ public class Card {
 	protected Optional<String> grantsFreeUseOfCard = Optional.empty();
 	protected String subtype;
 	protected String mediaName;
+	protected String requiredDlc;
 
 	public Card() {
 
@@ -35,6 +36,7 @@ public class Card {
 		this.grantsFreeUseOfCard = original.grantsFreeUseOfCard;
 		this.subtype = original.subtype;
 		this.mediaName = original.mediaName;
+		this.requiredDlc = original.requiredDlc;
 	}
 
 	@Override
@@ -141,5 +143,13 @@ public class Card {
 
 	public String getMediaName() {
 		return mediaName;
+	}
+
+	public String getRequiredDlc() {
+		return requiredDlc;
+	}
+
+	public void setRequiredDlc(String requiredDlc) {
+		this.requiredDlc = requiredDlc;
 	}
 }

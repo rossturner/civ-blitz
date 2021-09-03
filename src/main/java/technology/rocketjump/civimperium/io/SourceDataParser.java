@@ -20,6 +20,7 @@ public class SourceDataParser {
 							SubtypesParser subtypesParser, SourceDataRepo sourceDataRepo, IconParser iconParser,
 							PlayersParser playersParser, CivilizationsCsvParser civilizationsCsvParser,
 							CivilizationLeadersCsvParser civilizationLeadersCsvParser,
+							DlcCsvParser dlcParser,
 							ObjectiveDefinitionParser objectiveDefinitionParser,
 							@Qualifier("leaderTraits") String leaderTraitsContent,
 							@Qualifier("civTraits") String civTraitsContent,
@@ -28,7 +29,9 @@ public class SourceDataParser {
 							@Qualifier("LeaderIcons") String leaderIconsContent,
 							@Qualifier("Players") String playersContent,
 							@Qualifier("Civilizations") String civCsvContent,
-							@Qualifier("CivilizationLeaders") String civLeadersCsvContent) throws IOException {
+							@Qualifier("CivilizationLeaders") String civLeadersCsvContent,
+							@Qualifier("CivilizationDLC") String civDlcContent,
+							@Qualifier("LeaderDLC") String leaderDlcContent) throws IOException {
 		leaderTraitsParser.parse(leaderTraitsContent);
 		civTraitsParser.parse(civTraitsContent);
 		subtypesParser.parse(subtypesContent);
@@ -37,6 +40,7 @@ public class SourceDataParser {
 		playersParser.parse(playersContent);
 		civilizationsCsvParser.parse(civCsvContent);
 		civilizationLeadersCsvParser.parse(civLeadersCsvContent);
+		dlcParser.parse(civDlcContent, leaderDlcContent);
 
 		objectiveDefinitionParser.readFromGoogleSheet();
 

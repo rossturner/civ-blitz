@@ -109,6 +109,30 @@ public class ResourceFiles {
 		}
 	}
 
+	@Value("classpath:csv/CivilizationsDLC.csv")
+	private Resource civilizationDlcFile;
+
+	@Bean(name = "CivilizationDLC")
+	public String civilizationDLC() {
+		try (InputStream is = civilizationDlcFile.getInputStream()) {
+			return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Value("classpath:csv/LeadersDLC.csv")
+	private Resource leaderDlcFile;
+
+	@Bean(name = "LeaderDLC")
+	public String leaderDLC() {
+		try (InputStream is = leaderDlcFile.getInputStream()) {
+			return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	@Value("classpath:adjective_noun/adjectives.txt")
 	private Resource adjectivesFile;
 
