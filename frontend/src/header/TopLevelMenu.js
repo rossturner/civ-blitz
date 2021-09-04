@@ -1,4 +1,4 @@
-import {Container, Image, Menu} from "semantic-ui-react";
+import {Image, Menu} from "semantic-ui-react";
 import React from "react";
 import {Link} from "react-router-dom";
 
@@ -13,57 +13,62 @@ const TopLevelMenu = ({loggedInPlayer}) => {
         encodedBaseUrl+'%2Fapi%2Flogin%2Fdiscord&response_type=code&scope=identify&state='+randomString;
 
     return (
-        <Menu fixed='top' inverted>
-            <Container>
-                <Menu.Item>
-                    <Link to='/'>
-                    {/*<Image size='mini' src='/logo.png' style={{ marginRight: '1.5em' }} />*/}
-                    Civ Imperium
-                    </Link>
-                </Menu.Item>
+        <Menu stackable inverted className='Top-level-menu'>
+            <Menu.Item>
+                <Link to='/'>
+                {/*<Image size='mini' src='/logo.png' style={{ marginRight: '1.5em' }} />*/}
+                Civ Imperium
+                </Link>
+            </Menu.Item>
 
-                {!loggedInPlayer &&
-                    <Menu.Item as='a' header href={discordLoginUrl}>
-                        <Image src='/images/Discord-Logo-Color.png' height={20}/>
-                        &nbsp;
-                        Login
-                    </Menu.Item>
-                }
-                {loggedInPlayer &&
-                    <Menu.Item header>
-                        <Link to='/collection'>
-                            {loggedInPlayer.discordUsername}'s Collection
-                        </Link>
-                    </Menu.Item>
-                }
-                {loggedInPlayer &&
+            {!loggedInPlayer &&
+                <Menu.Item as='a' header href={discordLoginUrl}>
+                    <Image src='/images/Discord-Logo-Color.png' height={20}/>
+                    &nbsp;
+                    Login
+                </Menu.Item>
+            }
+            {loggedInPlayer &&
                 <Menu.Item header>
-                    <Link to='/matches'>
-                        Matches
+                    <Link to='/collection'>
+                        {loggedInPlayer.discordUsername}'s Collection
                     </Link>
                 </Menu.Item>
-                }
+            }
+            {loggedInPlayer &&
+            <Menu.Item header>
+                <Link to='/matches'>
+                    Matches
+                </Link>
+            </Menu.Item>
+            }
 
-                <Menu.Item header>
-                    <Link to='/modtester'>
-                    Mod Tester
-                    </Link>
-                </Menu.Item>
-                <Menu.Item header>
-                    <Link to='/civbuilder'>
-                    Civ Builder Proof of Concept
-                    </Link>
-                </Menu.Item>
+            <Menu.Item header>
+                <Link to='/modtester'>
+                Mod Tester
+                </Link>
+            </Menu.Item>
+            <Menu.Item header>
+                <Link to='/civbuilder'>
+                Civ Builder Proof of Concept
+                </Link>
+            </Menu.Item>
 
-                {loggedInPlayer && loggedInPlayer.isAdmin &&
-                <Menu.Item header>
-                    <Link to='/admin'>
-                        Admin area
-                    </Link>
-                </Menu.Item>
-                }
+            {loggedInPlayer &&
+            <Menu.Item header>
+                <Link to='/dlc-settings'>
+                    {loggedInPlayer.discordUsername}'s DLC Settings
+                </Link>
+            </Menu.Item>
+            }
 
-            </Container>
+            {loggedInPlayer && loggedInPlayer.isAdmin &&
+            <Menu.Item header>
+                <Link to='/admin'>
+                    Admin area
+                </Link>
+            </Menu.Item>
+            }
         </Menu>
     );
 };

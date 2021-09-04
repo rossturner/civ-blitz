@@ -1,4 +1,9 @@
 
+.ui.menu.Top-level-menu {
+    border-radius: 0;
+    margin-bottom: 2em;
+}
+
 /*.App {*/
 /*  text-align: center;*/
 /*}*/

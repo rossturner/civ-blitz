@@ -19,7 +19,7 @@ const PackShopPage = ({loggedInPlayer}) => {
     }, []);
 
     return (
-        <Container style={{marginTop: '6em'}}>
+        <Container>
             <Header as='h2'>Pack shop</Header>
 
             {!loggedInPlayer &&

@@ -4,7 +4,7 @@ import {Container, Header} from "semantic-ui-react";
 const HomePage = () => {
 
     return (
-        <Container style={{marginTop: '6em'}}>
+        <Container>
             <Container textAlign='center' style={{marginBottom: '1em'}}>
                 <Header as='h2'>Welcome to Civ Imperium!</Header>
             </Container>

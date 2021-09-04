@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import technology.rocketjump.civimperium.codegen.tables.pojos.CardPack;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
+import technology.rocketjump.civimperium.codegen.tables.pojos.PlayerDlcSetting;
 import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
 import technology.rocketjump.civimperium.model.MatchSignupWithPlayer;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static technology.rocketjump.civimperium.cards.CollectionService.cardIsSupported;
 import static technology.rocketjump.civimperium.model.CardCategory.*;
 
 @Service
@@ -26,14 +28,16 @@ public class PackService {
 	private final SourceDataRepo sourceDataRepo;
 	private final CollectionService collectionService;
 	private final PlayerRepo playerRepo;
+	private final DlcRepo dlcRepo;
 	private final Random random = new Random();
 
 	@Autowired
-	public PackService(PackRepo packRepo, SourceDataRepo sourceDataRepo, CollectionService collectionService, PlayerRepo playerRepo) {
+	public PackService(PackRepo packRepo, SourceDataRepo sourceDataRepo, CollectionService collectionService, PlayerRepo playerRepo, DlcRepo dlcRepo) {
 		this.packRepo = packRepo;
 		this.sourceDataRepo = sourceDataRepo;
 		this.collectionService = collectionService;
 		this.playerRepo = playerRepo;
+		this.dlcRepo = dlcRepo;
 	}
 
 	public void purchasePack(Player player, CardPackType packType, String category) {
@@ -112,26 +116,27 @@ public class PackService {
 		}
 
 		List<Card> selectedCards = new ArrayList<>();
+		List<PlayerDlcSetting> dlcSettings = dlcRepo.getAllForPlayer(player);
 
 		// randomly select cards per category
 		if (pack.getNumCivAbility() != null) {
 			for (int cursor = 0; cursor < pack.getNumCivAbility(); cursor++) {
-				selectCard(CivilizationAbility, selectedCards);
+				selectCard(CivilizationAbility, selectedCards, dlcSettings);
 			}
 		}
 		if (pack.getNumLeaderAbility() != null) {
 			for (int cursor = 0; cursor < pack.getNumLeaderAbility(); cursor++) {
-				selectCard(LeaderAbility, selectedCards);
+				selectCard(LeaderAbility, selectedCards, dlcSettings);
 			}
 		}
 		if (pack.getNumUniqueInfrastructure() != null) {
 			for (int cursor = 0; cursor < pack.getNumUniqueInfrastructure(); cursor++) {
-				selectCard(UniqueInfrastructure, selectedCards);
+				selectCard(UniqueInfrastructure, selectedCards, dlcSettings);
 			}
 		}
 		if (pack.getNumUniqueUnit() != null) {
 			for (int cursor = 0; cursor < pack.getNumUniqueUnit(); cursor++) {
-				selectCard(UniqueUnit, selectedCards);
+				selectCard(UniqueUnit, selectedCards, dlcSettings);
 			}
 		}
 
@@ -144,12 +149,15 @@ public class PackService {
 		return selectedCards;
 	}
 
-	private void selectCard(CardCategory cardCategory, List<Card> selectedCards) {
+	private void selectCard(CardCategory cardCategory, List<Card> selectedCards, List<PlayerDlcSetting> dlcSettings) {
 		List<Card> allInCategory = sourceDataRepo.getByCategory(cardCategory);
 		Card selected = null;
 		while (selected == null) {
 			selected = allInCategory.get(random.nextInt(allInCategory.size()));
 			if (selectedCards.contains(selected)) {
+				selected = null;
+			}
+			if (!dlcSettings.isEmpty() && !cardIsSupported(selected, dlcSettings)) {
 				selected = null;
 			}
 		}

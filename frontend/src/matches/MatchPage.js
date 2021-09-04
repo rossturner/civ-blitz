@@ -132,7 +132,7 @@ const MatchPage = ({loggedInPlayer}) => {
 
     return (
         <React.Fragment>
-            <Container style={{marginTop: '6em'}}>
+            <Container>
                 <Header as='h2'>{match.matchName}</Header>
 
                 {loading &&

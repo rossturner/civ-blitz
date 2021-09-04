@@ -58,7 +58,7 @@ const ModTester = () => {
 
     return (
         <React.Fragment>
-            <Container style={{marginTop: '6em'}}>
+            <Container>
                 <ConstructedCiv index='mod tester' cards={editingCiv.cards} editable={editingCiv.editable} alwaysEditing={true}
                                 onCardClick={(card) => civCardClicked(card)} />
             </Container>

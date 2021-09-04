@@ -2,8 +2,6 @@ import './App.css';
 import TopLevelMenu from "./header/TopLevelMenu";
 import React, {useEffect, useState} from "react";
 import CardStore from "./cards/CardStore";
-import CivBuilder from "./CivBuilder";
-import ImpRandom from "./ImpRandom";
 import ModTester from "./ModTester";
 import PlayerCollection from "./PlayerCollection";
 import jwt from "jsonwebtoken";
@@ -16,10 +14,10 @@ import HomePage from "./HomePage";
 import MatchPage from "./matches/MatchPage";
 import PackOpener from "./cards/PackOpener";
 import PackShopPage from "./cards/PackShopPage";
+import DlcSettingsPage from "./player/DlcSettingsPage";
 
 const App = ({history}) => {
 
-    const [collection, setCollection] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loggedInPlayer, setLoggedInPlayer] = useState();
 
@@ -49,10 +47,7 @@ const App = ({history}) => {
             .then((response) => {
                 if (!CardStore.initialised) {
                     CardStore.addCards(response.data);
-                    let newCollection = CardStore.getInitialCollection();
-                    newCollection.sort(ImpRandom.cardSort);
                     setLoading(false);
-                    setCollection(newCollection);
                 }
             })
             .catch((error) => {
@@ -90,14 +85,14 @@ const App = ({history}) => {
                 <Route path="/modtester">
                     <ModTester/>
                 </Route>
-                <Route path="/civbuilder">
-                    <CivBuilder collection={collection} setCollection={setCollection}/>
-                </Route>
                 <Route exact path="/matches">
                     <MatchesPage loggedInPlayer={loggedInPlayer} />
                 </Route>
                 <Route path="/matches/:matchId">
                     <MatchPage loggedInPlayer={loggedInPlayer} />
+                </Route>
+                <Route exact path='/dlc-settings'>
+                    <DlcSettingsPage loggedInPlayer={loggedInPlayer} />
                 </Route>
                 <Route path="/admin">
                     <AdminPage />

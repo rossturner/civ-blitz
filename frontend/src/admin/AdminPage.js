@@ -51,7 +51,7 @@ const AdminPage = () => {
 
     return (
         <React.Fragment>
-            <Container style={{marginTop: '6em'}}>
+            <Container>
                 <Header as='h2'>Admin area</Header>
 
                 <Segment>

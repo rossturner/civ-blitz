@@ -23,7 +23,7 @@ const PackOpener = () => {
     }, []);
 
     return (
-        <Container style={{marginTop: '6em'}}>
+        <Container>
 
             {loading &&
             <p>Loading...</p>

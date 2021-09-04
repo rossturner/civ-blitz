@@ -72,7 +72,7 @@ const PlayerCollection = ({loggedInPlayer}) => {
     return (
         <React.Fragment>
 
-            <Container style={{marginTop: '6em'}}>
+            <Container>
 
             {loading &&
             <div>Loading...</div>

@@ -45,22 +45,6 @@ const CardStore = {
         return allCards;
     },
 
-    getInitialCollection: () => {
-        let selected = [];
-        CATEGORIES.forEach(category => {
-            selected = selected.concat(getUniqueCardsFromCategory(category, 4));
-        })
-        return selected;
-    },
-
-    getMoreCardsForCollection: (collection) => {
-        let selected = [];
-        CATEGORIES.forEach(category => {
-            selected = selected.concat(getUniqueCardsFromCategory(category, 2, collection));
-        })
-        return selected;
-    },
-
     getMediaNameForCivType: (civType) => {
         return mediaByCivType[civType];
     },

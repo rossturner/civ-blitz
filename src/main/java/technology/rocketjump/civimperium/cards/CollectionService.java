@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Collection;
 import technology.rocketjump.civimperium.codegen.tables.pojos.Player;
+import technology.rocketjump.civimperium.codegen.tables.pojos.PlayerDlcSetting;
 import technology.rocketjump.civimperium.matches.MatchRepo;
 import technology.rocketjump.civimperium.model.Card;
 import technology.rocketjump.civimperium.model.CardCategory;
@@ -90,6 +91,25 @@ public class CollectionService {
 		return result;
 	}
 
+	public void rerollCard(CollectionCard collectionCard, Player player, List<PlayerDlcSetting> currentSettings) {
+		removeFromCollection(collectionCard, player);
+
+		Card selectedCard = null;
+		List<Card> cardsInCategory = sourceDataRepo.getByCategory(collectionCard.getCardCategory());
+		while (selectedCard == null) {
+			selectedCard = cardsInCategory.get(random.nextInt(cardsInCategory.size()));
+			if (!cardIsSupported(selectedCard, currentSettings)) {
+				selectedCard = null;
+			}
+		}
+
+		addToCollection(selectedCard, player);
+	}
+
+	public static boolean cardIsSupported(Card selectedCard, List<PlayerDlcSetting> currentSettings) {
+		return currentSettings.stream().anyMatch(s -> s.getDlcName().equals(selectedCard.getRequiredDlc()));
+	}
+
 	public void addToCollection(Card card, Player player) {
 		collectionRepo.addToCollection(card, player);
 	}
@@ -97,5 +117,4 @@ public class CollectionService {
 	public void removeFromCollection(Card card, Player player) {
 		collectionRepo.removeFromCollection(card, player);
 	}
-
 }
