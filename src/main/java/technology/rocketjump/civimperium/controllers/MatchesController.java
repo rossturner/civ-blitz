@@ -19,10 +19,7 @@ import technology.rocketjump.civimperium.model.MatchSignupWithPlayer;
 import technology.rocketjump.civimperium.model.MatchWithPlayers;
 import technology.rocketjump.civimperium.players.PlayerService;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static technology.rocketjump.civimperium.matches.MatchState.DRAFT;
@@ -226,20 +223,18 @@ public class MatchesController {
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 			} else {
 				SecretObjective secretObjective = chosenObjective.get();
-				ObjectiveDefinition imperiumSecretObjective = objectiveDefinitionRepo.getById(secretObjective.getObjective())
+				ObjectiveDefinition chosenObjectiveDef = objectiveDefinitionRepo.getById(secretObjective.getObjective())
 						.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
 
-				if (!secretObjective.getSelected() && secretObjectives.stream().filter(SecretObjective::getSelected).count() == 5) {
-					// already have 5 other objectives selected
-//				} else if (!secretObjective.getSelected() &&
-//						secretObjectives.stream()
-//								.filter(SecretObjective::getSelected)
-//								.map(obj -> objectiveDefinitionRepo.getById(obj.getObjective()).orElse(NULL_OBJECTIVE))
-//								.filter(obj -> obj.getStars(match.getStartEra()) == 1)
-//								.count() == 1 &&
-//						imperiumSecretObjective.getStars(match.getStartEra()) == 1) {
-//					// Selecting a 1 star objective when 1 is already selected, which is not allowed
+				if (!secretObjective.getSelected() && secretObjectives.stream().filter(SecretObjective::getSelected).count() == 3) {
+					// already have 3 other objectives selected
+				} else if (!secretObjective.getSelected() &&
+						secretObjectives.stream()
+								.filter(SecretObjective::getSelected)
+								.map(obj -> objectiveDefinitionRepo.getById(obj.getObjective()).orElse(NULL_OBJECTIVE))
+								.anyMatch(obj -> Objects.equals(obj.getStars(match.getStartEra()), chosenObjectiveDef.getStars(match.getStartEra())))) {
+					// Selecting an objective when we already have an objective selected for that many stars
 				} else {
 					secretObjective.setSelected(!secretObjective.getSelected());
 					matchService.updateSecretObjectiveSelection(secretObjective);
@@ -248,6 +243,7 @@ public class MatchesController {
 				return secretObjectives.stream()
 						.map(so -> new SecretObjectiveResponse(so, objectiveDefinitionRepo.getById(so.getObjective()).orElse(NULL_OBJECTIVE), match.getStartEra()
 						))
+						.sorted(SECRET_OBJECTIVE_SORT)
 						.collect(Collectors.toList());
 			}
 		}

@@ -373,12 +373,12 @@ public class MatchService {
 				.stream()
 				.filter(SecretObjective::getSelected)
 				.count();
-		if (selectedSecretObjectives < 2) {
-			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Must have selected 2 secret objectives to commit");
+		if (selectedSecretObjectives != 3) {
+			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "You must select 3 secret objectives");
 		}
-		if (selectedSecretObjectives > 5) {
-			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Can select a maximum of 5 secret objectives");
-		}
+//		if (selectedSecretObjectives > 5) {
+//			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Can select a maximum of 5 secret objectives");
+//		}
 
 		matchSignup.setCommitted(true);
 		matchRepo.updateSignup(matchSignup);

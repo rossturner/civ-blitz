@@ -134,7 +134,7 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
 
     const canCommit = !currentPlayerSignup.committed && currentPlayerSignup.startBiasCivType &&
         CATEGORIES.every(category => currentPlayerSignup[CardInfo.getSignupPropName(category)]) &&
-        numSelectedSecretObjectives > 1;
+        numSelectedSecretObjectives === 3;
 
     const doCommit = () => {
         axios.post('/api/matches/' + match.matchId + '/commit')
@@ -166,7 +166,7 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
         <React.Fragment>
             <Container>
                 <Container>
-                    <Header as='h4'>Secret objectives (minimum 2, maximum 5). Stars on unclaimed secret objectives will be subtracted from your final score!</Header>
+                    <Header as='h4'>Secret objectives - you must select a 1 star, 2 star and 3 star objective</Header>
                     <CardGroup centered>
                         {secretObjectives.map(s => <ObjectiveCard key={s.objectiveName} objectiveJson={s} cardClicked={secretObjectiveClicked}
                                                                   clickDisabled={currentPlayerSignup.committed} />)}
