@@ -37,3 +37,9 @@ google:
   api:
     key: SET_BY_ENV_VARIABLE
 
+server:
+  error:
+    include-message: always
+    include-exception: true
+    include-stacktrace: always
+
