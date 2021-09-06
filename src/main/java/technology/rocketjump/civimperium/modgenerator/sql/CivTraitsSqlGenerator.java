@@ -25,6 +25,12 @@ public class CivTraitsSqlGenerator extends ImperiumFileGenerator {
 			}
 		}
 
+		Card civAbilityCard = civInfo.selectedCards.get(CardCategory.CivilizationAbility);
+		if (civAbilityCard.getTraitType().equals("TRAIT_CIVILIZATION_MAYAB")) {
+			sqlBuilder.append("INSERT OR REPLACE INTO RequirementArguments (RequirementId, Name, Type, Value) VALUES (")
+					.append("'PLAYER_IS_MAYA', 'CivilizationType', 'ARGTYPE_IDENTITY', '").append(modName).append("');\n");
+		}
+
 		return sqlBuilder.toString();
 	}
 
