@@ -48,11 +48,6 @@ const TopLevelMenu = ({loggedInPlayer}) => {
                 Mod Tester
                 </Link>
             </Menu.Item>
-            <Menu.Item header>
-                <Link to='/civbuilder'>
-                Civ Builder Proof of Concept
-                </Link>
-            </Menu.Item>
 
             {loggedInPlayer &&
             <Menu.Item header>
