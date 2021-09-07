@@ -1,5 +1,7 @@
 package technology.rocketjump.civimperium.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -19,6 +21,7 @@ public class Card {
 	protected String subtype;
 	protected String mediaName;
 	protected String requiredDlc;
+	protected List<String> modifierIds = new ArrayList<>();
 
 	public Card() {
 
@@ -37,6 +40,7 @@ public class Card {
 		this.subtype = original.subtype;
 		this.mediaName = original.mediaName;
 		this.requiredDlc = original.requiredDlc;
+		this.modifierIds = original.modifierIds;
 	}
 
 	@Override
@@ -151,5 +155,9 @@ public class Card {
 
 	public void setRequiredDlc(String requiredDlc) {
 		this.requiredDlc = requiredDlc;
+	}
+
+	public List<String> getModifierIds() {
+		return modifierIds;
 	}
 }

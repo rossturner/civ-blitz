@@ -156,4 +156,16 @@ public class ResourceFiles {
 			throw new RuntimeException(e);
 		}
 	}
+
+	@Value("classpath:csv/TraitModifiers.csv")
+	private Resource traitModifiersFile;
+
+	@Bean(name = "TraitModifiers")
+	public String TraitModifiers() {
+		try (InputStream is = traitModifiersFile.getInputStream()) {
+			return StreamUtils.copyToString(is, StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }
