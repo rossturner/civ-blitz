@@ -26,9 +26,11 @@ public class MapSettingsGenerator {
 						TemperatureSetting.Standard, RainfallSetting.Standard, mapSize.defaultCityStates, selectRandomly(DisasterIntensity.values()).value);
 			}
 		} else {
+			StartEra startEraSetting = selectRandomly(StartEra.values());
 			mapSize = pickSmallestPossibleMapSize(numPlayers);
 //			mapSize = pickMapSize(numPlayers);
 			SeaLevelSetting seaLevelSetting = selectRandomly(SeaLevelSetting.values());
+
 
 //			if (lightOnLand(mapType, seaLevelSetting)) {
 //				mapSize = mapSize.getBigger();
@@ -46,7 +48,7 @@ public class MapSettingsGenerator {
 			}
 
 			return new MapSettings(
-					StartEra.Ancient,
+					startEraSetting,
 					mapType,
 					mapSize,
 					selectRandomly(WorldAge.values()),

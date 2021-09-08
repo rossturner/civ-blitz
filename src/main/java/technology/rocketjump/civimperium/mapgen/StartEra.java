@@ -1,9 +1,20 @@
 package technology.rocketjump.civimperium.mapgen;
 
-public enum StartEra {
+public enum StartEra implements Weightable {
 
-	Ancient,
-	Medieval,
-	Industrial
+	Ancient(4f),
+	Medieval(2f),
+	Industrial(0f);
+
+	private final float weighting;
+
+	StartEra(float weighting) {
+		this.weighting = weighting;
+	}
+
+	@Override
+	public float getWeighting() {
+		return weighting;
+	}
 
 }
