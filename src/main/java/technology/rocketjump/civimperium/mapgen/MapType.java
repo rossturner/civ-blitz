@@ -7,10 +7,10 @@ public enum MapType implements Weightable {
 	Archipelago(1f, Light),
 	Continents(2f, Average),
 	Continents_and_Islands(1f, Average),
-	Fractal(1f, Average),
-	Highlands(4f, VeryHeavy),
+	Fractal(4f, Average),
+	Highlands(1f, VeryHeavy),
 	Island_Plates(2f, Light),
-	Lakes(8f, VeryHeavy),
+	Lakes(2f, VeryHeavy),
 	Pangaea(9f, Heavy),
 	Primordial(3f, Heavy),
 
@@ -21,11 +21,11 @@ public enum MapType implements Weightable {
 	Europe(0.25f, Heavy),
 	Mediterranean_Large(0.25f, Heavy),
 
-	Seven_Seas(7f, Heavy),
+	Seven_Seas(4f, Heavy),
 	Shuffle(2f, Average),
 	Small_Continents(2f, Average),
 	Terra(4f, Light),
-	Wetlands(2f, Average);
+	Wetlands(3f, Average);
 
 	public final float weighting;
 	public final MapLandAmount landAmount;
