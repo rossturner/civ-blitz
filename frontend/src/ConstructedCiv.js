@@ -1,11 +1,11 @@
 import {Button, Card, Container, Header, Segment, Select} from "semantic-ui-react";
 import React, {useState} from "react";
-import ImperiumCard from "./cards/ImperiumCard";
+import CivCard from "./cards/CivCard";
 
 const ConstructedCiv = ({index, cards, editable, onCardClick, onConfirmClick, alwaysEditing}) => {
 
     const cardItems = cards.map((card, index) => {
-        return <ImperiumCard key={index} cardJson={card} onClick={() => editable ? onCardClick(card) : {}}/>;
+        return <CivCard key={index} cardJson={card} onClick={() => editable ? onCardClick(card) : {}}/>;
     });
 
     let downloadLink = "/api/mods?";

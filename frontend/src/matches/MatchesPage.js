@@ -63,7 +63,7 @@ const MatchesPage = ({loggedInPlayer}) => {
                     {matchSections}
 
                     {matchList.length === 0 &&
-                    <p>No matches are scheduled at this time, go and ask an Imperium admin to set one up</p>
+                    <p>No matches are scheduled at this time, go and ask a Civ Blitz admin to set one up</p>
                     }
                 </React.Fragment>
                 }

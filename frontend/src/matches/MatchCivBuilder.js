@@ -1,11 +1,11 @@
 import {Button, Card, CardGroup, Container, Header, List, Placeholder, Select} from "semantic-ui-react";
 import React, {useEffect, useState} from "react";
-import ImperiumCardGroup from "../cards/ImperiumCardGroup";
+import CivCardGroup from "../cards/CivCardGroup";
 import axios from "axios";
 import ImpRandom from "../ImpRandom";
 import CardInfo from "../cards/CardInfo";
 import CardStore, {CATEGORIES} from "../cards/CardStore";
-import ImperiumCard from "../cards/ImperiumCard";
+import CivCard from "../cards/CivCard";
 import CheckFreeUseOfCardModal from "./CheckFreeUseOfCardModal";
 import ObjectiveCard from "./objectives/ObjectiveCard";
 
@@ -109,12 +109,12 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
         const propName = CardInfo.getSignupPropName(category);
         if (currentPlayerSignup[propName]) {
             const card = CardStore.getCardByTraitType(currentPlayerSignup[propName]);
-            return <ImperiumCard key={card.cardName} cardJson={card} onClick={civCardClicked}
-                                 clickDisabled={currentPlayerSignup.committed}/>;
+            return <CivCard key={card.cardName} cardJson={card} onClick={civCardClicked}
+                            clickDisabled={currentPlayerSignup.committed}/>;
         } else {
             return <Card
                 key={category}
-                className='imperium-card'
+                className='civ-card'
                 color={CardInfo.getCategoryColor(category)}
                 meta={CardInfo.getCategoryName(category)}
                 description={(<Placeholder>
@@ -206,7 +206,7 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
             {!currentPlayerSignup.committed &&
             <Container style={{marginTop: '1em'}}>
                 <Header as='h3'>Available collection</Header>
-                <ImperiumCardGroup cards={collection} cardClicked={collectionCardClicked}/>
+                <CivCardGroup cards={collection} cardClicked={collectionCardClicked}/>
             </Container>
             }
         </React.Fragment>

@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>technology.rocketjump</groupId>
-    <artifactId>civimperium</artifactId>
+    <artifactId>civblitz</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>civimperium</name>
+    <name>civblitz</name>
     <description>Civ Imperium applicatin</description>
     <properties>
         <java.version>11</java.version>
@@ -254,47 +254,47 @@
 
                                     <forcedTypes>
                                         <forcedType>
-                                            <userType>technology.rocketjump.civimperium.matches.MatchState</userType>
+                                            <userType>technology.rocketjump.civblitz.matches.MatchState</userType>
                                             <expressions>match_state</expressions>
                                             <enumConverter>true</enumConverter>
                                         </forcedType>
                                         <forcedType>
-                                            <userType>technology.rocketjump.civimperium.mapgen.MapType</userType>
+                                            <userType>technology.rocketjump.civblitz.mapgen.MapType</userType>
                                             <expressions>map_type</expressions>
                                             <enumConverter>true</enumConverter>
                                         </forcedType>
                                         <forcedType>
-                                            <userType>technology.rocketjump.civimperium.mapgen.MapSize</userType>
+                                            <userType>technology.rocketjump.civblitz.mapgen.MapSize</userType>
                                             <expressions>map_size</expressions>
                                             <enumConverter>true</enumConverter>
                                         </forcedType>
                                         <forcedType>
-                                            <userType>technology.rocketjump.civimperium.mapgen.WorldAge</userType>
+                                            <userType>technology.rocketjump.civblitz.mapgen.WorldAge</userType>
                                             <expressions>world_age</expressions>
                                             <enumConverter>true</enumConverter>
                                         </forcedType>
                                         <forcedType>
-                                            <userType>technology.rocketjump.civimperium.mapgen.SeaLevelSetting</userType>
+                                            <userType>technology.rocketjump.civblitz.mapgen.SeaLevelSetting</userType>
                                             <expressions>sea_level</expressions>
                                             <enumConverter>true</enumConverter>
                                         </forcedType>
                                         <forcedType>
-                                            <userType>technology.rocketjump.civimperium.mapgen.TemperatureSetting</userType>
+                                            <userType>technology.rocketjump.civblitz.mapgen.TemperatureSetting</userType>
                                             <expressions>temperature</expressions>
                                             <enumConverter>true</enumConverter>
                                         </forcedType>
                                         <forcedType>
-                                            <userType>technology.rocketjump.civimperium.mapgen.RainfallSetting</userType>
+                                            <userType>technology.rocketjump.civblitz.mapgen.RainfallSetting</userType>
                                             <expressions>rainfall</expressions>
                                             <enumConverter>true</enumConverter>
                                         </forcedType>
                                         <forcedType>
-                                            <userType>technology.rocketjump.civimperium.cards.CardPackType</userType>
+                                            <userType>technology.rocketjump.civblitz.cards.CardPackType</userType>
                                             <expressions>pack_type</expressions>
                                             <enumConverter>true</enumConverter>
                                         </forcedType>
                                         <forcedType>
-                                            <userType>technology.rocketjump.civimperium.mapgen.StartEra</userType>
+                                            <userType>technology.rocketjump.civblitz.mapgen.StartEra</userType>
                                             <expressions>start_era</expressions>
                                             <enumConverter>true</enumConverter>
                                         </forcedType>
@@ -308,7 +308,7 @@
                                     <daos>true</daos>
                                 </generate>
                                 <target>
-                                    <packageName>technology.rocketjump.civimperium.codegen</packageName>
+                                    <packageName>technology.rocketjump.civblitz.codegen</packageName>
                                     <directory>${jooq.generated.source.directory}</directory>
                                 </target>
                             </generator>

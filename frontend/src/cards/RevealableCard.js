@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Card, Image, Transition} from "semantic-ui-react";
-import ImperiumCard from "./ImperiumCard";
-import './ImperiumCard.css'
+import CivCard from "./CivCard";
+import './CivCard.css'
 
 const RevealableCard = ({cardJson}) => {
 
@@ -23,7 +23,7 @@ const RevealableCard = ({cardJson}) => {
             {!revealed &&
             <Transition visible={placeholderDisplayed} animation='scale' duration={500}
                         onComplete={placeholderComplete}>
-                <Card className='imperium-card' onClick={placeholderClicked}>
+                <Card className='civ-card' onClick={placeholderClicked}>
                     <Image src='/images/imperium.png' wrapped ui={false} />
                     <Card.Content>
                         <Card.Header>???</Card.Header>
@@ -36,7 +36,7 @@ const RevealableCard = ({cardJson}) => {
             }
 
             <Transition visible={revealed} animation='scale' duration={500}>
-                 <ImperiumCard cardJson={cardJson} clickDisabled={true} />
+                 <CivCard cardJson={cardJson} clickDisabled={true} />
              </Transition>
         </React.Fragment>
     );

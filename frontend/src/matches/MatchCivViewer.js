@@ -2,7 +2,7 @@ import {Card, CardGroup, Container, Placeholder} from "semantic-ui-react";
 import React, {useEffect, useState} from "react";
 import CardInfo from "../cards/CardInfo";
 import CardStore, {CATEGORIES} from "../cards/CardStore";
-import ImperiumCard from "../cards/ImperiumCard";
+import CivCard from "../cards/CivCard";
 import ObjectiveCard from "./objectives/ObjectiveCard";
 import axios from "axios";
 
@@ -33,11 +33,11 @@ const MatchCivViewer = ({match, signup, loggedInPlayer, secretObjectivesProp, se
         const propName = CardInfo.getSignupPropName(category);
         if (signup[propName]) {
             const card = CardStore.getCardByTraitType(signup[propName]);
-            return <ImperiumCard key={category} cardJson={card} clickDisabled={true}/>;
+            return <CivCard key={category} cardJson={card} clickDisabled={true}/>;
         } else {
             return <Card
                 key={category}
-                className='imperium-card'
+                className='civ-card'
                 color={CardInfo.getCategoryColor(category)}
                 meta={CardInfo.getCategoryName(category)}
                 description={(<Placeholder>

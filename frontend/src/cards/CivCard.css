@@ -1,0 +1,8 @@
+
+.ui.card.civ-card {
+    width: 260px;
+}
+
+.ui.card>.content {
+    color: #444444;
+}

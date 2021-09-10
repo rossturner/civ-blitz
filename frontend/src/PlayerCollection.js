@@ -1,7 +1,7 @@
 import {Button, Container, Header, Icon, Modal, Segment} from "semantic-ui-react";
 import React, {useEffect, useState} from "react";
 import ImpRandom from "./ImpRandom";
-import ImperiumCardGroup from "./cards/ImperiumCardGroup";
+import CivCardGroup from "./cards/CivCardGroup";
 import axios from "axios";
 import PlayerAvatar from "./player/PlayerAvatar";
 import {Link} from "react-router-dom";
@@ -135,7 +135,7 @@ const PlayerCollection = ({loggedInPlayer}) => {
 
 
 
-                    <ImperiumCardGroup cards={collection} cardClicked={() => {}} />
+                    <CivCardGroup cards={collection} cardClicked={() => {}} />
                 </React.Fragment>
             }
 

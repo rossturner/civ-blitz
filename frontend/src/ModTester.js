@@ -3,7 +3,7 @@ import ImpRandom from "./ImpRandom";
 import CardStore from "./cards/CardStore";
 import ConstructedCiv from "./ConstructedCiv";
 import {Container, Header} from "semantic-ui-react";
-import ImperiumCardGroup from "./cards/ImperiumCardGroup";
+import CivCardGroup from "./cards/CivCardGroup";
 
 const ModTester = () => {
     const [editingCiv, setEditingCiv] = useState({
@@ -65,7 +65,7 @@ const ModTester = () => {
 
             <Container style={{marginTop: '2em'}}>
                 <Header as='h2'>All cards</Header>
-                <ImperiumCardGroup cards={collection} cardClicked={collectionCardClicked} />
+                <CivCardGroup cards={collection} cardClicked={collectionCardClicked} />
             </Container>
         </React.Fragment>
     );
