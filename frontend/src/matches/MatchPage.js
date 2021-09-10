@@ -14,6 +14,7 @@ import UnclaimObjectiveModal from "./objectives/UnclaimObjectiveModal";
 import AdminClaimObjectiveModal from "./objectives/AdminClaimObjectiveModal";
 import AdminUnclaimObjectiveModal from "./objectives/AdminUnclaimObjectiveModal";
 import MatchLeaderboard from "./MatchLeaderboard";
+import GuildCard from "./objectives/GuildCard";
 
 const MatchPage = ({loggedInPlayer}) => {
 
@@ -23,6 +24,7 @@ const MatchPage = ({loggedInPlayer}) => {
     const [leaderboard, setLeaderboard] = useState({});
     const [publicObjectives, setPublicObjectives] = useState([]);
     const [secretObjectives, setSecretObjectives] = useState([]);
+    const [guilds, setGuilds] = useState([]);
 
     const [claimingObjective, setClaimingObjective] = useState({});
     const [unclaimingObjective, setUnclaimingObjective] = useState({});
@@ -51,6 +53,14 @@ const MatchPage = ({loggedInPlayer}) => {
                 })
                 .catch((error) => {
                     console.error('Error retrieving match objectives', error);
+                })
+
+            axios.get('/api/matches/' + matchId + '/guilds')
+                .then((response) => {
+                    setGuilds(response.data);
+                })
+                .catch((error) => {
+                    console.error('Error retrieving match guilds', error);
                 })
         }
 
@@ -159,6 +169,16 @@ const MatchPage = ({loggedInPlayer}) => {
                                     leaderboardChanged={setLeaderboard}/>
                             </Container>
                             }
+
+                            <Container style={{'margin': '1em'}}>
+                                <Header>Guilds:</Header>
+                                <p>Guilds are scored at the moment the game ends. For each guild category, the player
+                                in 1st place gains 3 stars, 2nd place gains 2 stars and 3rd place gains 1 star. You can
+                                not gain any stars from a guild with a score of 0.</p>
+                                <CardGroup centered>
+                                    {guilds.map(guild => <GuildCard key={guild.guildId} guild={guild} />)}
+                                </CardGroup>
+                            </Container>
 
                             <Container style={{'margin': '1em'}}>
                                 <Header>Public objectives:</Header>

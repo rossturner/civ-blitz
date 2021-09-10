@@ -14,6 +14,7 @@ import technology.rocketjump.civblitz.codegen.tables.pojos.SecretObjective;
 import technology.rocketjump.civblitz.matches.LeaderboardService;
 import technology.rocketjump.civblitz.matches.MatchService;
 import technology.rocketjump.civblitz.matches.MatchState;
+import technology.rocketjump.civblitz.matches.guilds.GuildDefinition;
 import technology.rocketjump.civblitz.matches.objectives.*;
 import technology.rocketjump.civblitz.model.MatchSignupWithPlayer;
 import technology.rocketjump.civblitz.model.MatchWithPlayers;
@@ -30,6 +31,7 @@ import static technology.rocketjump.civblitz.matches.objectives.ObjectiveDefinit
 public class MatchesController {
 
 	private static final Comparator<ObjectiveResponse> OBJECTIVE_SORT = (o1, o2) -> o1.getNumStars() == o2.getNumStars() ? o1.getObjectiveName().compareTo(o2.getObjectiveName()) : o1.getNumStars() - o2.getNumStars();
+	private static final Comparator<GuildDefinition> GUILD_SORT = Comparator.comparing(o -> o.guildName);
 	private static final Comparator<SecretObjectiveResponse> SECRET_OBJECTIVE_SORT = (o1, o2) -> o1.getNumStars() == o2.getNumStars() ? o1.getObjectiveName().compareTo(o2.getObjectiveName()) : o1.getNumStars() - o2.getNumStars();
 
 	private final JwtService jwtService;
@@ -141,6 +143,14 @@ public class MatchesController {
 					return new ObjectiveResponse(objective, pub.getClaimedByPlayerIds(), match.getStartEra());
 				})
 				.sorted(OBJECTIVE_SORT)
+				.collect(Collectors.toList());
+	}
+
+	@GetMapping("/{matchId}/guilds")
+	public List<GuildDefinition> getMatchGuilds(@PathVariable int matchId) {
+		MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+		return allObjectivesService.getMatchGuilds(matchId).stream()
+				.sorted(GUILD_SORT)
 				.collect(Collectors.toList());
 	}
 

@@ -8,6 +8,9 @@ import technology.rocketjump.civblitz.codegen.tables.pojos.Match;
 import technology.rocketjump.civblitz.codegen.tables.pojos.Player;
 import technology.rocketjump.civblitz.codegen.tables.pojos.SecretObjective;
 import technology.rocketjump.civblitz.mapgen.StartEra;
+import technology.rocketjump.civblitz.matches.guilds.GuildDefinition;
+import technology.rocketjump.civblitz.matches.guilds.GuildDefinitionRepo;
+import technology.rocketjump.civblitz.matches.guilds.GuildRepo;
 import technology.rocketjump.civblitz.model.MatchSignupWithPlayer;
 import technology.rocketjump.civblitz.model.MatchWithPlayers;
 
@@ -22,16 +25,22 @@ import static technology.rocketjump.civblitz.matches.objectives.ObjectiveDefinit
 public class ObjectivesService {
 
 	private static final long MINIMUM_MILITARY_PUBLIC_OBJECTIVES = 2;
+	private static final int NUM_GUILDS_PER_MATCH = 3;
 	private final AllObjectivesService allObjectivesService;
 	private final ObjectivesRepo objectivesRepo;
 	private final ObjectiveDefinitionRepo objectiveDefinitionRepo;
+	private final GuildDefinitionRepo guildDefinitionRepo;
+	private final GuildRepo guildRepo;
 	private final Random random = new Random();
 
 	@Autowired
-	public ObjectivesService(AllObjectivesService allObjectivesService, ObjectivesRepo objectivesRepo, ObjectiveDefinitionRepo objectiveDefinitionRepo) {
+	public ObjectivesService(AllObjectivesService allObjectivesService, ObjectivesRepo objectivesRepo,
+							 ObjectiveDefinitionRepo objectiveDefinitionRepo, GuildDefinitionRepo guildDefinitionRepo, GuildRepo guildRepo) {
 		this.allObjectivesService = allObjectivesService;
 		this.objectivesRepo = objectivesRepo;
 		this.objectiveDefinitionRepo = objectiveDefinitionRepo;
+		this.guildDefinitionRepo = guildDefinitionRepo;
+		this.guildRepo = guildRepo;
 	}
 
 	public void initialiseObjectives(MatchWithPlayers match) {
@@ -64,10 +73,26 @@ public class ObjectivesService {
 				objectivesRepo.add(match, signup, objective);
 			}
 		}
+
+		Set<GuildDefinition> selectedGuilds = new HashSet<>();
+		List<GuildDefinition> allGuilds = guildDefinitionRepo.getAll();
+
+		while (selectedGuilds.size() < NUM_GUILDS_PER_MATCH) {
+			GuildDefinition randomGuild = allGuilds.get(random.nextInt(allGuilds.size()));
+			boolean alreadySelectedThisCategory = selectedGuilds.stream().anyMatch(g -> g.category.equals(randomGuild.category));
+			if (!alreadySelectedThisCategory) {
+				selectedGuilds.add(randomGuild);
+			}
+		}
+		for (GuildDefinition selectedGuild : selectedGuilds) {
+			guildRepo.add(match, selectedGuild);
+		}
+
 	}
 
 	public void clearObjectives(Match match) {
 		objectivesRepo.clear(match);
+		guildRepo.clear(match);
 	}
 
 	public List<SecretObjective> getSecretObjectives(int matchId, Player player) {

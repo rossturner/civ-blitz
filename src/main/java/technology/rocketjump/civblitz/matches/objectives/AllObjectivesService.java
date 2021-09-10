@@ -7,6 +7,9 @@ import org.springframework.web.server.ResponseStatusException;
 import technology.rocketjump.civblitz.codegen.tables.pojos.Player;
 import technology.rocketjump.civblitz.codegen.tables.pojos.SecretObjective;
 import technology.rocketjump.civblitz.matches.MatchState;
+import technology.rocketjump.civblitz.matches.guilds.GuildDefinition;
+import technology.rocketjump.civblitz.matches.guilds.GuildDefinitionRepo;
+import technology.rocketjump.civblitz.matches.guilds.GuildRepo;
 import technology.rocketjump.civblitz.model.MatchWithPlayers;
 
 import java.util.List;
@@ -20,11 +23,16 @@ public class AllObjectivesService {
 
 	private final ObjectivesRepo objectivesRepo;
 	private final ObjectiveDefinitionRepo objectiveDefinitionRepo;
+	private final GuildRepo guildRepo;
+	private final GuildDefinitionRepo guildDefinitionRepo;
 
 	@Autowired
-	public AllObjectivesService(ObjectivesRepo objectivesRepo, ObjectiveDefinitionRepo objectiveDefinitionRepo) {
+	public AllObjectivesService(ObjectivesRepo objectivesRepo, ObjectiveDefinitionRepo objectiveDefinitionRepo,
+								GuildRepo guildRepo, GuildDefinitionRepo guildDefinitionRepo) {
 		this.objectivesRepo = objectivesRepo;
 		this.objectiveDefinitionRepo = objectiveDefinitionRepo;
+		this.guildRepo = guildRepo;
+		this.guildDefinitionRepo = guildDefinitionRepo;
 	}
 
 	public List<PublicObjectiveWithClaimants> getPublicObjectives(int matchId) {
@@ -65,4 +73,10 @@ public class AllObjectivesService {
 		return s.getClaimed() || s.getPlayerId().equals(player.getPlayerId()) || playerIsAdminAndNotInMatch;
 	}
 
+	public List<GuildDefinition> getMatchGuilds(int matchId) {
+		return guildRepo.getMatchGuilds(matchId)
+				.stream()
+				.map(matchGuild -> guildDefinitionRepo.getById(matchGuild.getGuildId()).orElse(GuildDefinition.NULL_GUILD))
+				.collect(Collectors.toList());
+	}
 }
