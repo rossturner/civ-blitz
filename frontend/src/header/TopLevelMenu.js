@@ -17,7 +17,7 @@ const TopLevelMenu = ({loggedInPlayer}) => {
             <Menu.Item>
                 <Link to='/'>
                 {/*<Image size='mini' src='/logo.png' style={{ marginRight: '1.5em' }} />*/}
-                Civ Imperium
+                Civ Blitz
                 </Link>
             </Menu.Item>
 
