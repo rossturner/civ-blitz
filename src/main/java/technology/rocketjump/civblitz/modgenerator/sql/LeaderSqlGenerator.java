@@ -6,6 +6,9 @@ import technology.rocketjump.civblitz.model.CardCategory;
 import technology.rocketjump.civblitz.modgenerator.ModHeaderGenerator;
 import technology.rocketjump.civblitz.modgenerator.model.ModHeader;
 import technology.rocketjump.civblitz.modgenerator.model.ModdedCivInfo;
+import technology.rocketjump.civblitz.modgenerator.sql.actsofgod.ActOfGod;
+
+import java.util.List;
 
 @Component
 public class LeaderSqlGenerator extends BlitzFileGenerator {
@@ -50,8 +53,12 @@ public class LeaderSqlGenerator extends BlitzFileGenerator {
 		addLeaderTrait(sqlBuilder, leaderCard.getTraitType(), modName);
 
 		if (civInfo.selectedCards.get(CardCategory.CivilizationAbility).getTraitType().equals("TRAIT_CIVILIZATION_MAORI_MANA")) {
-			sqlBuilder.append("INSERT INTO Leaders_XP2 (LeaderType, OceanStart) ")
+			sqlBuilder.append("INSERT OR REPLACE INTO Leaders_XP2 (LeaderType, OceanStart) ")
 					.append("VALUES ('LEADER_IMP_").append(modName).append("', 1);\n");
+		}
+
+		for (ActOfGod actOfGod : modHeader.actsOfGod) {
+			actOfGod.applyToLeaderTrait(leaderCard.getTraitType(), modName, sqlBuilder);
 		}
 
 		if (leaderCard.getGrantsTraitType().isPresent()) {
@@ -101,6 +108,17 @@ public class LeaderSqlGenerator extends BlitzFileGenerator {
 	private void addLeaderTrait(StringBuilder sqlBuilder, String traitType, String modName) {
 		sqlBuilder.append("INSERT INTO LeaderTraits (LeaderType, TraitType)\n" +
 				"VALUES ('LEADER_IMP_").append(modName).append("', '").append(traitType).append("');\n");
+	}
+
+	@Override
+
+	public String getFileContents(ModHeader modHeader, List<ModdedCivInfo> civs) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(super.getFileContents(modHeader, civs));
+		for (ActOfGod actOfGod : modHeader.actsOfGod) {
+			actOfGod.applyGlobalChanges(builder);
+		}
+		return builder.toString();
 	}
 
 	@Override
