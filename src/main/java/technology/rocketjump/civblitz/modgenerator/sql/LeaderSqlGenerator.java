@@ -49,8 +49,7 @@ public class LeaderSqlGenerator extends BlitzFileGenerator {
 
 		addLeaderTrait(sqlBuilder, leaderCard.getTraitType(), modName);
 
-		if (civInfo.selectedCards.get(CardCategory.LeaderAbility).getTraitType().equals("TRAIT_LEADER_KUPES_VOYAGE") &&
-			civInfo.selectedCards.get(CardCategory.CivilizationAbility).getTraitType().equals("TRAIT_CIVILIZATION_MAORI_MANA")) {
+		if (civInfo.selectedCards.get(CardCategory.CivilizationAbility).getTraitType().equals("TRAIT_CIVILIZATION_MAORI_MANA")) {
 			sqlBuilder.append("INSERT INTO Leaders_XP2 (LeaderType, OceanStart) ")
 					.append("VALUES ('LEADER_IMP_").append(modName).append("', 1);\n");
 		}
