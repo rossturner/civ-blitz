@@ -6,6 +6,9 @@ import technology.rocketjump.civblitz.model.CardCategory;
 import technology.rocketjump.civblitz.modgenerator.ModHeaderGenerator;
 import technology.rocketjump.civblitz.modgenerator.model.ModHeader;
 import technology.rocketjump.civblitz.modgenerator.model.ModdedCivInfo;
+import technology.rocketjump.civblitz.modgenerator.sql.actsofgod.ActOfGod;
+
+import java.util.List;
 
 @Component
 public class LeaderTextSqlGenerator extends BlitzFileGenerator {
@@ -25,6 +28,16 @@ public class LeaderTextSqlGenerator extends BlitzFileGenerator {
 				"('LOC_LEADER_IMP_").append(modName).append("', 'en_US', '").append(leaderCard.getCardName()).append(" (").append(civCard.getCardName()).append(")');");
 
 		return sqlBuilder.toString();
+	}
+
+	@Override
+	public String getFileContents(ModHeader modHeader, List<ModdedCivInfo> civs) {
+		StringBuilder builder = new StringBuilder();
+		builder.append(super.getFileContents(modHeader, civs));
+		for (ActOfGod actOfGod : modHeader.actsOfGod) {
+			actOfGod.applyLocalisationChanges(builder);
+		}
+		return builder.toString();
 	}
 
 	@Override

@@ -35,4 +35,9 @@ public class LostAtSea implements ActOfGod {
 	public void applyGlobalChanges(StringBuilder sqlBuilder) {
 
 	}
+
+	@Override
+	public void applyLocalisationChanges(StringBuilder sqlBuilder) {
+
+	}
 }

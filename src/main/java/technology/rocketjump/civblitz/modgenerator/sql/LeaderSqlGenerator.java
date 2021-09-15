@@ -111,7 +111,6 @@ public class LeaderSqlGenerator extends BlitzFileGenerator {
 	}
 
 	@Override
-
 	public String getFileContents(ModHeader modHeader, List<ModdedCivInfo> civs) {
 		StringBuilder builder = new StringBuilder();
 		builder.append(super.getFileContents(modHeader, civs));

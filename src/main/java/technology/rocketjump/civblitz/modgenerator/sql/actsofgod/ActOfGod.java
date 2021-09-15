@@ -10,4 +10,5 @@ public interface ActOfGod {
 
 	void applyGlobalChanges(StringBuilder sqlBuilder);
 
+	void applyLocalisationChanges(StringBuilder sqlBuilder);
 }
