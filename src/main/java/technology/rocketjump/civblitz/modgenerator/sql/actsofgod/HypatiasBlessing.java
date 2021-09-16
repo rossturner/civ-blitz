@@ -26,6 +26,5 @@ public class HypatiasBlessing implements ActOfGod {
 
 	@Override
 	public void applyLocalisationChanges(StringBuilder sqlBuilder) {
-
 	}
 }

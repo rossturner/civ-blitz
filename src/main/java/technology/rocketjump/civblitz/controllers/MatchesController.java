@@ -16,6 +16,7 @@ import technology.rocketjump.civblitz.matches.MatchService;
 import technology.rocketjump.civblitz.matches.MatchState;
 import technology.rocketjump.civblitz.matches.guilds.GuildDefinition;
 import technology.rocketjump.civblitz.matches.objectives.*;
+import technology.rocketjump.civblitz.model.DecoratedMatch;
 import technology.rocketjump.civblitz.model.MatchSignupWithPlayer;
 import technology.rocketjump.civblitz.model.MatchWithPlayers;
 import technology.rocketjump.civblitz.players.PlayerService;
@@ -97,7 +98,7 @@ public class MatchesController {
 	}
 
 	@GetMapping("/{matchId}")
-	public Match getMatch(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId) {
+	public DecoratedMatch getMatch(@RequestHeader("Authorization") String jwToken, @PathVariable int matchId) {
 		MatchWithPlayers match = matchService.getById(matchId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 		if (match.getMatchState().equals(DRAFT)) {
 			// Hide other players' selections in draft stage
@@ -108,7 +109,7 @@ public class MatchesController {
 				}
 			});
 		}
-		return match;
+		return new DecoratedMatch(match);
 	}
 
 	@DeleteMapping("/{matchId}")

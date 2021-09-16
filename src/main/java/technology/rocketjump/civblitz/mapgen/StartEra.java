@@ -2,14 +2,18 @@ package technology.rocketjump.civblitz.mapgen;
 
 public enum StartEra implements Weightable {
 
-	Ancient(4f),
-	Medieval(2f),
-	Industrial(0f);
+	Ancient(1f, "", 100),
+	Medieval(1f, "", 80),
+	Industrial(1f, "No Great Prophets are available with an Industrial start era.", 80);
 
 	private final float weighting;
+	public final String hint;
+	public final int numTurns;
 
-	StartEra(float weighting) {
+	StartEra(float weighting, String hint, int numTurns) {
 		this.weighting = weighting;
+		this.hint = hint;
+		this.numTurns = numTurns;
 	}
 
 	@Override

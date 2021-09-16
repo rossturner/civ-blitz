@@ -49,7 +49,7 @@ public class Cowvalry implements ActOfGod {
 		addTranslation("LOC_UNIT_BARBARIAN_HORSEMAN_NAME", "Barbarian Cowman", sqlBuilder);
 	}
 
-	private void addTranslation(String tag, String text, StringBuilder sqlBuilder) {
+	public static void addTranslation(String tag, String text, StringBuilder sqlBuilder) {
 		sqlBuilder.append(ST("INSERT OR REPLACE INTO LocalizedText (Tag, Language, Text) VALUES " +
 				"('<tag>', 'en_US', '<text>');\n", Map.of(
 				"tag", tag,
