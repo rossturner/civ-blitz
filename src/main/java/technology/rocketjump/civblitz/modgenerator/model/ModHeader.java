@@ -18,7 +18,8 @@ public class ModHeader {
 		this.modDescription = modDescription;
 		this.id = id;
 
-//		actsOfGod.add(new LostAtSea());
+		actsOfGod.add(new Cowvalry());
+		actsOfGod.add(new HypatiasBlessing());
 	}
 
 }

@@ -44,6 +44,8 @@ public class Cowvalry implements ActOfGod {
 	public void applyLocalisationChanges(StringBuilder sqlBuilder) {
 		addTranslation("LOC_TECH_HORSEBACK_RIDING_NAME", "Cowback Riding", sqlBuilder);
 		addTranslation("LOC_UNIT_HORSEMAN_NAME", "Cowman", sqlBuilder);
+		addTranslation("LOC_UNIT_HORSEMAN_DESCRIPTION", "A cow-mounted warrior with high strength and speed.", sqlBuilder);
+		addTranslation("LOC_UNIT_CAVALRY_NAME", "Cowvalry", sqlBuilder);
 		addTranslation("LOC_UNIT_BARBARIAN_HORSEMAN_NAME", "Barbarian Cowman", sqlBuilder);
 	}
 

@@ -54,6 +54,10 @@ const allCategories = {
     'Wildcard': {
         'color': 'pink',
         'icon': 'asterisk'
+    },
+    'Hardship': {
+        'color': 'red',
+        'icon': 'frown'
     }
 };
 
