@@ -55,7 +55,16 @@ public class PlayerRepo {
 		create.update(PLAYER)
 				.set(PLAYER.BALANCE, player.getBalance())
 				.set(PLAYER.TOTAL_POINTS_EARNED, player.getTotalPointsEarned())
+				.set(PLAYER.RANKING_SCORE, player.getRankingScore())
 				.where(PLAYER.PLAYER_ID.eq(player.getPlayerId()))
 				.execute();
+	}
+
+	public List<Player> getPlayersByRankingScore() {
+		return create.selectFrom(PLAYER)
+				.where(PLAYER.RANKING_SCORE.greaterThan(0.0))
+				.orderBy(PLAYER.RANKING_SCORE.desc())
+				.limit(100)
+				.fetchInto(Player.class);
 	}
 }

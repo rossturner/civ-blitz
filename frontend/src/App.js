@@ -15,6 +15,7 @@ import MatchPage from "./matches/MatchPage";
 import PackOpener from "./cards/PackOpener";
 import PackShopPage from "./cards/PackShopPage";
 import DlcSettingsPage from "./player/DlcSettingsPage";
+import PlayerLeaderboard from "./player/PlayerLeaderboard";
 
 const App = ({history}) => {
 
@@ -81,6 +82,9 @@ const App = ({history}) => {
                 </Route>
                 <Route path="/packs">
                     <PackOpener/>
+                </Route>
+                <Route path="/leaderboard">
+                    <PlayerLeaderboard />
                 </Route>
                 <Route path="/modtester">
                     <ModTester/>

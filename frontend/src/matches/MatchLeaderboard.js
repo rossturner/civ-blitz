@@ -9,7 +9,7 @@ const MatchLeaderboard = ({match, leaderboard, loggedInPlayer, leaderboardChange
 
     const tableRows = [];
     const currentPlayerSignup = match.signups && match.signups.find(s => s.playerId === loggedInPlayer.discordId);
-    const playerIsAdminNotInMatch = true;//!currentPlayerSignup && loggedInPlayer.isAdmin;
+    const playerIsAdminNotInMatch = !currentPlayerSignup && loggedInPlayer.isAdmin;
     const canBeCompleted = match.matchState === 'POST_MATCH' && playerIsAdminNotInMatch;
 
     const updateScore = (playerId, score) => {

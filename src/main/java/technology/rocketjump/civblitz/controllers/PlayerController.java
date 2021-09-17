@@ -119,4 +119,10 @@ public class PlayerController {
 		}
 	}
 
+
+	@GetMapping("/leaderboard")
+	public List<Player> getPlayersLeaderboard() {
+		return playerService.getPlayerLeaderboard();
+	}
+
 }

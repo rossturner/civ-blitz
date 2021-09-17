@@ -6,6 +6,7 @@ import technology.rocketjump.civblitz.auth.CivBlitzToken;
 import technology.rocketjump.civblitz.cards.CollectionService;
 import technology.rocketjump.civblitz.codegen.tables.pojos.Player;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -41,5 +42,9 @@ public class PlayerService {
 
 	public Optional<Player> getPlayerById(String playerId) {
 		return playerRepo.getPlayerByDiscordId(playerId);
+	}
+
+	public List<Player> getPlayerLeaderboard() {
+		return playerRepo.getPlayersByRankingScore();
 	}
 }

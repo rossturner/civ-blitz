@@ -44,6 +44,12 @@ const TopLevelMenu = ({loggedInPlayer}) => {
             }
 
             <Menu.Item header>
+                <Link to='/leaderboard'>
+                    Leaderboard
+                </Link>
+            </Menu.Item>
+
+            <Menu.Item header>
                 <Link to='/modtester'>
                 Mod Tester
                 </Link>

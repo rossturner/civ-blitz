@@ -198,9 +198,9 @@ public class MatchService {
 	}
 
 	private synchronized void completeMatch(MatchWithPlayers match, Map<String, Object> payload, Player currentPlayer) {
-		if (match.signups.stream().anyMatch(s -> s.getPlayerId().equals(currentPlayer.getPlayerId()))) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can not complete a match you played in");
-		}
+//		if (match.signups.stream().anyMatch(s -> s.getPlayerId().equals(currentPlayer.getPlayerId()))) {
+//			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can not complete a match you played in");
+//		}
 
 		for (MatchSignupWithPlayer signup : match.signups) {
 			if (!payload.containsKey(signup.getPlayerId())) {
