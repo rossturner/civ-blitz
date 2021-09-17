@@ -179,6 +179,7 @@ public class MatchRepo {
 				.set(MATCH_SIGNUP.UNIQUE_UNIT_IS_FREE, matchSignup.getUniqueUnitIsFree())
 				.set(MATCH_SIGNUP.START_BIAS_CIV_TYPE, matchSignup.getStartBiasCivType())
 				.set(MATCH_SIGNUP.COMMITTED, matchSignup.getCommitted())
+				.set(MATCH_SIGNUP.FINAL_POINTS_AWARDED, matchSignup.getFinalPointsAwarded())
 				.where(MATCH_SIGNUP.MATCH_ID.eq(matchSignup.getMatchId())
 						.and(MATCH_SIGNUP.PLAYER_ID.eq(matchSignup.getPlayerId())))
 				.execute();
@@ -192,5 +193,11 @@ public class MatchRepo {
 		create.deleteFrom(MATCH)
 				.where(MATCH.MATCH_ID.eq(match.getMatchId()))
 				.execute();
+	}
+
+	public List<MatchSignup> getSignupsForPlayer(Player player) {
+		return create.selectFrom(MATCH_SIGNUP)
+				.where(MATCH_SIGNUP.PLAYER_ID.eq(player.getPlayerId()))
+				.fetchInto(MatchSignup.class);
 	}
 }

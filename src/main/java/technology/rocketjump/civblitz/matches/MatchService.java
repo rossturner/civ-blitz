@@ -198,9 +198,9 @@ public class MatchService {
 	}
 
 	private void completeMatch(MatchWithPlayers match, Map<String, Object> payload, Player currentPlayer) {
-		if (match.signups.stream().anyMatch(s -> s.getPlayerId().equals(currentPlayer.getPlayerId()))) {
-			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can not complete a match you played in");
-		}
+//		if (match.signups.stream().anyMatch(s -> s.getPlayerId().equals(currentPlayer.getPlayerId()))) {
+//			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can not complete a match you played in");
+//		}
 
 		for (MatchSignupWithPlayer signup : match.signups) {
 			if (!payload.containsKey(signup.getPlayerId())) {
@@ -224,8 +224,12 @@ public class MatchService {
 						.append(signup.getPlayer().getDiscordUsername()).append("\n");
 			}
 
+			signup.setFinalPointsAwarded(0.0 + awardedStarAmount);
+			matchRepo.updateSignup(signup);
+
 			signup.getPlayer().setBalance(signup.getPlayer().getBalance() + awardedStarAmount);
 			signup.getPlayer().setTotalPointsEarned(signup.getPlayer().getTotalPointsEarned() + awardedStarAmount);
+			signup.getPlayer().setAveragePointsEarned(calculateAveragePoints(signup.getPlayer()));
 			playerRepo.updateBalances(signup.getPlayer());
 		}
 
@@ -448,5 +452,23 @@ public class MatchService {
 
 		match.setSpectator(!match.getSpectator());
 		matchRepo.update(match);
+	}
+
+	private Double calculateAveragePoints(Player player) {
+		double totalPointsFromMatches = 0.0;
+		double numScoredMatches = 0.0;
+
+		for (MatchSignup matchSignup : matchRepo.getSignupsForPlayer(player)) {
+			if (matchSignup.getFinalPointsAwarded() != null) {
+				totalPointsFromMatches += matchSignup.getFinalPointsAwarded();
+				numScoredMatches += 1.0;
+			}
+		}
+
+		if (numScoredMatches > 0.0) {
+			return totalPointsFromMatches / numScoredMatches;
+		} else {
+			return 0.0;
+		}
 	}
 }

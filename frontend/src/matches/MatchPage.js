@@ -32,7 +32,7 @@ const MatchPage = ({loggedInPlayer}) => {
     const [showAdminUnclaimObjectiveModal, setShowAdminUnclaimObjectiveModal] = useState(false);
 
     const currentPlayerSignup = match.signups && match.signups.find(s => s.playerId === loggedInPlayer.discordId);
-    const playerIsAdminNotInMatch = !currentPlayerSignup && loggedInPlayer.isAdmin;
+    const playerIsAdminNotInMatch = true;//!currentPlayerSignup && loggedInPlayer.isAdmin;
 
     useEffect(() => {
         axios.get('/api/matches/' + matchId)
