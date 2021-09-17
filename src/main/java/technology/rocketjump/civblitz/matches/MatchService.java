@@ -108,7 +108,7 @@ public class MatchService {
 		return match;
 	}
 
-	public Match switchState(MatchWithPlayers match, MatchState newState, Map<String, Object> payload, Player currentPlayer) {
+	public synchronized Match switchState(MatchWithPlayers match, MatchState newState, Map<String, Object> payload, Player currentPlayer) {
 		MatchState currentState = match.getMatchState();
 		if (currentState.equals(SIGNUPS) && newState.equals(DRAFT)) {
 			proceedToDraft(match, payload);
@@ -197,10 +197,10 @@ public class MatchService {
 		matchRepo.update(match);
 	}
 
-	private void completeMatch(MatchWithPlayers match, Map<String, Object> payload, Player currentPlayer) {
-//		if (match.signups.stream().anyMatch(s -> s.getPlayerId().equals(currentPlayer.getPlayerId()))) {
-//			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can not complete a match you played in");
-//		}
+	private synchronized void completeMatch(MatchWithPlayers match, Map<String, Object> payload, Player currentPlayer) {
+		if (match.signups.stream().anyMatch(s -> s.getPlayerId().equals(currentPlayer.getPlayerId()))) {
+			throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Can not complete a match you played in");
+		}
 
 		for (MatchSignupWithPlayer signup : match.signups) {
 			if (!payload.containsKey(signup.getPlayerId())) {
@@ -229,7 +229,7 @@ public class MatchService {
 
 			signup.getPlayer().setBalance(signup.getPlayer().getBalance() + awardedStarAmount);
 			signup.getPlayer().setTotalPointsEarned(signup.getPlayer().getTotalPointsEarned() + awardedStarAmount);
-			signup.getPlayer().setAveragePointsEarned(calculateAveragePoints(signup.getPlayer()));
+			signup.getPlayer().setRankingScore(calculateAveragePoints(signup.getPlayer()));
 			playerRepo.updateBalances(signup.getPlayer());
 		}
 
