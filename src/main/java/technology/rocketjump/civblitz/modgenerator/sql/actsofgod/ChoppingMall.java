@@ -1,8 +1,6 @@
 package technology.rocketjump.civblitz.modgenerator.sql.actsofgod;
 
-import java.util.Map;
-
-import static technology.rocketjump.civblitz.modgenerator.sql.StringTemplateWrapper.ST;
+import static technology.rocketjump.civblitz.modgenerator.sql.actsofgod.Contractors.addTraitModifier;
 
 public class ChoppingMall implements ActOfGod {
 
@@ -13,11 +11,7 @@ public class ChoppingMall implements ActOfGod {
 
 	@Override
 	public void applyToCivTrait(String civAbilityTraitType, String modName, StringBuilder sqlBuilder) {
-		sqlBuilder.append(ST("INSERT OR REPLACE INTO TraitModifiers (TraitType, ModifierId) VALUES ('<traitType>', '<modifierId>');\n",
-				Map.of(
-						"traitType", civAbilityTraitType,
-						"modifierId", "TRAIT_BUILDER_WONDER_PERCENT"
-				)));
+		addTraitModifier("TRAIT_BUILDER_WONDER_PERCENT", civAbilityTraitType, sqlBuilder);
 	}
 
 	@Override

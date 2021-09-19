@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import static technology.rocketjump.civblitz.modgenerator.sql.StringTemplateWrapper.ST;
+import static technology.rocketjump.civblitz.modgenerator.sql.actsofgod.Contractors.addTraitModifier;
 
 public class VikingMode implements ActOfGod {
 
@@ -16,11 +17,7 @@ public class VikingMode implements ActOfGod {
 	public void applyToCivTrait(String civAbilityTraitType, String modName, StringBuilder sqlBuilder) {
 		for (String modifierId : List.of("TRAIT_GRANT_COASTAL_RAID_ABILITY", "TRAIT_LEADER_PILLAGE_SCIENCE_MINES",
 				"TRAIT_LEADER_PILLAGE_CULTURE_QUARRIES", "TRAIT_LEADER_PILLAGE_CULTURE_PLANTATIONS", "TRAIT_LEADER_PILLAGE_CULTURE_PASTURES", "TRAIT_LEADER_PILLAGE_CULTURE_CAMPS")) {
-			sqlBuilder.append(ST("INSERT OR REPLACE INTO TraitModifiers (TraitType, ModifierId) VALUES ('<traitType>', '<modifierId>');\n",
-					Map.of(
-							"traitType", civAbilityTraitType,
-							"modifierId", modifierId
-					)));
+			addTraitModifier(modifierId, civAbilityTraitType, sqlBuilder);
 		}
 	}
 

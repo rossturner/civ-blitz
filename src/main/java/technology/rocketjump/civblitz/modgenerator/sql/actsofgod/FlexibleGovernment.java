@@ -1,31 +1,27 @@
 package technology.rocketjump.civblitz.modgenerator.sql.actsofgod;
 
-import java.util.List;
 import java.util.Map;
 
 import static technology.rocketjump.civblitz.modgenerator.sql.StringTemplateWrapper.ST;
-import static technology.rocketjump.civblitz.modgenerator.sql.actsofgod.Contractors.addTraitModifier;
 
-public class LostAtSea implements ActOfGod {
+public class FlexibleGovernment implements ActOfGod {
 
 	@Override
 	public String getID() {
-		return "LOST_AT_SEA";
+		return "FLEXIBLE_GOVERNMENT";
 	}
 
 	@Override
 	public void applyToCivTrait(String civAbilityTraitType, String modName, StringBuilder sqlBuilder) {
-		for (String modifierId : List.of("TRAIT_MAORI_MANA_OCEAN", "TRAIT_MAORI_MANA_SAILING", "TRAIT_MAORI_MANA_SHIPBUILDING", "TRAIT_MAORI_EMBARKED_ABILITY")) {
-			addTraitModifier(modifierId, civAbilityTraitType, sqlBuilder);
-		}
-
+		sqlBuilder.append(ST("INSERT OR REPLACE INTO CivilizationTraits (TraitType, CivilizationType) VALUES ('<traitType>', 'CIVILIZATION_IMP_<modName>');\n",
+				Map.of(
+						"modName", modName,
+						"traitType", "TRAIT_CIVILIZATION_PLATOS_REPUBLIC"
+				)));
 	}
 
 	@Override
 	public void applyToLeaderTrait(String leaderAbilityTraitType, String modName, StringBuilder sqlBuilder) {
-		sqlBuilder.append(ST("INSERT OR REPLACE INTO Leaders_XP2 (LeaderType, OceanStart) VALUES ('LEADER_IMP_<modName>', 1);\n",
-				Map.of("modName", modName)
-		));
 	}
 
 	@Override
