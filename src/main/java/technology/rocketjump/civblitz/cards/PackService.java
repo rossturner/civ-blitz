@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 import static technology.rocketjump.civblitz.cards.CollectionService.cardIsSupported;
+import static technology.rocketjump.civblitz.model.Card.BANNED_CARDS;
 import static technology.rocketjump.civblitz.model.CardCategory.*;
 
 @Service
@@ -154,7 +155,7 @@ public class PackService {
 		Card selected = null;
 		while (selected == null) {
 			selected = allInCategory.get(random.nextInt(allInCategory.size()));
-			if (selectedCards.contains(selected)) {
+			if (selectedCards.contains(selected) || BANNED_CARDS.contains(selected.getTraitType())) {
 				selected = null;
 			}
 			if (!dlcSettings.isEmpty() && !cardIsSupported(selected, dlcSettings)) {

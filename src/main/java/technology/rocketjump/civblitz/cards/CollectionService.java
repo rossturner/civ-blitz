@@ -13,6 +13,8 @@ import technology.rocketjump.civblitz.model.SourceDataRepo;
 
 import java.util.*;
 
+import static technology.rocketjump.civblitz.model.Card.BANNED_CARDS;
+
 @Service
 public class CollectionService {
 
@@ -57,7 +59,9 @@ public class CollectionService {
 			List<Card> cardsInCategory = sourceDataRepo.getByCategory(entry.getKey());
 			while (selectedForCategory.size() < entry.getValue()) {
 				Card randomCard = cardsInCategory.get(random.nextInt(cardsInCategory.size()));
-				selectedForCategory.add(randomCard);
+				if (!BANNED_CARDS.contains(randomCard.getTraitType())) {
+					selectedForCategory.add(randomCard);
+				}
 			}
 
 			for (Card card : selectedForCategory) {

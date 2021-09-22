@@ -1,11 +1,15 @@
 package technology.rocketjump.civblitz.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class Card {
+
+	public static final List<String> BANNED_CARDS = Arrays.asList(
+			"TRAIT_CIVILIZATION_BYZANTIUM",
+			"TRAIT_CIVILIZATION_BABYLON",
+			"TRAIT_CIVILIZATION_UNIT_AMERICAN_P51",
+			"TRAIT_CIVILIZATION_UNIT_GERMAN_UBOAT"
+	);
 
 	protected String cardName;
 	protected String cardDescription;
