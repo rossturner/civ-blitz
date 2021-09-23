@@ -141,7 +141,7 @@ public class MatchesController {
 		return allObjectivesService.getPublicObjectives(matchId).stream()
 				.map((pub) -> {
 					ObjectiveDefinition objective = objectiveDefinitionRepo.getById(pub.getObjective()).orElse(NULL_OBJECTIVE);
-					return new ObjectiveResponse(objective, pub.getClaimedByPlayerIds(), match.getStartEra());
+					return new ObjectiveResponse(objective, pub.getClaimedByPlayerIds(), match.getStartEra(), match.signups.size());
 				})
 				.sorted(OBJECTIVE_SORT)
 				.collect(Collectors.toList());

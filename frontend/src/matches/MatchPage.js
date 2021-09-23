@@ -182,8 +182,7 @@ const MatchPage = ({loggedInPlayer}) => {
 
                             <Container style={{'margin': '1em'}}>
                                 <Header>Public objectives:</Header>
-                                <p>Each 1 star objective can be claimed by up to 3 players. Each 2 star objective can be claimed by up to 2 players.
-                                    Each 3 star objective can be claimed by a single player.</p>
+                                <p>Each objective lists how many players can still claim it.</p>
                                 <CardGroup centered>
                                     {publicObjectives.filter(o => o.numStars === 1).map(objectiveToCard)}
                                 </CardGroup>

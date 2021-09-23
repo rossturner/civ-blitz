@@ -166,7 +166,7 @@ public class ObjectivesService {
 				throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You have already claimed this objective");
 			}
 
-			if (claimedByPlayerIds.size() >= maxClaimsFor(objective, match.getStartEra())) {
+			if (claimedByPlayerIds.size() >= maxClaimsFor(objective, match.getStartEra(), match.signups.size())) {
 				throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Other players have already claimed this objective the maximum number of times");
 			}
 
@@ -191,13 +191,35 @@ public class ObjectivesService {
 		}
 	}
 
-	private int maxClaimsFor(ObjectiveDefinition objective, StartEra startEra) {
+	public static int maxClaimsFor(ObjectiveDefinition objective, StartEra startEra, int numPlayers) {
 		if (objective.getStars(startEra) == 1) {
-			return 3;
+			if (numPlayers <= 2) {
+				return 1;
+			} else if (numPlayers <= 4) {
+				return 2;
+			} else if (numPlayers <= 7) {
+				return 3;
+			} else if (numPlayers <= 9) {
+				return 4;
+			} else {
+				return 5;
+			}
 		} else if (objective.getStars(startEra) == 2) {
-			return 2;
+			if (numPlayers <= 3) {
+				return 1;
+			} else if (numPlayers <= 7) {
+				return 2;
+			} else if (numPlayers <= 9) {
+				return 3;
+			} else {
+				return 4;
+			}
 		} else {
-			return 1;
+			if (numPlayers <= 9) {
+				return 1;
+			} else {
+				return 2;
+			}
 		}
 	}
 }

@@ -17,6 +17,7 @@ const ObjectiveCard = ({objectiveJson, cardClicked, clickDisabled, claimedByPlay
     }
 
     const claimantSections = claimedByPlayers.map(signup => <PlayerAvatar key={signup.player.playerId} player={signup.player} size='huge' />);
+    const numClaimsOutstanding = objectiveJson.maxClaims - claimedByPlayers.length;
 
     return (
         <Card className={className} onClick={!clickDisabled ? () => cardClicked(objectiveJson) : null} color={color}>
@@ -45,6 +46,9 @@ const ObjectiveCard = ({objectiveJson, cardClicked, clickDisabled, claimedByPlay
                 <Icon color='yellow' name='star' />
                 }
                 {objectiveJson.numStars} star{objectiveJson.numStars > 1 ? 's' : ''}
+                {!isSecretObjective && numClaimsOutstanding > 0 &&
+                <i>&nbsp;- {numClaimsOutstanding} claim{numClaimsOutstanding > 1 ? 's' : ''} left</i>
+                }
 
                 {objectiveJson.military &&
                 <Popup

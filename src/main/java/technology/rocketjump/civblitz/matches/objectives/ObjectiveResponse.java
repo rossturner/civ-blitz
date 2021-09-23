@@ -12,9 +12,10 @@ public class ObjectiveResponse {
 	private final int numStars;
 	private final ObjectiveDefinition.ObjectiveType type;
 	private final List<String> claimedByPlayerIds;
+	private final int maxClaims;
 	private final boolean military;
 
-	public ObjectiveResponse(ObjectiveDefinition objective, List<String> claimedByPlayerIds, StartEra startEra) {
+	public ObjectiveResponse(ObjectiveDefinition objective, List<String> claimedByPlayerIds, StartEra startEra, int numPlayers) {
 		this.enumName = objective.objectiveId;
 		this.objectiveName = objective.objectiveName;
 		this.description = objective.description;
@@ -23,6 +24,7 @@ public class ObjectiveResponse {
 		this.type = objective.objectiveType;
 		this.claimedByPlayerIds = claimedByPlayerIds;
 		this.military = objective.military;
+		this.maxClaims = ObjectivesService.maxClaimsFor(objective, startEra, numPlayers);
 	}
 
 	public String getEnumName() {
@@ -51,5 +53,9 @@ public class ObjectiveResponse {
 
 	public boolean isMilitary() {
 		return military;
+	}
+
+	public int getMaxClaims() {
+		return maxClaims;
 	}
 }
