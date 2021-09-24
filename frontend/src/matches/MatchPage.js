@@ -164,7 +164,7 @@ const MatchPage = ({loggedInPlayer}) => {
                             {leaderboard &&
                             <Container style={{'margin': '1em'}}>
                                 <Header>Leaderboard:</Header>
-                                <p>The winner is the player with the most stars after 100 turns. These may be any mix of public and secret objectives.</p>
+                                <p>The winner is the player with the most stars after {match.numTurns} turns. These may be any mix of public and secret objectives. Guilds are scored at the end of the game.</p>
                                 <MatchLeaderboard match={match} leaderboard={leaderboard} loggedInPlayer={loggedInPlayer}
                                     leaderboardChanged={setLeaderboard}/>
                             </Container>
