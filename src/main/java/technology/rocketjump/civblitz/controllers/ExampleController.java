@@ -75,10 +75,10 @@ public class ExampleController {
 		response.setStatus(HttpServletResponse.SC_OK);
 		Map<CardCategory, Card> selectedCards = new HashMap<>();
 		for (Card card : List.of(
-				sourceDataRepo.getByTraitType("TRAIT_CIVILIZATION_MAYAB"),
-				sourceDataRepo.getByTraitType("TRAIT_LEADER_KUPES_VOYAGE"),
-				sourceDataRepo.getByTraitType("TRAIT_CIVILIZATION_DISTRICT_SEOWON"),
-				sourceDataRepo.getByTraitType("TRAIT_CIVILIZATION_UNIT_AZTEC_EAGLE_WARRIOR")
+				sourceDataRepo.getByIdentifier("TRAIT_CIVILIZATION_MAYAB"),
+				sourceDataRepo.getByIdentifier("TRAIT_LEADER_KUPES_VOYAGE"),
+				sourceDataRepo.getByIdentifier("TRAIT_CIVILIZATION_DISTRICT_SEOWON"),
+				sourceDataRepo.getByIdentifier("TRAIT_CIVILIZATION_UNIT_AZTEC_EAGLE_WARRIOR")
 		)) {
 			selectedCards.put(card.getCardCategory(), card);
 		}

@@ -4,6 +4,7 @@ import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import technology.rocketjump.civblitz.cards.ModifierCardsParser;
 import technology.rocketjump.civblitz.matches.guilds.GuildDefinitionParser;
 import technology.rocketjump.civblitz.matches.objectives.ObjectiveDefinitionParser;
 import technology.rocketjump.civblitz.model.Card;
@@ -24,6 +25,7 @@ public class SourceDataParser {
 							DlcCsvParser dlcParser, ModifiersCsvParser modifiersParser,
 							ObjectiveDefinitionParser objectiveDefinitionParser,
 							GuildDefinitionParser guildDefinitionParser,
+							ModifierCardsParser modifierCardsParser,
 							@Qualifier("leaderTraits") String leaderTraitsContent,
 							@Qualifier("civTraits") String civTraitsContent,
 							@Qualifier("subtypes") String subtypesContent,
@@ -50,10 +52,14 @@ public class SourceDataParser {
 		guildDefinitionParser.readFromGoogleSheet();
 
 		sourceDataRepo.removeGrantedCards();
-		System.out.println("Cards parsed: " + sourceDataRepo.getAll().size());
+		System.out.println("Base cards parsed: " + sourceDataRepo.getAll().size());
 
 		verifyIconAtlasEntries(sourceDataRepo);
 		verifyAllCivRecordEntries(sourceDataRepo);
+
+		modifierCardsParser.readFromGoogleSheet();
+
+		System.out.println("All cards parsed: " + sourceDataRepo.getAll().size());
 	}
 
 	private void verifyIconAtlasEntries(SourceDataRepo sourceDataRepo) {

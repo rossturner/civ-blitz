@@ -42,7 +42,7 @@ public class CollectionService {
 
 		collectionRepo.deleteCollection(player);
 
-		List<CardCategory> categories = new ArrayList<>(List.of(CardCategory.values()));
+		List<CardCategory> categories = new ArrayList<>(CardCategory.mainCategories);
 		Collections.shuffle(categories); // shuffle categories so we can randomly remove up to 1 from each
 		Map<CardCategory, Integer> cardsToSelect = new HashMap<>();
 		for (CardCategory category : categories) {
@@ -76,7 +76,7 @@ public class CollectionService {
 		if (matchRepo.getNumActiveMatches(player) > 0) {
 			return MAX_MULLIGANS_ALLOWED;
 		} else {
-			int defaultInitialCards = (NUM_INITIAL_CARDS_PER_CATEGORY * CardCategory.values().length);
+			int defaultInitialCards = (NUM_INITIAL_CARDS_PER_CATEGORY * CardCategory.mainCategories.size());
 			return defaultInitialCards - getCollection(player).size();
 		}
 	}
@@ -85,10 +85,10 @@ public class CollectionService {
 		List<Collection> collectionList = collectionRepo.getCollection(player);
 		List<CollectionCard> result = new ArrayList<>(collectionList.size());
 		for (Collection collectionEntry : collectionList) {
-			Card card = sourceDataRepo.getByTraitType(collectionEntry.getCardTraitType());
+			Card card = sourceDataRepo.getByIdentifier(collectionEntry.getCardTraitType());
 			CollectionCard collectionCard = new CollectionCard(card, collectionEntry.getQuantity());
 			if (card.getGrantsFreeUseOfCard().isPresent()) {
-				collectionCard.setFreeUseCard(sourceDataRepo.getByTraitType(card.getGrantsFreeUseOfCard().get()));
+				collectionCard.setFreeUseCard(sourceDataRepo.getByIdentifier(card.getGrantsFreeUseOfCard().get()));
 			}
 			result.add(collectionCard);
 		}

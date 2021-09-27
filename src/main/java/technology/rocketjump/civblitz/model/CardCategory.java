@@ -1,11 +1,18 @@
 package technology.rocketjump.civblitz.model;
 
+import java.util.List;
+
 public enum CardCategory {
 
 	LeaderAbility,
 	CivilizationAbility,
 	UniqueUnit,
-	UniqueInfrastructure;
+	UniqueInfrastructure,
+
+	Power,
+	ActOfGod;
+
+	public static List<CardCategory> mainCategories = List.of(LeaderAbility, CivilizationAbility, UniqueUnit, UniqueInfrastructure);
 
 	public static CardCategory parseAcronym(String acronym) {
 		switch (acronym) {

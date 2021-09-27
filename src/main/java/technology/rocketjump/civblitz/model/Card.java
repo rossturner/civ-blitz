@@ -4,6 +4,8 @@ import java.util.*;
 
 public class Card {
 
+	private static final int MAX_CARD_ID_LENGTH = 60;
+
 	public static final List<String> BANNED_CARDS = Arrays.asList(
 			"TRAIT_CIVILIZATION_BYZANTIUM",
 			"TRAIT_CIVILIZATION_BABYLON",
@@ -11,12 +13,17 @@ public class Card {
 			"TRAIT_CIVILIZATION_UNIT_GERMAN_UBOAT"
 	);
 
-	protected String cardName;
-	protected String cardDescription;
-	protected String traitType; // Use this as the unique identifier
+	protected String identifier;
+	protected String baseCardName;
+	protected String baseCardDescription;
+	protected String enhancedCardName;
+	protected String enhancedCardDescription;
+	protected String traitType;
 	protected String civilizationType;
 	protected Optional<String> leaderType = Optional.empty();
 	protected CardCategory cardCategory;
+	protected SuperCategory superCategory = SuperCategory.Standard;
+	protected CardRarity rarity = CardRarity.Common;
 
 	protected String civilizationFriendlyName;
 
@@ -26,14 +33,17 @@ public class Card {
 	protected String mediaName;
 	protected String requiredDlc;
 	protected List<String> modifierIds = new ArrayList<>();
+	protected String gameplaySQL;
+	protected String localisationSQL;
 
 	public Card() {
 
 	}
 
 	public Card(Card original) {
-		this.cardName = original.cardName;
-		this.cardDescription = original.cardDescription;
+		this.identifier = original.identifier;
+		this.baseCardName = original.baseCardName;
+		this.baseCardDescription = original.baseCardDescription;
 		this.traitType = original.traitType;
 		this.civilizationType = original.civilizationType;
 		this.leaderType = original.leaderType;
@@ -44,12 +54,16 @@ public class Card {
 		this.subtype = original.subtype;
 		this.mediaName = original.mediaName;
 		this.requiredDlc = original.requiredDlc;
-		this.modifierIds = original.modifierIds;
+		this.modifierIds.addAll(original.modifierIds);
+		this.superCategory = original.superCategory;
+		this.rarity = original.rarity;
+		this.gameplaySQL = original.gameplaySQL;
+		this.localisationSQL = original.localisationSQL;
 	}
 
 	@Override
 	public String toString() {
-		return cardName + " " + traitType;
+		return baseCardName + " " + traitType;
 	}
 
 	@Override
@@ -63,6 +77,18 @@ public class Card {
 	@Override
 	public int hashCode() {
 		return Objects.hash(traitType);
+	}
+
+	public String getIdentifier() {
+		return identifier;
+	}
+
+	public void setIdentifier(String identifier) {
+		if (identifier.length() > MAX_CARD_ID_LENGTH) {
+			this.identifier = identifier.substring(0, MAX_CARD_ID_LENGTH);
+		} else {
+			this.identifier = identifier;
+		}
 	}
 
 	public String getCivilizationType() {
@@ -105,20 +131,36 @@ public class Card {
 		this.civilizationFriendlyName = civilizationFriendlyName;
 	}
 
-	public String getCardName() {
-		return cardName;
+	public String getBaseCardName() {
+		return baseCardName;
 	}
 
-	public void setCardName(String cardName) {
-		this.cardName = cardName;
+	public void setBaseCardName(String baseCardName) {
+		this.baseCardName = baseCardName;
 	}
 
-	public String getCardDescription() {
-		return cardDescription;
+	public String getBaseCardDescription() {
+		return baseCardDescription;
 	}
 
-	public void setCardDescription(String cardDescription) {
-		this.cardDescription = cardDescription;
+	public void setBaseCardDescription(String baseCardDescription) {
+		this.baseCardDescription = baseCardDescription;
+	}
+
+	public String getEnhancedCardName() {
+		return enhancedCardName;
+	}
+
+	public void setEnhancedCardName(String enhancedCardName) {
+		this.enhancedCardName = enhancedCardName;
+	}
+
+	public String getEnhancedCardDescription() {
+		return enhancedCardDescription;
+	}
+
+	public void setEnhancedCardDescription(String enhancedCardDescription) {
+		this.enhancedCardDescription = enhancedCardDescription;
 	}
 
 	public Optional<String> getGrantsTraitType() {
@@ -163,5 +205,37 @@ public class Card {
 
 	public List<String> getModifierIds() {
 		return modifierIds;
+	}
+
+	public SuperCategory getSuperCategory() {
+		return superCategory;
+	}
+
+	public void setSuperCategory(SuperCategory superCategory) {
+		this.superCategory = superCategory;
+	}
+
+	public CardRarity getRarity() {
+		return rarity;
+	}
+
+	public void setRarity(CardRarity rarity) {
+		this.rarity = rarity;
+	}
+
+	public String getGameplaySQL() {
+		return gameplaySQL;
+	}
+
+	public void setGameplaySQL(String gameplaySQL) {
+		this.gameplaySQL = gameplaySQL;
+	}
+
+	public String getLocalisationSQL() {
+		return localisationSQL;
+	}
+
+	public void setLocalisationSQL(String localisationSQL) {
+		this.localisationSQL = localisationSQL;
 	}
 }

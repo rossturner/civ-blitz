@@ -69,7 +69,7 @@ public class CompleteModGenerator {
 			if (civInfo.selectedCards.size() != 4) {
 				throw new IllegalArgumentException(getClass().getSimpleName() + " must be passed a map of 4 cards");
 			}
-			for (CardCategory cardCategory : CardCategory.values()) {
+			for (CardCategory cardCategory : CardCategory.mainCategories) {
 				if (!civInfo.selectedCards.containsKey(cardCategory)) {
 					throw new IllegalArgumentException(getClass().getSimpleName() + " must be passed one card in each category");
 				}
@@ -102,10 +102,10 @@ public class CompleteModGenerator {
 	}
 
 	public byte[] generateMod(ModdedCivInfo civInfo) throws IOException {
-		if (civInfo.selectedCards.size() != 4) {
-			throw new IllegalArgumentException(getClass().getSimpleName() + " must be passed a map of 4 cards");
+		if (civInfo.selectedCards.size() < 4) {
+			throw new IllegalArgumentException(getClass().getSimpleName() + " must be passed a map of at least 4 cards");
 		}
-		for (CardCategory cardCategory : CardCategory.values()) {
+		for (CardCategory cardCategory : CardCategory.mainCategories) {
 			if (!civInfo.selectedCards.containsKey(cardCategory)) {
 				throw new IllegalArgumentException(getClass().getSimpleName() + " must be passed one card in each category");
 			}

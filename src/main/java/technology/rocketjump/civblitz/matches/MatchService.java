@@ -267,7 +267,7 @@ public class MatchService {
 		if (applyFreeUse) {
 			String freeUseCardTraitType = cardInCollection.getGrantsFreeUseOfCard()
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Card does not come with a free use card"));
-			Card freeUseCard = sourceDataRepo.getByTraitType(freeUseCardTraitType);
+			Card freeUseCard = sourceDataRepo.getByIdentifier(freeUseCardTraitType);
 			existingCardSelection = matchSignup.getCard(freeUseCard.getCardCategory());
 			if (existingCardSelection != null) {
 				removeCardFromMatchDeck(match, player, existingCardSelection);
@@ -294,7 +294,7 @@ public class MatchService {
 			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Can not change cards once committed");
 		}
 
-		Card card = sourceDataRepo.getByTraitType(cardTraitType);
+		Card card = sourceDataRepo.getByIdentifier(cardTraitType);
 		if (matchSignup.getCard(card.getCardCategory()) == null) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Card is not already part of selected deck");
 		}
@@ -310,7 +310,7 @@ public class MatchService {
 		}
 		// check if need to remove free use granted card
 		if (card.getGrantsFreeUseOfCard().isPresent()) {
-			Card freeUseCard = sourceDataRepo.getByTraitType(card.getGrantsFreeUseOfCard().get());
+			Card freeUseCard = sourceDataRepo.getByIdentifier(card.getGrantsFreeUseOfCard().get());
 			if (freeUseCard.getTraitType().equals(matchSignup.getCard(freeUseCard.getCardCategory())) &&
 					matchSignup.isFreeUse(freeUseCard)) {
 				removeCardFromMatchDeck(match, player, freeUseCard.getTraitType());
@@ -364,7 +364,7 @@ public class MatchService {
 			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Can only commit during the draft phase");
 		}
 
-		for (CardCategory category : CardCategory.values()) {
+		for (CardCategory category : CardCategory.mainCategories) {
 			if (matchSignup.getCard(category) == null) {
 				throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "All cards must be assigned to commit");
 			}

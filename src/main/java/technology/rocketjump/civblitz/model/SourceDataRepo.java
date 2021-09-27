@@ -10,8 +10,8 @@ import java.util.*;
 public class SourceDataRepo {
 
 	private final Map<String, String> friendlyNameByCivilizationType = new TreeMap<>();
-	private final Map<String, Card> cardsByTraitType = new TreeMap<>();
-	private final Map<String, Card> cardsByCardName = new TreeMap<>();
+
+	private final Map<String, Card> cardsByIdentifier = new TreeMap<>();
 	private final Map<CardCategory, List<Card>> cardsByCategory = new EnumMap<>(CardCategory.class);
 	private final Map<String, String> subtypesByTraitType = new HashMap<>();
 	private final Map<String, IconAtlasEntry> iconAtlasEntriesByCivOrLeaderType = new HashMap<>();
@@ -31,6 +31,7 @@ public class SourceDataRepo {
 	public final Map<String, String> capitalNamesByCivType = new HashMap<>();
 
 	public final Map<String, CSVRecord> civilizationCsvRecordsByCivType = new HashMap<>();
+	public final Map<String, Card> civAbilityCardByFriendlyName = new HashMap<>();
 
 	@Autowired
 	public SourceDataRepo() {
@@ -42,21 +43,19 @@ public class SourceDataRepo {
 	}
 
 	public void add(Card card) {
-		if (cardsByTraitType.containsKey(card.getTraitType())) {
-			System.out.println("Duplicate card for trait type " + card.getTraitType());
+		if (cardsByIdentifier.containsKey(card.getIdentifier())) {
+			System.out.println("Duplicate card for identifier " + card.getIdentifier());
 		}
 
-		cardsByTraitType.put(card.getTraitType(), card);
-		cardsByCardName.put(card.getCardName(), card);
+		cardsByIdentifier.put(card.getIdentifier(), card);
 		cardsByCategory.computeIfAbsent(card.getCardCategory(), a -> new ArrayList<>()).add(card);
 	}
 
 	public void removeGrantedCards() {
-		for (String traitType : new ArrayList<>(cardsByTraitType.keySet())) {
-			Card card = cardsByTraitType.get(traitType);
+		for (String identifier : new ArrayList<>(cardsByIdentifier.keySet())) {
+			Card card = cardsByIdentifier.get(identifier);
 			if (card != null && card.getGrantsTraitType().isPresent()) {
-				Card removed = cardsByTraitType.remove(card.getGrantsTraitType().get());
-				cardsByCardName.remove(card.getCardName());
+				Card removed = cardsByIdentifier.remove(card.getGrantsTraitType().get());
 				cardsByCategory.get(removed.getCardCategory()).remove(removed);
 			}
 		}
@@ -64,15 +63,15 @@ public class SourceDataRepo {
 	}
 
 	public Collection<Card> getAll() {
-		return cardsByTraitType.values();
+		return cardsByIdentifier.values();
 	}
 
 	public String getFriendlyCivName(String civilizationType) {
 		return friendlyNameByCivilizationType.get(civilizationType);
 	}
 
-	public Card getByTraitType(String traitType) {
-		return cardsByTraitType.get(traitType);
+	public Card getByIdentifier(String cardIdentifier) {
+		return cardsByIdentifier.get(cardIdentifier);
 	}
 
 	public List<Card> getByCategory(CardCategory cardCategory) {
@@ -95,4 +94,7 @@ public class SourceDataRepo {
 		return iconAtlasEntriesByCivOrLeaderType.get(civOrLeaderType);
 	}
 
+	public void linkCivAbilityCard(String civilizationFriendlyName, Card card) {
+		civAbilityCardByFriendlyName.put(civilizationFriendlyName, card);
+	}
 }

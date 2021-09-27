@@ -16,7 +16,7 @@ public class CivTraitsSqlGenerator extends BlitzFileGenerator {
 		String modName = ModHeaderGenerator.buildName(civInfo.selectedCards).toUpperCase();
 		StringBuilder sqlBuilder = new StringBuilder();
 
-		for (CardCategory cardCategory : CardCategory.values()) {
+		for (CardCategory cardCategory : CardCategory.mainCategories) {
 			if (!cardCategory.equals(CardCategory.LeaderAbility)) {
 				Card card = civInfo.selectedCards.get(cardCategory);
 				addLine(sqlBuilder, card.getTraitType(), modName);

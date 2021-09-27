@@ -32,7 +32,7 @@ public class ModifiersCsvParser {
 				String traitType = record.get("TraitType");
 				String modifierId = record.get("ModifierId");
 
-				Card card = sourceDataRepe.getByTraitType(traitType);
+				Card card = sourceDataRepe.getByIdentifier(traitType);
 				if (card != null) {
 					card.getModifierIds().add(modifierId);
 				}

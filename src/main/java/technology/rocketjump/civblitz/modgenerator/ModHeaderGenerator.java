@@ -28,10 +28,10 @@ public class ModHeaderGenerator {
 		StringBuilder descriptionBuilder = new StringBuilder();
 		descriptionBuilder.append("This mod consists of a new civ using the ");
 		descriptionBuilder.append(selectedCards.get(CivilizationAbility).getCivilizationFriendlyName()).append(" civ ability, ");
-		descriptionBuilder.append(selectedCards.get(LeaderAbility).getCardName()).append(" as the leader, the ");
-		descriptionBuilder.append(selectedCards.get(UniqueInfrastructure).getCardName()).append(" unique infrastructure (from ")
+		descriptionBuilder.append(selectedCards.get(LeaderAbility).getBaseCardName()).append(" as the leader, the ");
+		descriptionBuilder.append(selectedCards.get(UniqueInfrastructure).getBaseCardName()).append(" unique infrastructure (from ")
 				.append(selectedCards.get(UniqueInfrastructure).getCivilizationFriendlyName()).append("), and the ");
-		descriptionBuilder.append(selectedCards.get(UniqueUnit).getCardName()).append(" unique unit (from ")
+		descriptionBuilder.append(selectedCards.get(UniqueUnit).getBaseCardName()).append(" unique unit (from ")
 				.append(selectedCards.get(UniqueUnit).getCivilizationFriendlyName()).append(").");
 
 
@@ -41,7 +41,7 @@ public class ModHeaderGenerator {
 	public static String buildName(Map<CardCategory, Card> selectedCards) {
 		StringBuilder nameBuilder = new StringBuilder();
 		nameBuilder.append(getShortName(selectedCards.get(CivilizationAbility).getCivilizationFriendlyName()));
-		nameBuilder.append(getShortName(selectedCards.get(CardCategory.LeaderAbility).getCardName()));
+		nameBuilder.append(getShortName(selectedCards.get(CardCategory.LeaderAbility).getBaseCardName()));
 		nameBuilder.append(getShortName(selectedCards.get(CardCategory.UniqueInfrastructure).getCivilizationFriendlyName()));
 		nameBuilder.append(getShortName(selectedCards.get(CardCategory.UniqueUnit).getCivilizationFriendlyName()));
 		return nameBuilder.toString();

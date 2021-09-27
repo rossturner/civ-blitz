@@ -17,7 +17,7 @@ import java.util.*;
 @Component
 public class ObjectiveDefinitionParser {
 
-	private static final int MAX_IDENTIFIER_LENGTH = 28;
+	public static final int MAX_IDENTIFIER_LENGTH = 28;
 	private final String googleApiKey;
 	private final RestTemplate restTemplate = new RestTemplate();
 	private final ObjectMapper objectMapper = new ObjectMapper();
@@ -135,7 +135,7 @@ public class ObjectiveDefinitionParser {
 		return Optional.of(objectiveDefinition);
 	}
 
-	private String toIdentifier(String name) {
+	public static String toIdentifier(String name) {
 		StringBuilder identifier = new StringBuilder();
 
 		for (int cursor = 0; cursor < name.length() && cursor < MAX_IDENTIFIER_LENGTH; cursor++) {

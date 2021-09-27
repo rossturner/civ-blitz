@@ -43,7 +43,7 @@ public class ModsController {
 		response.setContentType("application/zip");
 		response.setStatus(HttpServletResponse.SC_OK);
 		Map<CardCategory, Card> selectedCards = new HashMap<>();
-		traitTypes.stream().map(sourceDataRepo::getByTraitType).forEach(card -> {
+		traitTypes.stream().map(sourceDataRepo::getByIdentifier).forEach(card -> {
 			selectedCards.put(card.getCardCategory(), card);
 		});
 
@@ -65,8 +65,8 @@ public class ModsController {
 		List<ModdedCivInfo> civs = new ArrayList<>();
 		for (MatchSignupWithPlayer signup : match.signups) {
 			Map<CardCategory, Card> selectedCards = new HashMap<>();
-			for (CardCategory category : CardCategory.values()) {
-				Card card = sourceDataRepo.getByTraitType(signup.getCard(category));
+			for (CardCategory category : CardCategory.mainCategories) {
+				Card card = sourceDataRepo.getByIdentifier(signup.getCard(category));
 				selectedCards.put(card.getCardCategory(), card);
 			}
 			civs.add(new ModdedCivInfo(selectedCards, signup.getStartBiasCivType()));

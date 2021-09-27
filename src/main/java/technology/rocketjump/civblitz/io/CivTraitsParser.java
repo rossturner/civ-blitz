@@ -38,6 +38,7 @@ public class CivTraitsParser {
 				String friendlyCivName = sourceDataRepo.getFriendlyCivName(civilizationType);
 
 				Card card = new Card();
+				card.setIdentifier(record.get("TraitType"));
 				card.setCivilizationType(civilizationType);
 				card.setTraitType(record.get("TraitType"));
 				card.setMediaName(simplify(record.get("MediaName")));
@@ -46,11 +47,11 @@ public class CivTraitsParser {
 
 				String description = record.get("Description");
 				if (card.getCardCategory().equals(CardCategory.CivilizationAbility)) {
-					card.setCardName(friendlyCivName);
-					card.setCardDescription(description);
+					card.setBaseCardName(friendlyCivName);
+					card.setBaseCardDescription(description);
 				} else {
-					card.setCardName(description.substring(0, description.indexOf(":")));
-					card.setCardDescription(StringUtils.capitalize(description.substring(description.indexOf(":") + 2)));
+					card.setBaseCardName(description.substring(0, description.indexOf(":")));
+					card.setBaseCardDescription(StringUtils.capitalize(description.substring(description.indexOf(":") + 2)));
 				}
 
 				String grants = record.get("Grants");
@@ -63,6 +64,9 @@ public class CivTraitsParser {
 				}
 
 				sourceDataRepo.add(card);
+				if (card.getCardCategory().equals(CardCategory.CivilizationAbility)) {
+					sourceDataRepo.linkCivAbilityCard(card.getCivilizationFriendlyName(), card);
+				}
 			}
 		}
 	}

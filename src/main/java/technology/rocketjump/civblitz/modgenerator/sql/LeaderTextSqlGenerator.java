@@ -25,7 +25,7 @@ public class LeaderTextSqlGenerator extends BlitzFileGenerator {
 		sqlBuilder.append("INSERT OR REPLACE INTO LocalizedText\n" +
 				"(Tag, Language,\tText)\n" +
 				"VALUES\n" +
-				"('LOC_LEADER_IMP_").append(modName).append("', 'en_US', '").append(leaderCard.getCardName()).append(" (").append(civCard.getCardName()).append(")');");
+				"('LOC_LEADER_IMP_").append(modName).append("', 'en_US', '").append(leaderCard.getBaseCardName()).append(" (").append(civCard.getBaseCardName()).append(")');");
 
 		return sqlBuilder.toString();
 	}

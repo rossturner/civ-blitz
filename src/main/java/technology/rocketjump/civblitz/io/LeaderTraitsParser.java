@@ -40,14 +40,15 @@ public class LeaderTraitsParser {
 				sourceDataRepo.addCivFriendlyName(civilizationType, civFriendlyName);
 
 				Card card = new Card();
+				card.setIdentifier(traitType);
 				card.setCivilizationType(civilizationType);
 				card.setLeaderType(Optional.of(record.get("LeaderType")));
 				card.setTraitType(traitType);
 				card.setMediaName(simplify(record.get("MediaName")));
 				card.setCardCategory(CardCategory.LeaderAbility);
 				card.setCivilizationFriendlyName(civFriendlyName);
-				card.setCardName(getLeaderNameFrom(record.get("Name")));
-				card.setCardDescription(record.get("Description"));
+				card.setBaseCardName(getLeaderNameFrom(record.get("Name")));
+				card.setBaseCardDescription(record.get("Description"));
 
 				String grants = record.get("Grants");
 				if (!grants.isEmpty()) {
