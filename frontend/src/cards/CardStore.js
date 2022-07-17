@@ -2,7 +2,7 @@ import ImpRandom from "../ImpRandom";
 
 let allCards = [];
 
-export const CATEGORIES = ["CivilizationAbility", "LeaderAbility", "UniqueInfrastructure", "UniqueUnit"];
+export const CATEGORIES = ["CivilizationAbility", "LeaderAbility", "UniqueInfrastructure", "UniqueUnit", "Power", "ActOfGod"];
 
 const byCategory = {};
 const byTraitType = {};
@@ -31,6 +31,7 @@ const CardStore = {
         if (!CardStore.initialised) {
             allCards = allCards.concat(cards);
             cards.forEach(card => {
+                card.cardName = card.enhancedCardName || card.baseCardName;
                 byCategory[card.cardCategory].push(card);
                 byTraitType[card.traitType] = card;
                 if (card.cardCategory === 'CivilizationAbility') {

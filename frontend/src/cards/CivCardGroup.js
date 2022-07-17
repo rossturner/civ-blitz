@@ -35,7 +35,7 @@ const CivCardGroup = ({cards, cardClicked}) => {
         if (currentFilter && currentFilter !== cardJson.cardCategory) {
             return null;
         } else {
-            return (<CivCard key={index} cardJson={cardJson} onClick={() => cardClicked(cardJson)}/>);
+            return <CivCard key={index} cardJson={cardJson} onClick={() => cardClicked(cardJson)}/>;
         }
     })
 

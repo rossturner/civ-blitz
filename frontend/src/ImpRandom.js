@@ -14,7 +14,7 @@ const ImpRandom = {
     },
 
     cardSort: (a, b) => {
-        return a.cardCategory.localeCompare(b.cardCategory) || a.cardName.localeCompare(b.cardName);
+        return a.cardCategory.localeCompare(b.cardCategory) || a.baseCardName.localeCompare(b.baseCardName);
     }
 
 };
