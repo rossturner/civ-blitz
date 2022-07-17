@@ -47,6 +47,8 @@ public class Card {
 		this.identifier = original.identifier;
 		this.baseCardName = original.baseCardName;
 		this.baseCardDescription = original.baseCardDescription;
+		this.enhancedCardName = original.enhancedCardName;
+		this.enhancedCardDescription = original.enhancedCardDescription;
 		this.traitType = original.traitType;
 		this.civilizationType = original.civilizationType;
 		this.leaderType = original.leaderType;

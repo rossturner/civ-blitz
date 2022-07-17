@@ -4,7 +4,7 @@ import CivCardGroup from "../cards/CivCardGroup";
 import axios from "axios";
 import ImpRandom from "../ImpRandom";
 import CardInfo from "../cards/CardInfo";
-import {CATEGORIES, MAIN_CATEGORIES} from "../cards/CardStore";
+import {MAIN_CATEGORIES} from "../cards/CardStore";
 import CivCard from "../cards/CivCard";
 import CheckFreeUseOfCardModal from "./CheckFreeUseOfCardModal";
 import ObjectiveCard from "./objectives/ObjectiveCard";
@@ -140,7 +140,7 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
     const numSelectedSecretObjectives = secretObjectives.filter(s => s.selected).length;
 
     const canCommit = !currentPlayerSignup.committed && currentPlayerSignup.startBiasCivType &&
-        CATEGORIES.every(category => currentPlayerSignup[CardInfo.getSignupPropName(category)]) &&
+        MAIN_CATEGORIES.every(requiredCategory => currentPlayerSignup.selectedCards.find(card => card.cardCategory === requiredCategory)) &&
         numSelectedSecretObjectives === 3;
 
     const doCommit = () => {

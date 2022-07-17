@@ -1,6 +1,7 @@
 package technology.rocketjump.civblitz.modgenerator.sql;
 
 import org.apache.commons.csv.CSVRecord;
+import org.jooq.tools.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technology.rocketjump.civblitz.model.Card;
@@ -24,11 +25,17 @@ public class CivilizationSqlGenerator extends BlitzFileGenerator {
 	@Override
 	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
 		Card civAbilityCard = civInfo.getCard(CivilizationAbility);
-		return getCivilizationSql(
+		String civSql = getCivilizationSql(
 				ModHeaderGenerator.buildName(civInfo.selectedCards).toUpperCase(),
 				civAbilityCard.getCivilizationType(),
 				civInfo.startBiasCivType
 		);
+		for (Card card : civInfo.selectedCards) {
+			if (!StringUtils.isEmpty(card.getGameplaySQL())) {
+				civSql = civSql + "\n\n-- " + card.getIdentifier() + "\n" + card.getGameplaySQL();
+			}
+		}
+		return civSql;
 	}
 
 	private String getCivilizationSql(String modName, String namesCivType, String startBiasCivType) {

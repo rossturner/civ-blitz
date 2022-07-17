@@ -26,21 +26,6 @@ const CardInfo = {
         }
     },
 
-    getSignupPropName: (category) => {
-        switch (category) {
-            case 'CivilizationAbility':
-                return 'cardCivAbility';
-            case 'LeaderAbility':
-                return 'cardLeaderAbility';
-            case 'UniqueUnit':
-                return 'cardUniqueUnit';
-            case 'UniqueInfrastructure':
-                return 'cardUniqueInfrastruture';
-            default:
-                return 'Unknown';
-        }
-    },
-
     getCategoryColor: (category) => {
         switch (category) {
             case 'CivilizationAbility':

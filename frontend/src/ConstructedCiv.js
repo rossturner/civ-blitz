@@ -16,7 +16,7 @@ const ConstructedCiv = ({index, cards, editable, onCardClick, onConfirmClick, al
     const startBiases = {};
     if (cards) {
         cards.forEach(card => {
-            searchParams.append('traitType', card.traitType);
+            searchParams.append('cardIdentifier', card.identifier);
             startBiases[card.civilizationType] = card.civilizationFriendlyName;
         });
     }

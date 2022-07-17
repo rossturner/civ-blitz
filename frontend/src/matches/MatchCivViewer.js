@@ -1,7 +1,7 @@
 import {Card, CardGroup, Container, Placeholder} from "semantic-ui-react";
 import React, {useEffect, useState} from "react";
 import CardInfo from "../cards/CardInfo";
-import CardStore, {CATEGORIES} from "../cards/CardStore";
+import CardStore, {MAIN_CATEGORIES} from "../cards/CardStore";
 import CivCard from "../cards/CivCard";
 import ObjectiveCard from "./objectives/ObjectiveCard";
 import axios from "axios";
@@ -29,11 +29,10 @@ const MatchCivViewer = ({match, signup, loggedInPlayer, secretObjectivesProp, se
         }
     }, [secretObjectivesProp]);
 
-    const civItems = CATEGORIES.map(category => {
-        const propName = CardInfo.getSignupPropName(category);
-        if (signup[propName]) {
-            const card = CardStore.getCardByTraitType(signup[propName]);
-            return <CivCard key={category} cardJson={card} clickDisabled={true}/>;
+    const civItems = MAIN_CATEGORIES.map(category => {
+        let cardForCategory = signup.selectedCards.find(c => c.cardCategory === category);
+        if (cardForCategory) {
+            return <CivCard key={category} cardJson={cardForCategory} clickDisabled={true}/>;
         } else {
             return <Card
                 key={category}
@@ -52,6 +51,11 @@ const MatchCivViewer = ({match, signup, loggedInPlayer, secretObjectivesProp, se
             />;
         }
     });
+    signup.selectedCards.forEach(card => {
+        if (!MAIN_CATEGORIES.includes(card.cardCategory)) {
+            civItems.push(<CivCard key={card.identifier} cardJson={card} clickDisabled={true}/>);
+        }
+    })
 
     return (
         <React.Fragment>
