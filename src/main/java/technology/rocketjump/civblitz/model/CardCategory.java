@@ -4,15 +4,19 @@ import java.util.List;
 
 public enum CardCategory {
 
-	LeaderAbility,
 	CivilizationAbility,
+	LeaderAbility,
 	UniqueUnit,
 	UniqueInfrastructure,
 
 	Power,
 	ActOfGod;
 
-	public static List<CardCategory> mainCategories = List.of(LeaderAbility, CivilizationAbility, UniqueUnit, UniqueInfrastructure);
+	public static List<CardCategory> mainCategories = List.of(CivilizationAbility, LeaderAbility, UniqueUnit, UniqueInfrastructure);
+
+	public boolean isUpgradable() {
+		return this.equals(UniqueUnit) || this.equals(UniqueInfrastructure);
+	}
 
 	public static CardCategory parseAcronym(String acronym) {
 		switch (acronym) {

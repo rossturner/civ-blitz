@@ -24,7 +24,7 @@ const RevealableCard = ({cardJson}) => {
             <Transition visible={placeholderDisplayed} animation='scale' duration={500}
                         onComplete={placeholderComplete}>
                 <Card className='civ-card' onClick={placeholderClicked}>
-                    <Image src='/images/imperium.png' wrapped ui={false} />
+                    <Image src={'/images/CivBlitz_'+cardJson.rarity+'.png'} wrapped ui={false} />
                     <Card.Content>
                         <Card.Header>???</Card.Header>
                         <Card.Description>

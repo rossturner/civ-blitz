@@ -35,6 +35,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.tokenEndpoint().accessTokenResponseClient(accessTokenResponseClient())
 				.and()
 				.userInfoEndpoint().userService(userService());
+
+		// Required for h2 console to be usable
+		if (!isProduction(environment)) {
+			http.headers().frameOptions().disable();
+		}
 	}
 
 	public static boolean isProduction(Environment environment) {

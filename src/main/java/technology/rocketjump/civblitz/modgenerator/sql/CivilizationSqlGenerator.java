@@ -4,11 +4,12 @@ import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technology.rocketjump.civblitz.model.Card;
-import technology.rocketjump.civblitz.model.CardCategory;
 import technology.rocketjump.civblitz.model.SourceDataRepo;
 import technology.rocketjump.civblitz.modgenerator.ModHeaderGenerator;
 import technology.rocketjump.civblitz.modgenerator.model.ModHeader;
 import technology.rocketjump.civblitz.modgenerator.model.ModdedCivInfo;
+
+import static technology.rocketjump.civblitz.model.CardCategory.CivilizationAbility;
 
 @Component
 public class CivilizationSqlGenerator extends BlitzFileGenerator {
@@ -22,17 +23,15 @@ public class CivilizationSqlGenerator extends BlitzFileGenerator {
 
 	@Override
 	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
-		Card leaderAbilityCard = civInfo.selectedCards.get(CardCategory.LeaderAbility);
+		Card civAbilityCard = civInfo.getCard(CivilizationAbility);
 		return getCivilizationSql(
 				ModHeaderGenerator.buildName(civInfo.selectedCards).toUpperCase(),
-				leaderAbilityCard.getLeaderType().get(),
-				leaderAbilityCard.getCivilizationType(),
-				civInfo.selectedCards.get(CardCategory.CivilizationAbility).getCivilizationType(),
+				civAbilityCard.getCivilizationType(),
 				civInfo.startBiasCivType
 		);
 	}
 
-	private String getCivilizationSql(String modName, String leaderType, String leaderCivType, String namesCivType, String startBiasCivType) {
+	private String getCivilizationSql(String modName, String namesCivType, String startBiasCivType) {
 		StringBuilder sqlBuilder = new StringBuilder();
 
 		sqlBuilder.append("INSERT OR REPLACE INTO Types (Type, Kind)\n" +

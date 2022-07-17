@@ -4,7 +4,7 @@ import CivCardGroup from "../cards/CivCardGroup";
 import axios from "axios";
 import ImpRandom from "../ImpRandom";
 import CardInfo from "../cards/CardInfo";
-import CardStore, {CATEGORIES} from "../cards/CardStore";
+import {CATEGORIES, MAIN_CATEGORIES} from "../cards/CardStore";
 import CivCard from "../cards/CivCard";
 import CheckFreeUseOfCardModal from "./CheckFreeUseOfCardModal";
 import ObjectiveCard from "./objectives/ObjectiveCard";
@@ -14,7 +14,9 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
 
     const [loadingCollection, setLoadingCollection] = useState(true);
     const [collection, setCollection] = useState([]);
-    const [currentPlayerSignup, setCurrentPlayerSignup] = useState({});
+    const [currentPlayerSignup, setCurrentPlayerSignup] = useState({
+        selectedCards: []
+    });
     const [cardWithFreeUseCard, setCardWithFreeUseCard] = useState({});
     const [secretObjectives, setSecretObjectives] = useState([]);
 
@@ -56,7 +58,7 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
 
     const civCardClicked = (card) => {
         if (!currentPlayerSignup.committed) {
-            axios.post('/api/matches/' + match.matchId + '/cards/remove', {cardTraitType: card.traitType})
+            axios.post('/api/matches/' + match.matchId + '/cards/remove', {cardIdentifier: card.identifier})
                 .then(response => {
                     setCurrentPlayerSignup(response.data);
                     setLoadingCollection(true);
@@ -67,7 +69,7 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
 
     const addCard = (card, applyFreeUse) => {
         setCardWithFreeUseCard({});
-        const payload = {cardTraitType: card.traitType};
+        const payload = {cardIdentifier: card.identifier};
         if (applyFreeUse) {
             payload.applyFreeUse = true;
         }
@@ -80,12 +82,12 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
     };
 
     const startBiases = {};
-    CATEGORIES.forEach(category => {
-        const propName = CardInfo.getSignupPropName(category);
-        if (currentPlayerSignup[propName]) {
-            const card = CardStore.getCardByTraitType(currentPlayerSignup[propName]);
-            startBiases[card.civilizationType] = card.civilizationFriendlyName;
-        }
+    MAIN_CATEGORIES.forEach(category => {
+        currentPlayerSignup.selectedCards.forEach(selectedCard => {
+            if (selectedCard.cardCategory === category) {
+                startBiases[selectedCard.civilizationType] = selectedCard.civilizationFriendlyName;
+            }
+        })
     });
     const startBiasOptions = [];
     for (const [civType, friendlyName] of Object.entries(startBiases)) {
@@ -105,11 +107,10 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
     };
 
 
-    const civItems = CATEGORIES.map((category, index) => {
-        const propName = CardInfo.getSignupPropName(category);
-        if (currentPlayerSignup[propName]) {
-            const card = CardStore.getCardByTraitType(currentPlayerSignup[propName]);
-            return <CivCard key={card.cardName} cardJson={card} onClick={civCardClicked}
+    const civItems = MAIN_CATEGORIES.map(category => {
+        const card = currentPlayerSignup.selectedCards.find(card => card.cardCategory === category);
+        if (card) {
+            return <CivCard key={card.identifier} cardJson={card} onClick={civCardClicked}
                             clickDisabled={currentPlayerSignup.committed}/>;
         } else {
             return <Card
@@ -129,6 +130,12 @@ const MatchCivBuilder = ({match, loggedInPlayer, onCommitChange}) => {
             />;
         }
     });
+    currentPlayerSignup.selectedCards.forEach(card => {
+        if (!MAIN_CATEGORIES.includes(card.cardCategory)) {
+            civItems.push(<CivCard key={card.identifier} cardJson={card} onClick={civCardClicked}
+                                   clickDisabled={currentPlayerSignup.committed}/>);
+        }
+    })
 
     const numSelectedSecretObjectives = secretObjectives.filter(s => s.selected).length;
 

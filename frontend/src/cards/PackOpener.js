@@ -44,7 +44,7 @@ const PackOpener = () => {
                     }
 
                     <CardGroup centered>
-                        {packContents.cards.map(card => <RevealableCard key={card.cardName} cardJson={card} />)}
+                        {packContents.cards.map(card => <RevealableCard key={card.identifier} cardJson={card} />)}
                     </CardGroup>
 
                 </React.Fragment>

@@ -89,7 +89,7 @@ public class ModifierCardsParser {
 		if (type.equalsIgnoreCase("Power")) {
 			return parsePowerCard(row, identifier, name);
 		} else if (type.equalsIgnoreCase("Upgrade")) {
-			return parseUpgradeCard(row, identifier, name);
+			return parseUpgradeCard(row, name);
 		} else {
 			logger.error("Unrecognised Type field in Modifiers sheet: " + type);
 			return Optional.empty();
@@ -139,10 +139,10 @@ public class ModifierCardsParser {
 		return Optional.of(powerCard);
 	}
 
-	private Optional<Card> parseUpgradeCard(JsonNode row, String identifier, String name) {
+	private Optional<Card> parseUpgradeCard(JsonNode row, String name) {
 
 		String upgradesCard = getColumn(row, ColumnHeader.UpgradesCard);
-		Card baseCard = sourceDataRepo.getByIdentifier(upgradesCard);
+		Card baseCard = sourceDataRepo.getBaseCardByTraitType(upgradesCard);
 		if (baseCard == null) {
 			logger.error("Can not find base card " + upgradesCard + " for upgrade " + name);
 			return Optional.empty();
@@ -158,7 +158,7 @@ public class ModifierCardsParser {
 			return Optional.empty();
 		}
 
-		identifier = rarity.name().toUpperCase()+"_"+upgradesCard;
+		String identifier = rarity.name().toUpperCase()+"_"+upgradesCard;
 		if (sourceDataRepo.getByIdentifier(identifier) != null) {
 			logger.error("Duplicate card with identifier " + identifier);
 			return Optional.empty();

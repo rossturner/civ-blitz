@@ -16,7 +16,7 @@ const CivCard = ({cardJson, onClick, clickDisabled}) => {
 
     const header = (
         <Card.Header>
-            {cardJson.cardName}
+            {cardJson.enhancedCardName || cardJson.baseCardName}
             {cardJson.quantity > 1 &&
             <React.Fragment>&nbsp;(x{cardJson.quantity})</React.Fragment>
             }

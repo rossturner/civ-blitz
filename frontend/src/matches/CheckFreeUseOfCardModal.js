@@ -21,7 +21,7 @@ const EditMatchModal = ({cardWithFreeUseCard, onConfirm, onCancel}) => {
             <Modal.Header>Do you want to use this card for free?</Modal.Header>
             <Modal.Content>
                 <Modal.Description>
-                    <p>Adding {cardWithFreeUseCard.cardName} comes with a free use of the {cardWithFreeUseCard.freeUseCard && cardWithFreeUseCard.freeUseCard.cardName} card. Do you wish to add this card as well?</p>
+                    <p>Adding {cardWithFreeUseCard.enhancedCardName || cardWithFreeUseCard.baseCardName} comes with a free use of the {cardWithFreeUseCard.freeUseCard && cardWithFreeUseCard.freeUseCard.baseCardName} card. Do you wish to add this card as well?</p>
                     {cardWithFreeUseCard.freeUseCard &&
                     <CivCard cardJson={cardWithFreeUseCard.freeUseCard} clickDisabled={true}/>
                     }

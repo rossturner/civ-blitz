@@ -25,8 +25,8 @@ public class IconsSqlGenerator extends BlitzFileGenerator {
 
 		String name = ModHeaderGenerator.buildName(civInfo.selectedCards).toUpperCase();
 
-		IconAtlasEntry civIconEntry = sourceDataRepo.getIconAtlasEntry(civInfo.selectedCards.get(CardCategory.CivilizationAbility).getCivilizationType());
-		IconAtlasEntry leaderIconEntry = sourceDataRepo.getIconAtlasEntry(civInfo.selectedCards.get(CardCategory.LeaderAbility).getLeaderType().get());
+		IconAtlasEntry civIconEntry = sourceDataRepo.getIconAtlasEntry(civInfo.getCard(CardCategory.CivilizationAbility).getCivilizationType());
+		IconAtlasEntry leaderIconEntry = sourceDataRepo.getIconAtlasEntry(civInfo.getCard(CardCategory.LeaderAbility).getLeaderType().orElseThrow());
 
 		sqlBuilder.append("INSERT OR REPLACE INTO IconDefinitions\n" +
 				"\t\t(Name,\t\t\t\t\t\t\t\t\tAtlas, \t\t\t\t\t\t\t\t\t'Index')\n" +

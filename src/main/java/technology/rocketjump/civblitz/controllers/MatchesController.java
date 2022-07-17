@@ -67,7 +67,7 @@ public class MatchesController {
 				// Hide other players' selections in draft stage
 				match.signups.forEach(signup -> {
 					if (!signup.getPlayerId().equals(currentPlayerId)) {
-						signup.hideAllCards();
+						signup.getSelectedCards().clear();
 					}
 				});
 			}
@@ -105,7 +105,7 @@ public class MatchesController {
 			String currentPlayerId = jwToken == null ? null : jwtService.parse(jwToken).getDiscordId();
 			match.signups.forEach(signup -> {
 				if (!signup.getPlayerId().equals(currentPlayerId)) {
-					signup.hideAllCards();
+					signup.getSelectedCards().clear();
 				}
 			});
 		}
@@ -308,9 +308,9 @@ public class MatchesController {
 			if (match.isEmpty()) {
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 			} else {
-				String cardTraitType = payload.get("cardTraitType").toString();
+				String cardIdentifier = payload.get("cardIdentifier").toString();
 				boolean applyFreeUse = payload.containsKey("applyFreeUse") && (boolean) payload.get("applyFreeUse");
-				return matchService.addCardToMatchDeck(match.get(), player, cardTraitType, applyFreeUse);
+				return matchService.addCardToMatchDeck(match.get(), player, cardIdentifier, applyFreeUse);
 			}
 		}
 	}
@@ -327,8 +327,8 @@ public class MatchesController {
 			if (match.isEmpty()) {
 				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 			} else {
-				String cardTraitType = payload.get("cardTraitType").toString();
-				return matchService.removeCardFromMatchDeck(match.get(), player, cardTraitType);
+				String cardIdentifier = payload.get("cardIdentifier").toString();
+				return matchService.removeCardFromMatchDeck(match.get(), player, cardIdentifier);
 			}
 		}
 	}

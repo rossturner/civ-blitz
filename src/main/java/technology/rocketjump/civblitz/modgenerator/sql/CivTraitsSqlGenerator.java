@@ -8,6 +8,8 @@ import technology.rocketjump.civblitz.modgenerator.model.ModHeader;
 import technology.rocketjump.civblitz.modgenerator.model.ModdedCivInfo;
 import technology.rocketjump.civblitz.modgenerator.sql.actsofgod.ActOfGod;
 
+import static technology.rocketjump.civblitz.model.CardCategory.CivilizationAbility;
+
 @Component
 public class CivTraitsSqlGenerator extends BlitzFileGenerator {
 
@@ -18,13 +20,13 @@ public class CivTraitsSqlGenerator extends BlitzFileGenerator {
 
 		for (CardCategory cardCategory : CardCategory.mainCategories) {
 			if (!cardCategory.equals(CardCategory.LeaderAbility)) {
-				Card card = civInfo.selectedCards.get(cardCategory);
+				Card card = civInfo.getCard(cardCategory);
 				addLine(sqlBuilder, card.getTraitType(), modName);
 				if (card.getGrantsTraitType().isPresent()) {
 					addLine(sqlBuilder, card.getGrantsTraitType().get(), modName);
 				}
 
-				if (cardCategory.equals(CardCategory.CivilizationAbility)) {
+				if (cardCategory.equals(CivilizationAbility)) {
 					for (ActOfGod actOfGod : modHeader.actsOfGod) {
 						actOfGod.applyToCivTrait(card.getTraitType(), modName, sqlBuilder);
 					}
@@ -32,7 +34,7 @@ public class CivTraitsSqlGenerator extends BlitzFileGenerator {
 			}
 		}
 
-		Card civAbilityCard = civInfo.selectedCards.get(CardCategory.CivilizationAbility);
+		Card civAbilityCard = civInfo.getCard(CivilizationAbility);
 		if (civAbilityCard.getTraitType().equals("TRAIT_CIVILIZATION_MAYAB")) {
 			sqlBuilder.append("INSERT OR REPLACE INTO RequirementArguments (RequirementId, Name, Type, Value) VALUES (")
 					.append("'PLAYER_IS_MAYA', 'CivilizationType', 'ARGTYPE_IDENTITY', '").append(modName).append("');\n");

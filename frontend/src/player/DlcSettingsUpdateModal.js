@@ -40,7 +40,7 @@ const DlcSettingsUpdateModal = ({showModal, playerSettings, onConfirm, onCancel}
         .map(setting => <List.Item key={setting.dlcName}>{setting.dlcName}</List.Item>);
 
     const cardNames = cardsToBeRerolled
-        .map(card => <List.Item key={card.cardName}>{card.cardName}</List.Item>);
+        .map(card => <List.Item key={card.identifier}>{card.enhancedCardName || card.baseCardName}</List.Item>);
 
     return (
         <Modal

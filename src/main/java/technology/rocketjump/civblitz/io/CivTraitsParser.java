@@ -38,7 +38,7 @@ public class CivTraitsParser {
 				String friendlyCivName = sourceDataRepo.getFriendlyCivName(civilizationType);
 
 				Card card = new Card();
-				card.setIdentifier(record.get("TraitType"));
+				card.setIdentifier("COMMON_"+record.get("TraitType"));
 				card.setCivilizationType(civilizationType);
 				card.setTraitType(record.get("TraitType"));
 				card.setMediaName(simplify(record.get("MediaName")));

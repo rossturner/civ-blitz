@@ -1,6 +1,9 @@
 package technology.rocketjump.civblitz.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 public class Card {
 
@@ -71,12 +74,12 @@ public class Card {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Card card = (Card) o;
-		return traitType.equals(card.traitType);
+		return identifier.equals(card.identifier);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(traitType);
+		return identifier.hashCode();
 	}
 
 	public String getIdentifier() {

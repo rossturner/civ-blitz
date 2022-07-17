@@ -7,10 +7,7 @@ import org.springframework.web.server.ResponseStatusException;
 import technology.rocketjump.civblitz.auth.AuditLogger;
 import technology.rocketjump.civblitz.cards.CollectionService;
 import technology.rocketjump.civblitz.cards.PackService;
-import technology.rocketjump.civblitz.codegen.tables.pojos.Match;
-import technology.rocketjump.civblitz.codegen.tables.pojos.MatchSignup;
-import technology.rocketjump.civblitz.codegen.tables.pojos.Player;
-import technology.rocketjump.civblitz.codegen.tables.pojos.SecretObjective;
+import technology.rocketjump.civblitz.codegen.tables.pojos.*;
 import technology.rocketjump.civblitz.mapgen.MapSettings;
 import technology.rocketjump.civblitz.mapgen.MapSettingsGenerator;
 import technology.rocketjump.civblitz.matches.objectives.ObjectivesService;
@@ -23,6 +20,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import static technology.rocketjump.civblitz.matches.MatchState.*;
+import static technology.rocketjump.civblitz.model.CardCategory.mainCategories;
 
 @Service
 public class MatchService {
@@ -158,11 +156,8 @@ public class MatchService {
 		for (MatchSignupWithPlayer signup : matchWithPlayers.signups) {
 			signup = uncommitPlayer(matchWithPlayers, signup.getPlayer());
 
-			for (CardCategory category : CardCategory.values()) {
-				String selectedCard = signup.getCard(category);
-				if (selectedCard != null) {
-					removeCardFromMatchDeck(matchWithPlayers, signup.getPlayer(), selectedCard);
-				}
+			for (Card selectedCard : signup.getSelectedCards()) {
+				removeCardFromMatchDeck(matchWithPlayers, signup.getPlayer(), selectedCard.getIdentifier());
 			}
 
 			signup.setStartBiasCivType(null);
@@ -242,13 +237,13 @@ public class MatchService {
 		}
 	}
 
-	public synchronized MatchSignupWithPlayer addCardToMatchDeck(MatchWithPlayers match, Player player, String cardTraitType, boolean applyFreeUse) {
+	public synchronized MatchSignupWithPlayer addCardToMatchDeck(MatchWithPlayers match, Player player, String cardIdentifier, boolean applyFreeUse) {
 		if (!match.getMatchState().equals(DRAFT)) {
 			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Can only add to deck during draft phase");
 		}
 
 		List<CollectionCard> playerCollection = collectionService.getCollection(player);
-		CollectionCard cardInCollection = playerCollection.stream().filter(c -> c.getTraitType().equals(cardTraitType)).findFirst()
+		CollectionCard cardInCollection = playerCollection.stream().filter(c -> c.getIdentifier().equals(cardIdentifier)).findFirst()
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Card does not exist in player's collection"));
 		if (cardInCollection.getQuantity() < 1) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Card has no quantity in player's collection");
@@ -259,32 +254,28 @@ public class MatchService {
 			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Can not change cards once committed");
 		}
 
-		String existingCardSelection = matchSignup.getCard(cardInCollection.getCardCategory());
-		if (existingCardSelection != null) {
-			removeCardFromMatchDeck(match, player, existingCardSelection);
+		Optional<Card> existingCardSelection = matchSignup.getCard(cardInCollection.getCardCategory());
+		if (existingCardSelection.isPresent() && mainCategories.contains(existingCardSelection.get().getCardCategory())) {
+			removeCardFromMatchDeck(match, player, existingCardSelection.get().getIdentifier());
 		}
 
 		if (applyFreeUse) {
 			String freeUseCardTraitType = cardInCollection.getGrantsFreeUseOfCard()
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Card does not come with a free use card"));
-			Card freeUseCard = sourceDataRepo.getByIdentifier(freeUseCardTraitType);
+			Card freeUseCard = sourceDataRepo.getBaseCardByTraitType(freeUseCardTraitType);
 			existingCardSelection = matchSignup.getCard(freeUseCard.getCardCategory());
-			if (existingCardSelection != null) {
-				removeCardFromMatchDeck(match, player, existingCardSelection);
-			}
+			existingCardSelection.ifPresent(card -> removeCardFromMatchDeck(match, player, card.getIdentifier()));
 
-			matchSignup.setCard(freeUseCard);
-			matchSignup.setFreeUse(freeUseCard, true);
+			matchRepo.addCardSelection(matchSignup, freeUseCard, true);
 		}
 
-		matchSignup.setCard(cardInCollection);
-		matchRepo.updateSignup(matchSignup);
+		matchRepo.addCardSelection(matchSignup, cardInCollection, false);
 		collectionService.removeFromCollection(cardInCollection, player);
 
 		return matchSignup;
 	}
 
-	public synchronized MatchSignupWithPlayer removeCardFromMatchDeck(MatchWithPlayers match, Player player, String cardTraitType) {
+	public synchronized MatchSignupWithPlayer removeCardFromMatchDeck(MatchWithPlayers match, Player player, String cardIdentifier) {
 		if (!match.getMatchState().equals(DRAFT)) {
 			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Can only remove from deck during draft phase");
 		}
@@ -294,29 +285,29 @@ public class MatchService {
 			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Can not change cards once committed");
 		}
 
-		Card card = sourceDataRepo.getByIdentifier(cardTraitType);
-		if (matchSignup.getCard(card.getCardCategory()) == null) {
+		Card card = sourceDataRepo.getByIdentifier(cardIdentifier);
+		if (!matchSignup.getSelectedCards().contains(card)) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Card is not already part of selected deck");
 		}
 
-		matchSignup.removeCard(card);
+		Optional<MatchSignupCard> removed = matchRepo.removeCardSelection(matchSignup, card);
+		if (removed.isPresent() && !removed.get().getIsFree()) {
+			collectionService.addToCollection(card, player);
+		}
+
 		if (card.getCivilizationType().equals(matchSignup.getStartBiasCivType())) {
 			matchSignup.setStartBiasCivType(null);
 		}
-		if (matchSignup.isFreeUse(card)) {
-			matchSignup.setFreeUse(card, false);
-		} else {
-			collectionService.addToCollection(card, player);
-		}
 		// check if need to remove free use granted card
 		if (card.getGrantsFreeUseOfCard().isPresent()) {
-			Card freeUseCard = sourceDataRepo.getByIdentifier(card.getGrantsFreeUseOfCard().get());
-			if (freeUseCard.getTraitType().equals(matchSignup.getCard(freeUseCard.getCardCategory())) &&
-					matchSignup.isFreeUse(freeUseCard)) {
-				removeCardFromMatchDeck(match, player, freeUseCard.getTraitType());
+			Card freeUseCard = sourceDataRepo.getBaseCardByTraitType(card.getGrantsFreeUseOfCard().get());
+			Optional<Card> selectedCardForCategory = matchSignup.getCard(freeUseCard.getCardCategory());
+			if (selectedCardForCategory.isPresent() && selectedCardForCategory.get().equals(freeUseCard)) {
+				if (matchRepo.isFreeUse(matchSignup, freeUseCard)) {
+					removeCardFromMatchDeck(match, player, freeUseCard.getIdentifier());
+				}
 			}
 		}
-		matchRepo.updateSignup(matchSignup);
 		return matchSignup;
 	}
 
@@ -364,7 +355,7 @@ public class MatchService {
 			throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "Can only commit during the draft phase");
 		}
 
-		for (CardCategory category : CardCategory.mainCategories) {
+		for (CardCategory category : mainCategories) {
 			if (matchSignup.getCard(category) == null) {
 				throw new ResponseStatusException(HttpStatus.PRECONDITION_FAILED, "All cards must be assigned to commit");
 			}

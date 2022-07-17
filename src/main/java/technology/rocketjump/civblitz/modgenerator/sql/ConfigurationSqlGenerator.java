@@ -25,7 +25,7 @@ public class ConfigurationSqlGenerator extends BlitzFileGenerator {
 
 		String modName = ModHeaderGenerator.buildName(civInfo.selectedCards).toUpperCase();
 
-		Card civAbilityCard = civInfo.selectedCards.get(CardCategory.CivilizationAbility);
+		Card civAbilityCard = civInfo.getCard(CardCategory.CivilizationAbility);
 		String civType = civAbilityCard.getCivilizationType();
 		String civName = sourceDataRepo.civNameByCivType.get(civType);
 		String civIcon = sourceDataRepo.civIconByCivType.get(civType);
@@ -34,7 +34,7 @@ public class ConfigurationSqlGenerator extends BlitzFileGenerator {
 		String civAbilityDesc = sourceDataRepo.civAbilityDescByCivType.get(civType);
 		String civAbilityIcon = sourceDataRepo.civAbilityIconByCivType.get(civType);
 
-		Card leaderAbilityCard = civInfo.selectedCards.get(CardCategory.LeaderAbility);
+		Card leaderAbilityCard = civInfo.getCard(CardCategory.LeaderAbility);
 		String leaderType = leaderAbilityCard.getLeaderType().get();
 		String leaderTrait = leaderAbilityCard.getTraitType();
 		String leaderIcon = sourceDataRepo.leaderIconByLeaderType.get(leaderType);
@@ -82,16 +82,18 @@ public class ConfigurationSqlGenerator extends BlitzFileGenerator {
 
 		int sortIndex = 10;
 
-		for (Card card : civInfo.selectedCards.values()) {
-			if (!card.getCardCategory().equals(CardCategory.LeaderAbility) && !card.getCardCategory().equals(CardCategory.CivilizationAbility)) {
-				addTraitPlayerItem(sqlBuilder, modName, card.getTraitType(), card.getCivilizationType(), sortIndex);
-				sortIndex += 10;
-			}
+		for (Card card : civInfo.selectedCards) {
+			if (CardCategory.mainCategories.contains(card.getCardCategory())) {
+				if (!card.getCardCategory().equals(CardCategory.LeaderAbility) && !card.getCardCategory().equals(CardCategory.CivilizationAbility)) {
+					addTraitPlayerItem(sqlBuilder, modName, card.getTraitType(), card.getCivilizationType(), sortIndex);
+					sortIndex += 10;
+				}
 
-			// add granted stuff, including from CA and LA
-			if (card.getGrantsTraitType().isPresent()) {
-				addTraitPlayerItem(sqlBuilder, modName, card.getGrantsTraitType().get(), card.getCivilizationType(), sortIndex);
-				sortIndex += 10;
+				// add granted stuff, including from CA and LA
+				if (card.getGrantsTraitType().isPresent()) {
+					addTraitPlayerItem(sqlBuilder, modName, card.getGrantsTraitType().get(), card.getCivilizationType(), sortIndex);
+					sortIndex += 10;
+				}
 			}
 		}
 

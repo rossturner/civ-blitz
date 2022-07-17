@@ -35,7 +35,7 @@ public class SubtypesParser {
 
 				sourceDataRepo.addSubtypeByTraitType(traitType, subtype);
 
-				Card card = sourceDataRepo.getByIdentifier(traitType);
+				Card card = sourceDataRepo.getBaseCardByTraitType(traitType);
 				if (card == null) {
 					throw new RuntimeException("Could not find card for TraitType " + traitType);
 				} else {

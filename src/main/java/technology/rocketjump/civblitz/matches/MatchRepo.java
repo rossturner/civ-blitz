@@ -5,16 +5,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technology.rocketjump.civblitz.codegen.tables.pojos.Match;
 import technology.rocketjump.civblitz.codegen.tables.pojos.MatchSignup;
+import technology.rocketjump.civblitz.codegen.tables.pojos.MatchSignupCard;
 import technology.rocketjump.civblitz.codegen.tables.pojos.Player;
 import technology.rocketjump.civblitz.codegen.tables.records.MatchRecord;
+import technology.rocketjump.civblitz.codegen.tables.records.MatchSignupCardRecord;
+import technology.rocketjump.civblitz.model.Card;
 import technology.rocketjump.civblitz.model.MatchSignupWithPlayer;
 import technology.rocketjump.civblitz.model.MatchWithPlayers;
+import technology.rocketjump.civblitz.model.SourceDataRepo;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static technology.rocketjump.civblitz.codegen.tables.Match.MATCH;
 import static technology.rocketjump.civblitz.codegen.tables.MatchSignup.MATCH_SIGNUP;
+import static technology.rocketjump.civblitz.codegen.tables.MatchSignupCard.MATCH_SIGNUP_CARD;
 import static technology.rocketjump.civblitz.codegen.tables.Player.PLAYER;
 import static technology.rocketjump.civblitz.matches.MatchState.SIGNUPS;
 
@@ -22,10 +27,12 @@ import static technology.rocketjump.civblitz.matches.MatchState.SIGNUPS;
 public class MatchRepo {
 
 	private final DSLContext create;
+	private final SourceDataRepo sourceDataRepo;
 
 	@Autowired
-	public MatchRepo(DSLContext create) {
+	public MatchRepo(DSLContext create, SourceDataRepo sourceDataRepo) {
 		this.create = create;
+		this.sourceDataRepo = sourceDataRepo;
 	}
 
 	public Integer getNumActiveMatches(Player player) {
@@ -71,7 +78,11 @@ public class MatchRepo {
 				.stream().map(entry -> new MatchWithPlayers(entry.getKey(),
 						entry.getValue().stream()
 								.filter(signup -> signup.getPlayerId() != null)
-								.map(signup -> new MatchSignupWithPlayer(signup, playersById.get(signup.getPlayerId())))
+								.map(signup -> {
+									Player player = playersById.get(signup.getPlayerId());
+									List<Card> selectedCards = getSelectedCards(signup);
+									return new MatchSignupWithPlayer(signup, player, selectedCards);
+								})
 								.collect(Collectors.toList())))
 				.findFirst();
 	}
@@ -117,7 +128,8 @@ public class MatchRepo {
 				.stream().map(entry -> new MatchWithPlayers(entry.getKey(),
 						entry.getValue().stream()
 								.filter(signup -> signup.getPlayerId() != null)
-								.map(signup -> new MatchSignupWithPlayer(signup, playersById.get(signup.getPlayerId())))
+								.map(signup -> new MatchSignupWithPlayer(signup, playersById.get(signup.getPlayerId()),
+										getSelectedCards(signup)))
 								.collect(Collectors.toList())))
 				.collect(Collectors.toList());
 	}
@@ -133,10 +145,6 @@ public class MatchRepo {
 			newSignup.setMatchId(match.getMatchId());
 			newSignup.setPlayerId(player.getPlayerId());
 			newSignup.setCommitted(false);
-			newSignup.setCivAbilityIsFree(false);
-			newSignup.setLeaderAbilityIsFree(false);
-			newSignup.setUniqueInfrastructureIsFree(false);
-			newSignup.setUniqueUnitIsFree(false);
 			create.newRecord(MATCH_SIGNUP, newSignup).store();
 		}
 	}
@@ -169,14 +177,6 @@ public class MatchRepo {
 
 	public void updateSignup(MatchSignup matchSignup) {
 		create.update(MATCH_SIGNUP)
-				.set(MATCH_SIGNUP.CARD_CIV_ABILITY, matchSignup.getCardCivAbility())
-				.set(MATCH_SIGNUP.CARD_LEADER_ABILITY, matchSignup.getCardLeaderAbility())
-				.set(MATCH_SIGNUP.CARD_UNIQUE_INFRASTRUTURE, matchSignup.getCardUniqueInfrastruture())
-				.set(MATCH_SIGNUP.CARD_UNIQUE_UNIT, matchSignup.getCardUniqueUnit())
-				.set(MATCH_SIGNUP.CIV_ABILITY_IS_FREE, matchSignup.getCivAbilityIsFree())
-				.set(MATCH_SIGNUP.LEADER_ABILITY_IS_FREE, matchSignup.getLeaderAbilityIsFree())
-				.set(MATCH_SIGNUP.UNIQUE_INFRASTRUCTURE_IS_FREE, matchSignup.getUniqueInfrastructureIsFree())
-				.set(MATCH_SIGNUP.UNIQUE_UNIT_IS_FREE, matchSignup.getUniqueUnitIsFree())
 				.set(MATCH_SIGNUP.START_BIAS_CIV_TYPE, matchSignup.getStartBiasCivType())
 				.set(MATCH_SIGNUP.COMMITTED, matchSignup.getCommitted())
 				.set(MATCH_SIGNUP.FINAL_POINTS_AWARDED, matchSignup.getFinalPointsAwarded())
@@ -195,9 +195,61 @@ public class MatchRepo {
 				.execute();
 	}
 
+	private List<Card> getSelectedCards(MatchSignup signup) {
+		return create.select(MATCH_SIGNUP_CARD.CARD_IDENTIFIER)
+				.from(MATCH_SIGNUP_CARD)
+				.where(MATCH_SIGNUP_CARD.MATCH_ID.eq(signup.getMatchId()).and(MATCH_SIGNUP_CARD.PLAYER_ID.eq(signup.getPlayerId())))
+				.fetch(MATCH_SIGNUP_CARD.CARD_IDENTIFIER)
+				.stream().map(sourceDataRepo::getByIdentifier)
+				.collect(Collectors.toList());
+	}
+
 	public List<MatchSignup> getSignupsForPlayer(Player player) {
 		return create.selectFrom(MATCH_SIGNUP)
 				.where(MATCH_SIGNUP.PLAYER_ID.eq(player.getPlayerId()))
 				.fetchInto(MatchSignup.class);
+	}
+
+	public void addCardSelection(MatchSignupWithPlayer matchSignup, Card card, boolean isFree) {
+		MatchSignupCard cardSignup = new MatchSignupCard();
+		cardSignup.setMatchId(matchSignup.getMatchId());
+		cardSignup.setPlayerId(matchSignup.getPlayerId());
+		cardSignup.setCardIdentifier(card.getIdentifier());
+		cardSignup.setIsFree(isFree);
+
+		MatchSignupCardRecord cardSignupRecord = create.newRecord(MATCH_SIGNUP_CARD, cardSignup);
+		cardSignupRecord.store();
+		matchSignup.getSelectedCards().add(new Card(card));
+	}
+
+	public Optional<MatchSignupCard> removeCardSelection(MatchSignupWithPlayer matchSignup, Card card) {
+		Optional<MatchSignupCardRecord> optRecord = create.selectFrom(MATCH_SIGNUP_CARD)
+				.where(MATCH_SIGNUP_CARD.MATCH_ID.eq(matchSignup.getMatchId())
+						.and(MATCH_SIGNUP_CARD.PLAYER_ID.eq(matchSignup.getPlayerId()))
+						.and(MATCH_SIGNUP_CARD.CARD_IDENTIFIER.eq(card.getIdentifier())))
+				.fetchOptional();
+
+		if (optRecord.isPresent()) {
+			MatchSignupCard pojo = optRecord.get().into(MatchSignupCard.class);
+			optRecord.get().delete();
+			matchSignup.getSelectedCards().remove(card);
+			return Optional.of(pojo);
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	public boolean isFreeUse(MatchSignup matchSignup, Card card) {
+		Optional<MatchSignupCard> matchSignupCard = create.selectFrom(MATCH_SIGNUP_CARD)
+				.where(MATCH_SIGNUP_CARD.MATCH_ID.eq(matchSignup.getMatchId())
+						.and(MATCH_SIGNUP_CARD.PLAYER_ID.eq(matchSignup.getPlayerId()))
+						.and(MATCH_SIGNUP_CARD.CARD_IDENTIFIER.eq(card.getIdentifier())))
+				.fetchOptionalInto(MatchSignupCard.class);
+
+		if (matchSignupCard.isPresent()) {
+			return matchSignupCard.get().getIsFree();
+		} else {
+			return false;
+		}
 	}
 }

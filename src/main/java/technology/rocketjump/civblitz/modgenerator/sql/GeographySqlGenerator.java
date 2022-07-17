@@ -12,7 +12,7 @@ public class GeographySqlGenerator extends BlitzFileGenerator {
 	@Override
 	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
 		return getGeographySql(ModHeaderGenerator.buildName(civInfo.selectedCards).toUpperCase(),
-				civInfo.selectedCards.get(CardCategory.CivilizationAbility).getCivilizationType());
+				civInfo.getCard(CardCategory.CivilizationAbility).getCivilizationType());
 	}
 
 	public String getGeographySql(String modName, String geographyCivType) {

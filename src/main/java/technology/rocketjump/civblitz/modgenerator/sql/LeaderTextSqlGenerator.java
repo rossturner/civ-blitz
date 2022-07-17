@@ -19,8 +19,8 @@ public class LeaderTextSqlGenerator extends BlitzFileGenerator {
 
 		String modName = ModHeaderGenerator.buildName(civInfo.selectedCards).toUpperCase();
 
-		Card civCard = civInfo.selectedCards.get(CardCategory.CivilizationAbility);
-		Card leaderCard = civInfo.selectedCards.get(CardCategory.LeaderAbility);
+		Card civCard = civInfo.getCard(CardCategory.CivilizationAbility);
+		Card leaderCard = civInfo.getCard(CardCategory.LeaderAbility);
 
 		sqlBuilder.append("INSERT OR REPLACE INTO LocalizedText\n" +
 				"(Tag, Language,\tText)\n" +

@@ -12,7 +12,7 @@ public class ColorsSqlGenerator extends BlitzFileGenerator {
 	@Override
 	public String getFileContents(ModHeader modHeader, ModdedCivInfo civInfo) {
 		return getColorsSql(ModHeaderGenerator.buildName(civInfo.selectedCards).toUpperCase(),
-				civInfo.selectedCards.get(CardCategory.LeaderAbility).getLeaderType().get());
+				civInfo.getCard(CardCategory.LeaderAbility).getLeaderType().orElseThrow());
 	}
 
 	public String getColorsSql(String modName, String leaderType) {

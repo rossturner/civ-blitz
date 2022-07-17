@@ -40,7 +40,7 @@ public class LeaderTraitsParser {
 				sourceDataRepo.addCivFriendlyName(civilizationType, civFriendlyName);
 
 				Card card = new Card();
-				card.setIdentifier(traitType);
+				card.setIdentifier("COMMON_"+traitType);
 				card.setCivilizationType(civilizationType);
 				card.setLeaderType(Optional.of(record.get("LeaderType")));
 				card.setTraitType(traitType);

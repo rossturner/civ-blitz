@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import technology.rocketjump.civblitz.mapgen.MapSettings;
 import technology.rocketjump.civblitz.mapgen.MapSettingsGenerator;
 import technology.rocketjump.civblitz.model.Card;
-import technology.rocketjump.civblitz.model.CardCategory;
 import technology.rocketjump.civblitz.model.SourceDataRepo;
 import technology.rocketjump.civblitz.modgenerator.CompleteModGenerator;
 import technology.rocketjump.civblitz.modgenerator.ModHeaderGenerator;
@@ -16,9 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/example")
@@ -73,15 +70,12 @@ public class ExampleController {
 	public byte[] getSomething(HttpServletResponse response) throws IOException {
 		response.setContentType("application/zip");
 		response.setStatus(HttpServletResponse.SC_OK);
-		Map<CardCategory, Card> selectedCards = new HashMap<>();
-		for (Card card : List.of(
-				sourceDataRepo.getByIdentifier("TRAIT_CIVILIZATION_MAYAB"),
-				sourceDataRepo.getByIdentifier("TRAIT_LEADER_KUPES_VOYAGE"),
-				sourceDataRepo.getByIdentifier("TRAIT_CIVILIZATION_DISTRICT_SEOWON"),
-				sourceDataRepo.getByIdentifier("TRAIT_CIVILIZATION_UNIT_AZTEC_EAGLE_WARRIOR")
-		)) {
-			selectedCards.put(card.getCardCategory(), card);
-		}
+		List<Card> selectedCards = List.of(
+				sourceDataRepo.getBaseCardByTraitType("TRAIT_CIVILIZATION_MAYAB"),
+				sourceDataRepo.getBaseCardByTraitType("TRAIT_LEADER_KUPES_VOYAGE"),
+				sourceDataRepo.getBaseCardByTraitType("TRAIT_CIVILIZATION_DISTRICT_SEOWON"),
+				sourceDataRepo.getBaseCardByTraitType("TRAIT_CIVILIZATION_UNIT_AZTEC_EAGLE_WARRIOR")
+		);
 
 		ModdedCivInfo civInfo = new ModdedCivInfo(selectedCards, null);
 		String modName = modHeaderGenerator.createFor(civInfo.selectedCards).modName;

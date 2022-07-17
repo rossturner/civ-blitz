@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class DlcCsvParser {
@@ -34,7 +35,7 @@ public class DlcCsvParser {
 				String dlcName = record.get("DLC").trim();
 
 				for (CardCategory category : List.of(CardCategory.CivilizationAbility, CardCategory.UniqueInfrastructure, CardCategory.UniqueUnit)) {
-					sourceDataRepo.getByCategory(category)
+					sourceDataRepo.getByCategory(category, Optional.empty())
 							.stream().filter(card -> card.getCivilizationType().equals(civType))
 							.forEach(card -> {
 								card.setRequiredDlc(dlcName);
@@ -52,7 +53,7 @@ public class DlcCsvParser {
 				String leaderType = record.get("LeaderType").trim();
 				String dlcName = record.get("DLC").trim();
 
-				sourceDataRepo.getByCategory(CardCategory.LeaderAbility)
+				sourceDataRepo.getByCategory(CardCategory.LeaderAbility, Optional.empty())
 						.stream().filter(card -> card.getLeaderType().orElse("").equals(leaderType))
 						.forEach(card -> {
 							card.setRequiredDlc(dlcName);

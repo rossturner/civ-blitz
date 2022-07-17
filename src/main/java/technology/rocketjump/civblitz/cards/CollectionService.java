@@ -2,8 +2,8 @@ package technology.rocketjump.civblitz.cards;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import technology.rocketjump.civblitz.codegen.tables.pojos.Collection;
 import technology.rocketjump.civblitz.codegen.tables.pojos.Player;
+import technology.rocketjump.civblitz.codegen.tables.pojos.PlayerCollection;
 import technology.rocketjump.civblitz.codegen.tables.pojos.PlayerDlcSetting;
 import technology.rocketjump.civblitz.matches.MatchRepo;
 import technology.rocketjump.civblitz.model.Card;
@@ -14,6 +14,7 @@ import technology.rocketjump.civblitz.model.SourceDataRepo;
 import java.util.*;
 
 import static technology.rocketjump.civblitz.model.Card.BANNED_CARDS;
+import static technology.rocketjump.civblitz.model.CardRarity.Common;
 
 @Service
 public class CollectionService {
@@ -32,7 +33,7 @@ public class CollectionService {
 		this.matchRepo = matchRepo;
 	}
 
-	public List<Collection> initialiseCollection(Player player, int timesMulliganed) {
+	public List<PlayerCollection> initialiseCollection(Player player, int timesMulliganed) {
 		if (timesMulliganed > MAX_MULLIGANS_ALLOWED) {
 			throw new IllegalArgumentException("Can not mulligan more than 4 times");
 		}
@@ -56,7 +57,7 @@ public class CollectionService {
 
 		for (Map.Entry<CardCategory, Integer> entry : cardsToSelect.entrySet()) {
 			Set<Card> selectedForCategory = new HashSet<>();
-			List<Card> cardsInCategory = sourceDataRepo.getByCategory(entry.getKey());
+			List<Card> cardsInCategory = sourceDataRepo.getByCategory(entry.getKey(), Optional.of(Common));
 			while (selectedForCategory.size() < entry.getValue()) {
 				Card randomCard = cardsInCategory.get(random.nextInt(cardsInCategory.size()));
 				if (!BANNED_CARDS.contains(randomCard.getTraitType())) {
@@ -82,13 +83,13 @@ public class CollectionService {
 	}
 
 	public List<CollectionCard> getCollection(Player player) {
-		List<Collection> collectionList = collectionRepo.getCollection(player);
+		List<PlayerCollection> collectionList = collectionRepo.getCollection(player);
 		List<CollectionCard> result = new ArrayList<>(collectionList.size());
-		for (Collection collectionEntry : collectionList) {
-			Card card = sourceDataRepo.getByIdentifier(collectionEntry.getCardTraitType());
+		for (PlayerCollection collectionEntry : collectionList) {
+			Card card = sourceDataRepo.getByIdentifier(collectionEntry.getCardIdentifier());
 			CollectionCard collectionCard = new CollectionCard(card, collectionEntry.getQuantity());
 			if (card.getGrantsFreeUseOfCard().isPresent()) {
-				collectionCard.setFreeUseCard(sourceDataRepo.getByIdentifier(card.getGrantsFreeUseOfCard().get()));
+				collectionCard.setFreeUseCard(sourceDataRepo.getBaseCardByTraitType(card.getGrantsFreeUseOfCard().get()));
 			}
 			result.add(collectionCard);
 		}
@@ -99,7 +100,7 @@ public class CollectionService {
 		removeFromCollection(collectionCard, player);
 
 		Card selectedCard = null;
-		List<Card> cardsInCategory = sourceDataRepo.getByCategory(collectionCard.getCardCategory());
+		List<Card> cardsInCategory = sourceDataRepo.getByCategory(collectionCard.getCardCategory(), Optional.of(Common));
 		while (selectedCard == null) {
 			selectedCard = cardsInCategory.get(random.nextInt(cardsInCategory.size()));
 			if (!cardIsSupported(selectedCard, currentSettings)) {

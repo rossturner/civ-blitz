@@ -5,7 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import technology.rocketjump.civblitz.matches.MatchRepo;
-import technology.rocketjump.civblitz.model.*;
+import technology.rocketjump.civblitz.model.Card;
+import technology.rocketjump.civblitz.model.MatchSignupWithPlayer;
+import technology.rocketjump.civblitz.model.MatchWithPlayers;
+import technology.rocketjump.civblitz.model.SourceDataRepo;
 import technology.rocketjump.civblitz.modgenerator.CompleteModGenerator;
 import technology.rocketjump.civblitz.modgenerator.ModHeaderGenerator;
 import technology.rocketjump.civblitz.modgenerator.model.ModdedCivInfo;
@@ -13,9 +16,8 @@ import technology.rocketjump.civblitz.modgenerator.model.ModdedCivInfo;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/mods")
@@ -37,15 +39,13 @@ public class ModsController {
 
 	@GetMapping(produces = "application/zip")
 	@ResponseBody
-	public byte[] getMod(@RequestParam(name="traitType") List<String> traitTypes,
+	// TODO pass in identifiers rather than traitType
+	public byte[] getMod(@RequestParam(name= "cardIdentifier") List<String> cardIdentifiers,
 						 @RequestParam(name="startBias") String startBiasCivType,
 						 HttpServletResponse response) throws IOException {
 		response.setContentType("application/zip");
 		response.setStatus(HttpServletResponse.SC_OK);
-		Map<CardCategory, Card> selectedCards = new HashMap<>();
-		traitTypes.stream().map(sourceDataRepo::getByIdentifier).forEach(card -> {
-			selectedCards.put(card.getCardCategory(), card);
-		});
+		List<Card> selectedCards = cardIdentifiers.stream().map(sourceDataRepo::getByIdentifier).collect(Collectors.toList());
 
 		String modName = modHeaderGenerator.createFor(selectedCards).modName;
 		response.addHeader("Content-Disposition", "attachment; filename=\"CivBlitz_"+modName+".zip\"");
@@ -64,12 +64,7 @@ public class ModsController {
 
 		List<ModdedCivInfo> civs = new ArrayList<>();
 		for (MatchSignupWithPlayer signup : match.signups) {
-			Map<CardCategory, Card> selectedCards = new HashMap<>();
-			for (CardCategory category : CardCategory.mainCategories) {
-				Card card = sourceDataRepo.getByIdentifier(signup.getCard(category));
-				selectedCards.put(card.getCardCategory(), card);
-			}
-			civs.add(new ModdedCivInfo(selectedCards, signup.getStartBiasCivType()));
+			civs.add(new ModdedCivInfo(signup.getSelectedCards(), signup.getStartBiasCivType()));
 		}
 
 		String modName = modHeaderGenerator.createFor(match.getMatchName()).modName;

@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class SourceDataRepo {
@@ -55,7 +56,7 @@ public class SourceDataRepo {
 		for (String identifier : new ArrayList<>(cardsByIdentifier.keySet())) {
 			Card card = cardsByIdentifier.get(identifier);
 			if (card != null && card.getGrantsTraitType().isPresent()) {
-				Card removed = cardsByIdentifier.remove(card.getGrantsTraitType().get());
+				Card removed = cardsByIdentifier.remove("COMMON_"+card.getGrantsTraitType().get());
 				cardsByCategory.get(removed.getCardCategory()).remove(removed);
 			}
 		}
@@ -70,12 +71,22 @@ public class SourceDataRepo {
 		return friendlyNameByCivilizationType.get(civilizationType);
 	}
 
+	public Card getBaseCardByTraitType(String traitType) {
+		return cardsByIdentifier.get("COMMON_" + traitType);
+	}
+
 	public Card getByIdentifier(String cardIdentifier) {
 		return cardsByIdentifier.get(cardIdentifier);
 	}
 
-	public List<Card> getByCategory(CardCategory cardCategory) {
-		return cardsByCategory.get(cardCategory);
+	public List<Card> getByCategory(CardCategory cardCategory, Optional<CardRarity> optionalRarity) {
+		if (optionalRarity.isPresent()) {
+			return cardsByCategory.get(cardCategory).stream()
+					.filter(c -> c.getRarity().equals(optionalRarity.get()))
+					.collect(Collectors.toList());
+		} else {
+			return cardsByCategory.get(cardCategory);
+		}
 	}
 
 	public void addSubtypeByTraitType(String traitType, String subtype) {

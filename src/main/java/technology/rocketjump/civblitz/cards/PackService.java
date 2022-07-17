@@ -6,21 +6,22 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import technology.rocketjump.civblitz.codegen.tables.pojos.CardPack;
+import technology.rocketjump.civblitz.codegen.tables.pojos.MatchSignup;
 import technology.rocketjump.civblitz.codegen.tables.pojos.Player;
 import technology.rocketjump.civblitz.codegen.tables.pojos.PlayerDlcSetting;
-import technology.rocketjump.civblitz.model.Card;
-import technology.rocketjump.civblitz.model.CardCategory;
-import technology.rocketjump.civblitz.model.MatchSignupWithPlayer;
-import technology.rocketjump.civblitz.model.SourceDataRepo;
+import technology.rocketjump.civblitz.matches.MatchRepo;
+import technology.rocketjump.civblitz.model.*;
 import technology.rocketjump.civblitz.players.PlayerRepo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import static technology.rocketjump.civblitz.cards.CollectionService.cardIsSupported;
 import static technology.rocketjump.civblitz.model.Card.BANNED_CARDS;
 import static technology.rocketjump.civblitz.model.CardCategory.*;
+import static technology.rocketjump.civblitz.model.CardRarity.Common;
 
 @Service
 public class PackService {
@@ -30,15 +31,18 @@ public class PackService {
 	private final CollectionService collectionService;
 	private final PlayerRepo playerRepo;
 	private final DlcRepo dlcRepo;
+	private final MatchRepo matchRepo;
 	private final Random random = new Random();
 
 	@Autowired
-	public PackService(PackRepo packRepo, SourceDataRepo sourceDataRepo, CollectionService collectionService, PlayerRepo playerRepo, DlcRepo dlcRepo) {
+	public PackService(PackRepo packRepo, SourceDataRepo sourceDataRepo, CollectionService collectionService,
+					   PlayerRepo playerRepo, DlcRepo dlcRepo, MatchRepo matchRepo) {
 		this.packRepo = packRepo;
 		this.sourceDataRepo = sourceDataRepo;
 		this.collectionService = collectionService;
 		this.playerRepo = playerRepo;
 		this.dlcRepo = dlcRepo;
+		this.matchRepo = matchRepo;
 	}
 
 	public void purchasePack(Player player, CardPackType packType, String category) {
@@ -57,7 +61,7 @@ public class PackService {
 				setNumberOfCards(newPack, category, 3);
 				break;
 			case MATCH_BOOSTER:
-				for (CardCategory cardCategory : values()) {
+				for (CardCategory cardCategory : mainCategories) {
 					setNumberOfCards(newPack, cardCategory.name(), 1);
 				}
 				break;
@@ -99,12 +103,19 @@ public class PackService {
 		pack.setPlayerId(player.getPlayerId());
 		pack.setPackType(CardPackType.MATCH_BOOSTER);
 
-		pack.setNumCivAbility(player.getCivAbilityIsFree() ? 0 : 1);
-		pack.setNumLeaderAbility(player.getLeaderAbilityIsFree() ? 0 : 1);
-		pack.setNumUniqueInfrastructure(player.getUniqueInfrastructureIsFree() ? 0 : 1);
-		pack.setNumUniqueUnit(player.getUniqueUnitIsFree() ? 0 : 1);
+		pack.setNumCivAbility(countNotFree(player.getSelectedCards(), CivilizationAbility, player));
+		pack.setNumLeaderAbility(countNotFree(player.getSelectedCards(), LeaderAbility, player));
+		pack.setNumUniqueInfrastructure(countNotFree(player.getSelectedCards(), UniqueInfrastructure, player));
+		pack.setNumUniqueUnit(countNotFree(player.getSelectedCards(), UniqueUnit, player));
 
 		packRepo.create(pack);
+	}
+
+	private Integer countNotFree(List<Card> cards, CardCategory category, MatchSignup matchSignup) {
+		return (int) cards.stream()
+				.filter(c -> c.getCardCategory().equals(category))
+				.filter(c -> !matchRepo.isFreeUse(matchSignup, c))
+				.count();
 	}
 
 	public List<CardPack> getAllPacks(Player player) {
@@ -151,14 +162,16 @@ public class PackService {
 	}
 
 	private void selectCard(CardCategory cardCategory, List<Card> selectedCards, List<PlayerDlcSetting> dlcSettings) {
-		List<Card> allInCategory = sourceDataRepo.getByCategory(cardCategory);
+		List<Card> allInCategory = sourceDataRepo.getByCategory(cardCategory, Optional.empty());
+		CardRarity targetRarity = cardCategory.isUpgradable() ? CardRarity.pickRarityForPotentialUpgrade(random) : Common;
 		Card selected = null;
 		while (selected == null) {
 			selected = allInCategory.get(random.nextInt(allInCategory.size()));
-			if (selectedCards.contains(selected) || BANNED_CARDS.contains(selected.getTraitType())) {
+			if (selectedCards.contains(selected) || BANNED_CARDS.contains(selected.getTraitType()) ||
+					!selected.getRarity().equals(targetRarity)) {
 				selected = null;
 			}
-			if (!dlcSettings.isEmpty() && !cardIsSupported(selected, dlcSettings)) {
+			if (selected != null && !dlcSettings.isEmpty() && !cardIsSupported(selected, dlcSettings)) {
 				selected = null;
 			}
 		}
