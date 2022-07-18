@@ -1,6 +1,7 @@
 import {Button, Card, Container, Header, Segment, Select} from "semantic-ui-react";
 import React, {useState} from "react";
 import CivCard from "./cards/CivCard";
+import {MAIN_CATEGORIES} from "./cards/CardStore";
 
 const ConstructedCiv = ({index, cards, editable, onCardClick, onConfirmClick, alwaysEditing}) => {
 
@@ -34,6 +35,8 @@ const ConstructedCiv = ({index, cards, editable, onCardClick, onConfirmClick, al
         });
     }
 
+    const hasSelectedNecessaryCards = MAIN_CATEGORIES.every(requiredCategory => cards.find(card => card.cardCategory === requiredCategory));
+
     return (
         <Segment>
             <Header as='h3'>Civ {index}</Header>
@@ -55,12 +58,12 @@ const ConstructedCiv = ({index, cards, editable, onCardClick, onConfirmClick, al
                 }
 
                 {editable && !alwaysEditing &&
-                <Button primary disabled={cards.length < 4} onClick={() => onConfirmClick()}>
+                <Button primary disabled={!hasSelectedNecessaryCards} onClick={() => onConfirmClick()}>
                     Confirm
                 </Button>
                 }
 
-                {(!editable || (alwaysEditing && cards.length === 4)) &&
+                {(!editable || (alwaysEditing && hasSelectedNecessaryCards)) &&
                 <Button as='a' href={downloadLink} disabled={!selectedBias}>
                     Download mod
                 </Button>

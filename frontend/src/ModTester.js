@@ -16,8 +16,6 @@ const ModTester = () => {
     useEffect(() => {
         const allCards = CardStore.getAll();
         let cardsClone = [].concat(allCards);
-        // TODO remove this
-        cardsClone = cardsClone.filter(card => MAIN_CATEGORIES.includes(card.cardCategory));
         cardsClone.sort(ImpRandom.cardSort);
         setCollection(cardsClone);
     }, []);
@@ -26,21 +24,31 @@ const ModTester = () => {
         if (!editingCiv) {
             return;
         }
-        const toReplaceInCiv = editingCiv.cards.filter(selected => selected.cardCategory === card.cardCategory);
+        const maxOneOfCategory = MAIN_CATEGORIES.includes(card.cardCategory);
 
-        let editedCards = editingCiv.cards.filter(selected => selected.cardCategory !== card.cardCategory);
-        editedCards.push(card);
-        editedCards.sort(ImpRandom.cardSort);
-
+        let editedCards = editingCiv.cards;
         let updatedCollection = [].concat(collection).filter(c => c !== card);
-        updatedCollection = updatedCollection.concat(toReplaceInCiv);
+
+        if (maxOneOfCategory) {
+            const toReplaceInCiv = editingCiv.cards.filter(selected => selected.cardCategory === card.cardCategory);
+
+            editedCards = editingCiv.cards.filter(selected => selected.cardCategory !== card.cardCategory);
+            editedCards.push(card);
+            editedCards.sort(ImpRandom.cardSort);
+
+            updatedCollection = updatedCollection.concat(toReplaceInCiv);
+        } else {
+            editedCards.push(card);
+            editedCards.sort(ImpRandom.cardSort);
+        }
+
         updatedCollection.sort(ImpRandom.cardSort);
+        setCollection(updatedCollection);
 
         setEditingCiv({
             cards: editedCards,
             editable: true
         });
-        setCollection(updatedCollection);
     };
     const civCardClicked = (card) => {
 

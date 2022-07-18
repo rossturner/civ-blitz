@@ -21,6 +21,10 @@ const CardInfo = {
                 return 'Unique Unit';
             case 'UniqueInfrastructure':
                 return 'Unique Infrastructure';
+            case 'Power':
+                return 'Power';
+            case 'ActOfGod':
+                return 'Act of God';
             default:
                 return 'Unknown';
         }

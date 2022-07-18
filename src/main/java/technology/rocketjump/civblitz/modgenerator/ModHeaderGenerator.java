@@ -10,6 +10,7 @@ import technology.rocketjump.civblitz.modgenerator.model.ModHeader;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static technology.rocketjump.civblitz.model.CardCategory.*;
 
@@ -42,6 +43,7 @@ public class ModHeaderGenerator {
 
 	public static String buildName(List<Card> selectedCards) {
 		StringBuilder nameBuilder = new StringBuilder();
+		selectedCards = selectedCards.stream().filter(c -> mainCategories.contains(c.getCardCategory())).collect(Collectors.toList());
 		selectedCards.sort(Comparator.comparing(Card::getCardCategory));
 		for (Card card : selectedCards) {
 			if (!card.getRarity().equals(CardRarity.Common)) {

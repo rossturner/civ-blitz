@@ -11,9 +11,16 @@ const CivCardGroup = ({cards, cardClicked}) => {
         'All': '',
         'Civilization Ability': 'CivilizationAbility',
         'Leader Ability': 'LeaderAbility',
-        'Unique Infrastructure': 'UniqueInfrastructure',
-        'Unique Unit': 'UniqueUnit'
     };
+    if (cards.find(card => card.cardCategory === 'Power')) {
+        filters['Power'] = 'Power';
+    }
+    filters['Unique Infrastructure'] = 'UniqueInfrastructure';
+    filters['Unique Unit'] = 'UniqueUnit';
+    if (cards.find(card => card.cardCategory === 'ActOfGod')) {
+        filters['Act of God'] = 'ActOfGod';
+    }
+
     const checkboxes = [];
     for (const [displayText, value] of Object.entries(filters)) {
         checkboxes.push(
