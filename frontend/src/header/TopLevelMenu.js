@@ -70,6 +70,11 @@ const TopLevelMenu = ({loggedInPlayer}) => {
                 </Link>
             </Menu.Item>
             }
+            <Menu.Item header>
+                <Link to='/knownbugs'>
+                    Known Bugs
+                </Link>
+            </Menu.Item>
         </Menu>
     );
 };
