@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import ImpRandom from "./ImpRandom";
-import CardStore from "./cards/CardStore";
+import CardStore, {MAIN_CATEGORIES} from "./cards/CardStore";
 import ConstructedCiv from "./ConstructedCiv";
 import {Container, Header} from "semantic-ui-react";
 import CivCardGroup from "./cards/CivCardGroup";
@@ -16,6 +16,8 @@ const ModTester = () => {
     useEffect(() => {
         const allCards = CardStore.getAll();
         let cardsClone = [].concat(allCards);
+        // TODO remove this
+        cardsClone = cardsClone.filter(card => MAIN_CATEGORIES.includes(card.cardCategory));
         cardsClone.sort(ImpRandom.cardSort);
         setCollection(cardsClone);
     }, []);
