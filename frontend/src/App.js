@@ -17,6 +17,7 @@ import PackShopPage from "./cards/PackShopPage";
 import DlcSettingsPage from "./player/DlcSettingsPage";
 import PlayerLeaderboard from "./player/PlayerLeaderboard";
 import KnownBugs from "./KnownBugs";
+import DraftMatchPage from "./draft_matches/DraftMatchPage";
 
 const App = ({history}) => {
 
@@ -104,6 +105,9 @@ const App = ({history}) => {
                 </Route>
                 <Route path="/knownbugs">
                     <KnownBugs />
+                </Route>
+                <Route exact path="/draft">
+                    <DraftMatchPage loggedInPlayer={loggedInPlayer} />
                 </Route>
             </Switch>
 

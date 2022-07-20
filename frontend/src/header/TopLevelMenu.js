@@ -55,6 +55,12 @@ const TopLevelMenu = ({loggedInPlayer}) => {
                 </Link>
             </Menu.Item>
 
+            <Menu.Item header>
+                <Link to='/draft'>
+                    Draft Mode
+                </Link>
+            </Menu.Item>
+
             {loggedInPlayer &&
             <Menu.Item header>
                 <Link to='/dlc-settings'>
